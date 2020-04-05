@@ -1,0 +1,217 @@
+package org.neo4j.hop.entries.cypherscript;
+
+import org.apache.hop.core.Const;
+import org.apache.hop.core.util.Utils;
+import org.apache.hop.i18n.BaseMessages;
+import org.apache.hop.job.JobMeta;
+import org.apache.hop.job.entry.IJobEntry;
+import org.apache.hop.job.entry.IJobEntryDialog;
+import org.apache.hop.ui.core.dialog.ErrorDialog;
+import org.apache.hop.ui.core.gui.GUIResource;
+import org.apache.hop.ui.core.gui.WindowProperty;
+import org.apache.hop.ui.core.widget.MetaSelectionLine;
+import org.apache.hop.ui.core.widget.TextVar;
+import org.apache.hop.ui.job.dialog.JobDialog;
+import org.apache.hop.ui.job.entry.JobEntryDialog;
+import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.neo4j.hop.shared.NeoConnection;
+
+public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialog {
+
+  public static final String CHECK_CONNECTIONS_DIALOG = "Neo4jCheckConnectionsDialog";
+  private static Class<?> PKG = CypherScriptDialog.class; // for i18n purposes, needed by Translator2!!
+
+  private Shell shell;
+
+  private CypherScript jobEntry;
+
+  private boolean changed;
+
+  private Text wName;
+  private MetaSelectionLine<NeoConnection> wConnection;
+  private TextVar wScript;
+  private Button wReplaceVariables;
+
+  private Button wOK, wCancel;
+
+  public CypherScriptDialog( Shell parent, IJobEntry jobEntry, JobMeta jobMeta ) {
+    super( parent, jobEntry, jobMeta );
+    this.jobEntry = (CypherScript) jobEntry;
+
+    if ( this.jobEntry.getName() == null ) {
+      this.jobEntry.setName( "Neo4j Cypher Script" );
+    }
+  }
+
+  @Override public IJobEntry open() {
+
+    Shell parent = getParent();
+    Display display = parent.getDisplay();
+
+    shell = new Shell( parent, props.getJobsDialogStyle() );
+    props.setLook( shell );
+    JobDialog.setShellImage( shell, jobEntry );
+
+    ModifyListener lsMod = new ModifyListener() {
+      public void modifyText( ModifyEvent e ) {
+        jobEntry.setChanged();
+      }
+    };
+    changed = jobEntry.hasChanged();
+
+    FormLayout formLayout = new FormLayout();
+    formLayout.marginWidth = Const.FORM_MARGIN;
+    formLayout.marginHeight = Const.FORM_MARGIN;
+
+    shell.setLayout( formLayout );
+    shell.setText( "Neo4j Cypher Script" );
+
+    int middle = props.getMiddlePct();
+    int margin = Const.MARGIN;
+
+    Label wlName = new Label( shell, SWT.RIGHT );
+    wlName.setText( "Job entry name" );
+    props.setLook( wlName );
+    FormData fdlName = new FormData();
+    fdlName.left = new FormAttachment( 0, 0 );
+    fdlName.right = new FormAttachment( middle, -margin );
+    fdlName.top = new FormAttachment( 0, margin );
+    wlName.setLayoutData( fdlName );
+    wName = new Text( shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    props.setLook( wName );
+    wName.addModifyListener( lsMod );
+    FormData fdName = new FormData();
+    fdName.left = new FormAttachment( middle, 0 );
+    fdName.top = new FormAttachment( 0, margin );
+    fdName.right = new FormAttachment( 100, 0 );
+    wName.setLayoutData( fdName );
+    Control lastControl = wName;
+
+    wConnection = new MetaSelectionLine<>( jobMeta, metaStore, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use");
+    props.setLook( wConnection );
+    wConnection.addModifyListener( lsMod );
+    FormData fdConnection = new FormData();
+    fdConnection.left = new FormAttachment( 0, 0 );
+    fdConnection.right = new FormAttachment( 100, 0 );
+    fdConnection.top = new FormAttachment( lastControl, margin );
+    wConnection.setLayoutData( fdConnection );
+    try {
+      wConnection.fillItems();
+    } catch(Exception e) {
+      new ErrorDialog( shell, "Error", "Error getting list of connections", e );
+    }
+
+    // Add buttons first, then the script field can use dynamic sizing
+    //
+    wOK = new Button( shell, SWT.PUSH );
+    wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
+    wOK.addListener( SWT.Selection, e -> ok() );
+    wCancel = new Button( shell, SWT.PUSH );
+    wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
+    wCancel.addListener( SWT.Selection, e -> cancel() );
+
+    Label wlReplaceVariables = new Label( shell, SWT.LEFT );
+    wlReplaceVariables.setText( "Replace variables in script?" );
+    props.setLook( wlReplaceVariables );
+    FormData fdlReplaceVariables = new FormData();
+    fdlReplaceVariables.left = new FormAttachment( 0, 0 );
+    fdlReplaceVariables.right = new FormAttachment( middle, -margin );
+    fdlReplaceVariables.bottom = new FormAttachment( wOK, -margin * 2 );
+    wlReplaceVariables.setLayoutData( fdlReplaceVariables );
+    wReplaceVariables = new Button( shell, SWT.CHECK | SWT.BORDER );
+    props.setLook( wReplaceVariables );
+    FormData fdReplaceVariables = new FormData();
+    fdReplaceVariables.left = new FormAttachment( middle, 0 );
+    fdReplaceVariables.right = new FormAttachment( 100, 0 );
+    fdReplaceVariables.top = new FormAttachment( wlReplaceVariables, 0, SWT.CENTER );
+    wReplaceVariables.setLayoutData( fdReplaceVariables );
+
+    Label wlScript = new Label( shell, SWT.LEFT );
+    wlScript.setText( "Cypher Script. Separate commands with ; on a new line." );
+    props.setLook( wlScript );
+    FormData fdlCypher = new FormData();
+    fdlCypher.left = new FormAttachment( 0, 0 );
+    fdlCypher.right = new FormAttachment( 100, 0 );
+    fdlCypher.top = new FormAttachment( wConnection, margin );
+    wlScript.setLayoutData( fdlCypher );
+    wScript = new TextVar( jobMeta, shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
+    wScript.getTextWidget().setFont( GUIResource.getInstance().getFontFixed() );
+    props.setLook( wScript );
+    wScript.addModifyListener( lsMod );
+    FormData fdCypher = new FormData();
+    fdCypher.left = new FormAttachment( 0, 0 );
+    fdCypher.right = new FormAttachment( 100, 0 );
+    fdCypher.top = new FormAttachment( wlScript, margin );
+    fdCypher.bottom = new FormAttachment( wReplaceVariables, -margin * 2 );
+    wScript.setLayoutData( fdCypher );
+
+    // Put these buttons at the bottom
+    //
+    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel, }, margin, null );
+
+    // Detect X or ALT-F4 or something that kills this window...
+    //
+    shell.addListener( SWT.Close, e -> cancel() );
+    wName.addListener( SWT.DefaultSelection, e -> ok() );
+
+    getData();
+
+    BaseTransformDialog.setSize( shell );
+
+    shell.open();
+    while ( !shell.isDisposed() ) {
+      if ( !display.readAndDispatch() ) {
+        display.sleep();
+      }
+    }
+
+    return jobEntry;
+  }
+
+  private void cancel() {
+    jobEntry.setChanged( changed );
+    jobEntry = null;
+    dispose();
+  }
+
+  private void getData() {
+    wName.setText( Const.NVL( jobEntry.getName(), "" ) );
+    wConnection.setText( Const.NVL( jobEntry.getConnectionName(), "" ) );
+    wScript.setText( Const.NVL( jobEntry.getScript(), "" ) );
+    wReplaceVariables.setSelection( jobEntry.isReplacingVariables() );
+  }
+
+  private void ok() {
+    if ( Utils.isEmpty( wName.getText() ) ) {
+      MessageBox mb = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
+      mb.setText( "Warning" );
+      mb.setMessage( "The name of the job entry is missing!" );
+      mb.open();
+      return;
+    }
+    jobEntry.setName( wName.getText() );
+    jobEntry.setConnectionName( wConnection.getText() );
+    jobEntry.setScript( wScript.getText() );
+    jobEntry.setReplacingVariables( wReplaceVariables.getSelection() );
+
+    dispose();
+  }
+
+  public void dispose() {
+    props.setScreen( new WindowProperty( shell ) );
+    shell.dispose();
+  }
+}

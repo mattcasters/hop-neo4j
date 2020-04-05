@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<overlay id="label-test" title="Flow Test"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+         xmlns:HTML="http://www.w3.org/Profiles/XHTML-transitional" height="600" width="800" onload="modeler.init()"
+         xmlns:pen="http://www.pentaho.org/2008/xul" >
+
+
+  <!--
+  Add an entry to the spoon menu bar
+-->
+  <menubar id="spoon-menubar">
+
+    <menu id="neo4j" label="Neo4j" accesskey="alt-4">
+      <menupopup id="neo4j-popup">
+        <menuitem id="neo4-create-connection" label="Create connection" command="neo4jHelper.createConnection()"/>
+        <menuitem id="neo4-edit-connection" label="Edit connection" command="neo4jHelper.editConnection()"/>
+        <menuitem id="neo4-delete-connection" label="Delete connection" command="neo4jHelper.deleteConnection()"/>
+        <menuseparator id="neo4j-popup-sep1"/>
+        <menuitem id="neo4-create-model" label="Create data model" command="neo4jHelper.createModel()"/>
+        <menuitem id="neo4-edit-model" label="Edit data model" command="neo4jHelper.editModel()"/>
+        <menuitem id="neo4-delete-model" label="Delete data model" command="neo4jHelper.deleteModel()"/>
+        <menuseparator id="neo4j-popup-sep2"/>
+        <menuitem id="neo4-show-metastore" label="Show Metastore Browser" command="neo4jHelper.showMetaStoreBrowser()"/>
+        <menuseparator id="neo4j-popup-sep3"/>
+
+      </menupopup>
+    </menu>
+
+  </menubar>
+
+  <menupopup id="view-perspectives-popup">
+    <menuitem label="Neo4j" acceltext="CTRL-4" accesskey="ctrl-4"
+              command="spoon.loadPerspective('021-git')" />
+  </menupopup>
+
+</overlay>
