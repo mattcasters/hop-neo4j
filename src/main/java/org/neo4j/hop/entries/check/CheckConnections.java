@@ -1,27 +1,24 @@
 package org.neo4j.hop.entries.check;
 
-import org.apache.hop.job.entry.IJobEntry;
+import org.apache.hop.core.Result;
+import org.apache.hop.core.annotations.Action;
+import org.apache.hop.core.exception.HopException;
+import org.apache.hop.core.exception.HopXmlException;
+import org.apache.hop.core.xml.XmlHandler;
+import org.apache.hop.metastore.api.IMetaStore;
 import org.apache.hop.metastore.persist.MetaStoreFactory;
-import org.neo4j.hop.shared.MetaStoreUtil;
+import org.apache.hop.workflow.action.ActionBase;
+import org.apache.hop.workflow.action.IAction;
 import org.neo4j.driver.Session;
 import org.neo4j.hop.core.Neo4jDefaults;
-import org.neo4j.hop.shared.DriverSingleton;
+import org.neo4j.hop.shared.MetaStoreUtil;
 import org.neo4j.hop.shared.NeoConnection;
-import org.apache.hop.cluster.SlaveServer;
-import org.apache.hop.core.Result;
-import org.apache.hop.core.annotations.JobEntry;
-import org.apache.hop.core.database.DatabaseMeta;
-import org.apache.hop.core.exception.HopException;
-import org.apache.hop.core.exception.HopXMLException;
-import org.apache.hop.core.xml.XMLHandler;
-import org.apache.hop.job.entry.JobEntryBase;
-import org.apache.hop.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@JobEntry(
+@Action(
   id = "NEO4J_CHECK_CONNECTIONS",
   name = "Check Neo4j Connections",
   description = "Check to see if we can connecto to the listed Neo4j databases",
@@ -29,7 +26,7 @@ import java.util.List;
   categoryDescription = "i18n:org.apache.hop.job:JobCategory.Category.Conditions",
   documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/"
 )
-public class CheckConnections extends JobEntryBase implements IJobEntry {
+public class CheckConnections extends ActionBase implements IAction {
 
   private List<String> connectionNames;
 
@@ -46,31 +43,31 @@ public class CheckConnections extends JobEntryBase implements IJobEntry {
     connectionNames = new ArrayList<>();
   }
 
-  @Override public String getXML() {
+  @Override public String getXml() {
     StringBuilder xml = new StringBuilder();
     // Add entry name, type, ...
     //
-    xml.append( super.getXML() );
+    xml.append( super.getXml() );
 
-    xml.append( XMLHandler.openTag( "connections" ) );
+    xml.append( XmlHandler.openTag( "connections" ) );
 
     for ( String connectionName : connectionNames ) {
-      xml.append( XMLHandler.addTagValue( "connection", connectionName ) );
+      xml.append( XmlHandler.addTagValue( "connection", connectionName ) );
     }
 
-    xml.append( XMLHandler.closeTag( "connections" ) );
+    xml.append( XmlHandler.closeTag( "connections" ) );
     return xml.toString();
   }
 
-  @Override public void loadXML( Node node, IMetaStore metaStore ) throws HopXMLException {
+  @Override public void loadXml( Node node, IMetaStore metaStore ) throws HopXmlException {
 
-    super.loadXML( node );
+    super.loadXml( node );
 
     connectionNames = new ArrayList<>();
-    Node connectionsNode = XMLHandler.getSubNode( node, "connections" );
-    List<Node> connectionNodes = XMLHandler.getNodes( connectionsNode, "connection" );
+    Node connectionsNode = XmlHandler.getSubNode( node, "connections" );
+    List<Node> connectionNodes = XmlHandler.getNodes( connectionsNode, "connection" );
     for ( Node connectionNode : connectionNodes ) {
-      String connectionName = XMLHandler.getNodeValue( connectionNode );
+      String connectionName = XmlHandler.getNodeValue( connectionNode );
       connectionNames.add( connectionName );
     }
   }
@@ -78,11 +75,6 @@ public class CheckConnections extends JobEntryBase implements IJobEntry {
 
   @Override public Result execute( Result result, int nr ) throws HopException {
 
-    try {
-      metaStore = MetaStoreUtil.findMetaStore( this );
-    } catch ( Exception e ) {
-      throw new HopException( "Error finding metastore", e );
-    }
     MetaStoreFactory<NeoConnection> connectionFactory = new MetaStoreFactory<>( NeoConnection.class, metaStore, Neo4jDefaults.NAMESPACE );
 
     // Replace variables & parameters

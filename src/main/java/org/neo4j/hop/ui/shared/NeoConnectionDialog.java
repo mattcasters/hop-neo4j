@@ -90,7 +90,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
   private TextVar wMaxTransactionRetryTime;
 
   private TableView wUrls;
-  private Button wOK;
+  private Button wOk;
 
   public NeoConnectionDialog( Shell parent, IMetaStore metaStore, NeoConnection neoConnection ) {
     this(parent, metaStore, neoConnection, neoConnection);
@@ -120,9 +120,9 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     shell.setLayout( formLayout );
 
     // Buttons
-    wOK = new Button( shell, SWT.PUSH );
-    wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
-    wOK.addListener( SWT.Selection, e -> ok() );
+    wOk = new Button( shell, SWT.PUSH );
+    wOk.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
+    wOk.addListener( SWT.Selection, e -> ok() );
 
     Button wTest = new Button( shell, SWT.PUSH );
     wTest.setText( BaseMessages.getString( PKG, "System.Button.Test" ) );
@@ -132,7 +132,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
     wCancel.addListener( SWT.Selection, e -> cancel() );
 
-    Button[] buttons = new Button[] { wOK, wTest, wCancel };
+    Button[] buttons = new Button[] { wOk, wTest, wCancel };
     BaseTransformDialog.positionBottomButtons( shell, buttons, margin, lastControl );
 
     // Add the form widgets...
@@ -561,7 +561,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     fdgUrls.left = new FormAttachment( 0, 0 );
     fdgUrls.right = new FormAttachment( 100, 0 );
     fdgUrls.top = new FormAttachment( lastControl, margin * 2 );
-    fdgUrls.bottom = new FormAttachment( wOK, -margin * 2 );
+    fdgUrls.bottom = new FormAttachment( wOk, -margin * 2 );
     gUrls.setLayoutData( fdgUrls );
     lastControl = gUrls;
   }

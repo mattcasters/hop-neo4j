@@ -1,36 +1,31 @@
 package org.neo4j.hop.entries.cypherscript;
 
-import org.apache.hop.metastore.persist.MetaStoreFactory;
-import org.neo4j.hop.shared.MetaStoreUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Result;
+import org.apache.hop.core.annotations.Action;
+import org.apache.hop.core.exception.HopException;
+import org.apache.hop.core.exception.HopXmlException;
+import org.apache.hop.core.xml.XmlHandler;
+import org.apache.hop.metastore.api.IMetaStore;
+import org.apache.hop.metastore.persist.MetaStoreFactory;
+import org.apache.hop.workflow.action.ActionBase;
+import org.apache.hop.workflow.action.IAction;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
 import org.neo4j.hop.core.Neo4jDefaults;
-import org.neo4j.hop.shared.DriverSingleton;
+import org.neo4j.hop.shared.MetaStoreUtil;
 import org.neo4j.hop.shared.NeoConnection;
-import org.apache.hop.cluster.SlaveServer;
-import org.apache.hop.core.Result;
-import org.apache.hop.core.annotations.JobEntry;
-import org.apache.hop.core.database.DatabaseMeta;
-import org.apache.hop.core.exception.HopException;
-import org.apache.hop.core.exception.HopXMLException;
-import org.apache.hop.core.xml.XMLHandler;
-import org.apache.hop.job.entry.JobEntryBase;
-import org.apache.hop.job.entry.IJobEntry;
-import org.apache.hop.metastore.api.IMetaStore;
 import org.w3c.dom.Node;
 
-import java.util.List;
-
-@JobEntry(
-  id="NEO4J_CYPHER_SCRIPT",
-  name="Neo4j Cypher Script",
+@Action(
+  id = "NEO4J_CYPHER_SCRIPT",
+  name = "Neo4j Cypher Script",
   description = "Execute a Neo4j Cypher script",
-  image="neo4j_cypher.svg",
+  image = "neo4j_cypher.svg",
   categoryDescription = "i18n:org.apache.hop.job:JobCategory.Category.Scripting",
   documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/"
 )
-public class CypherScript extends JobEntryBase implements IJobEntry {
+public class CypherScript extends ActionBase implements IAction {
 
   private String connectionName;
 
@@ -39,10 +34,10 @@ public class CypherScript extends JobEntryBase implements IJobEntry {
   private boolean replacingVariables;
 
   public CypherScript() {
-    this("", "");
+    this( "", "" );
   }
 
-  public CypherScript( String name) {
+  public CypherScript( String name ) {
     this( name, "" );
   }
 
@@ -50,35 +45,30 @@ public class CypherScript extends JobEntryBase implements IJobEntry {
     super( name, description );
   }
 
-  @Override public String getXML() {
+  @Override public String getXml() {
     StringBuilder xml = new StringBuilder();
     // Add entry name, type, ...
     //
-    xml.append( super.getXML() );
+    xml.append( super.getXml() );
 
-    xml.append( XMLHandler.addTagValue( "connection", connectionName ) );
-    xml.append( XMLHandler.addTagValue( "script", script) );
-    xml.append( XMLHandler.addTagValue( "replace_variables", replacingVariables ? "Y" : "N") );
+    xml.append( XmlHandler.addTagValue( "connection", connectionName ) );
+    xml.append( XmlHandler.addTagValue( "script", script ) );
+    xml.append( XmlHandler.addTagValue( "replace_variables", replacingVariables ? "Y" : "N" ) );
 
     return xml.toString();
   }
 
-  @Override public void loadXML( Node node, IMetaStore metaStore ) throws HopXMLException {
+  @Override public void loadXml( Node node, IMetaStore metaStore ) throws HopXmlException {
 
-    super.loadXML( node );
+    super.loadXml( node );
 
-    connectionName = XMLHandler.getTagValue( node, "connection" );
-    script = XMLHandler.getTagValue( node, "script" );
-    replacingVariables =  "Y".equalsIgnoreCase( XMLHandler.getTagValue( node, "replace_variables" ) );
+    connectionName = XmlHandler.getTagValue( node, "connection" );
+    script = XmlHandler.getTagValue( node, "script" );
+    replacingVariables = "Y".equalsIgnoreCase( XmlHandler.getTagValue( node, "replace_variables" ) );
   }
 
   @Override public Result execute( Result result, int nr ) throws HopException {
 
-    try {
-      metaStore = MetaStoreUtil.findMetaStore( this );
-    } catch(Exception e) {
-      throw new HopException( "Error finding metastore", e );
-    }
     MetaStoreFactory<NeoConnection> connectionFactory = new MetaStoreFactory<>( NeoConnection.class, metaStore, Neo4jDefaults.NAMESPACE );
 
     // Replace variables & parameters
@@ -86,22 +76,22 @@ public class CypherScript extends JobEntryBase implements IJobEntry {
     NeoConnection connection;
     String realConnectionName = environmentSubstitute( connectionName );
     try {
-      if (StringUtils.isEmpty( realConnectionName )) {
+      if ( StringUtils.isEmpty( realConnectionName ) ) {
         throw new HopException( "The Neo4j connection name is not set" );
       }
 
       connection = connectionFactory.loadElement( realConnectionName );
-      if (connection==null) {
-        throw new HopException( "Unable to find connection with name '"+realConnectionName+"'" );
+      if ( connection == null ) {
+        throw new HopException( "Unable to find connection with name '" + realConnectionName + "'" );
       }
-    } catch(Exception e) {
+    } catch ( Exception e ) {
       result.setResult( false );
       result.increaseErrors( 1L );
-      throw new HopException( "Unable to gencsv or find connection with name '"+realConnectionName+"'", e);
+      throw new HopException( "Unable to gencsv or find connection with name '" + realConnectionName + "'", e );
     }
 
     String realScript;
-    if (replacingVariables) {
+    if ( replacingVariables ) {
       realScript = environmentSubstitute( script );
     } else {
       realScript = script;
@@ -118,7 +108,7 @@ public class CypherScript extends JobEntryBase implements IJobEntry {
 
       // Connect to the database
       //
-      session = connection.getSession(log);
+      session = connection.getSession( log );
       transaction = session.beginTransaction();
 
       // Split the script into parts : semi-colon at the start of a separate line
@@ -136,37 +126,37 @@ public class CypherScript extends JobEntryBase implements IJobEntry {
         if ( StringUtils.isNotEmpty( cypher ) ) {
           transaction.run( cypher );
           nrExecuted++;
-          log.logDetailed("Executed cypher statement: "+cypher);
+          log.logDetailed( "Executed cypher statement: " + cypher );
         }
       }
 
       // Commit
       //
       transaction.commit();
-    } catch(Exception e) {
+    } catch ( Exception e ) {
       // Error connecting or executing
       // Roll back
-      if (transaction!=null) {
+      if ( transaction != null ) {
         transaction.rollback();
       }
       result.increaseErrors( 1L );
       result.setResult( false );
-      log.logError("Error executing statements:", e);
+      log.logError( "Error executing statements:", e );
     } finally {
       // Clean up transaction, session and driver
       //
-      if (transaction!=null) {
+      if ( transaction != null ) {
         transaction.close();
       }
-      if (session!=null) {
+      if ( session != null ) {
         session.close();
       }
     }
 
-    if (result.getNrErrors()==0) {
-      logBasic("Neo4j script executed "+nrExecuted+" statements without error");
+    if ( result.getNrErrors() == 0 ) {
+      logBasic( "Neo4j script executed " + nrExecuted + " statements without error" );
     } else {
-      logBasic("Neo4j script executed with error(s)");
+      logBasic( "Neo4j script executed with error(s)" );
     }
 
     return result;

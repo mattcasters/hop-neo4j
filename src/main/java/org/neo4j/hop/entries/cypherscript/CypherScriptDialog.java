@@ -3,17 +3,17 @@ package org.neo4j.hop.entries.cypherscript;
 import org.apache.hop.core.Const;
 import org.apache.hop.core.util.Utils;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.job.JobMeta;
-import org.apache.hop.job.entry.IJobEntry;
-import org.apache.hop.job.entry.IJobEntryDialog;
 import org.apache.hop.ui.core.dialog.ErrorDialog;
 import org.apache.hop.ui.core.gui.GUIResource;
 import org.apache.hop.ui.core.gui.WindowProperty;
 import org.apache.hop.ui.core.widget.MetaSelectionLine;
 import org.apache.hop.ui.core.widget.TextVar;
-import org.apache.hop.ui.job.dialog.JobDialog;
-import org.apache.hop.ui.job.entry.JobEntryDialog;
 import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
+import org.apache.hop.ui.workflow.action.ActionDialog;
+import org.apache.hop.ui.workflow.dialog.WorkflowDialog;
+import org.apache.hop.workflow.WorkflowMeta;
+import org.apache.hop.workflow.action.IAction;
+import org.apache.hop.workflow.action.IActionDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.neo4j.hop.shared.NeoConnection;
 
-public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialog {
+public class CypherScriptDialog extends ActionDialog implements IActionDialog {
 
   public static final String CHECK_CONNECTIONS_DIALOG = "Neo4jCheckConnectionsDialog";
   private static Class<?> PKG = CypherScriptDialog.class; // for i18n purposes, needed by Translator2!!
@@ -45,9 +45,9 @@ public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialo
   private TextVar wScript;
   private Button wReplaceVariables;
 
-  private Button wOK, wCancel;
+  private Button wOk, wCancel;
 
-  public CypherScriptDialog( Shell parent, IJobEntry jobEntry, JobMeta jobMeta ) {
+  public CypherScriptDialog( Shell parent, IAction jobEntry, WorkflowMeta jobMeta ) {
     super( parent, jobEntry, jobMeta );
     this.jobEntry = (CypherScript) jobEntry;
 
@@ -56,14 +56,14 @@ public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialo
     }
   }
 
-  @Override public IJobEntry open() {
+  @Override public IAction open() {
 
     Shell parent = getParent();
     Display display = parent.getDisplay();
 
-    shell = new Shell( parent, props.getJobsDialogStyle() );
+    shell = new Shell( parent, props.getWorkflowsDialogStyle() );
     props.setLook( shell );
-    JobDialog.setShellImage( shell, jobEntry );
+    WorkflowDialog.setShellImage( shell, jobEntry );
 
     ModifyListener lsMod = new ModifyListener() {
       public void modifyText( ModifyEvent e ) {
@@ -100,7 +100,7 @@ public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialo
     wName.setLayoutData( fdName );
     Control lastControl = wName;
 
-    wConnection = new MetaSelectionLine<>( jobMeta, metaStore, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use");
+    wConnection = new MetaSelectionLine<>( workflowMeta, metaStore, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -110,15 +110,15 @@ public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialo
     wConnection.setLayoutData( fdConnection );
     try {
       wConnection.fillItems();
-    } catch(Exception e) {
+    } catch ( Exception e ) {
       new ErrorDialog( shell, "Error", "Error getting list of connections", e );
     }
 
     // Add buttons first, then the script field can use dynamic sizing
     //
-    wOK = new Button( shell, SWT.PUSH );
-    wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
-    wOK.addListener( SWT.Selection, e -> ok() );
+    wOk = new Button( shell, SWT.PUSH );
+    wOk.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
+    wOk.addListener( SWT.Selection, e -> ok() );
     wCancel = new Button( shell, SWT.PUSH );
     wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
     wCancel.addListener( SWT.Selection, e -> cancel() );
@@ -129,7 +129,7 @@ public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialo
     FormData fdlReplaceVariables = new FormData();
     fdlReplaceVariables.left = new FormAttachment( 0, 0 );
     fdlReplaceVariables.right = new FormAttachment( middle, -margin );
-    fdlReplaceVariables.bottom = new FormAttachment( wOK, -margin * 2 );
+    fdlReplaceVariables.bottom = new FormAttachment( wOk, -margin * 2 );
     wlReplaceVariables.setLayoutData( fdlReplaceVariables );
     wReplaceVariables = new Button( shell, SWT.CHECK | SWT.BORDER );
     props.setLook( wReplaceVariables );
@@ -147,7 +147,7 @@ public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialo
     fdlCypher.right = new FormAttachment( 100, 0 );
     fdlCypher.top = new FormAttachment( wConnection, margin );
     wlScript.setLayoutData( fdlCypher );
-    wScript = new TextVar( jobMeta, shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
+    wScript = new TextVar( workflowMeta, shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
     wScript.getTextWidget().setFont( GUIResource.getInstance().getFontFixed() );
     props.setLook( wScript );
     wScript.addModifyListener( lsMod );
@@ -160,7 +160,7 @@ public class CypherScriptDialog extends JobEntryDialog implements IJobEntryDialo
 
     // Put these buttons at the bottom
     //
-    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel, }, margin, null );
+    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOk, wCancel, }, margin, null );
 
     // Detect X or ALT-F4 or something that kills this window...
     //

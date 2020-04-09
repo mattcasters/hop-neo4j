@@ -170,14 +170,14 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     shell.setLayout( formLayout );
     shell.setText( "Graph Model Editor" );
 
-    Button wOK = new Button( shell, SWT.PUSH );
-    wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
-    wOK.addListener( SWT.Selection, event -> ok() );
+    Button wOk = new Button( shell, SWT.PUSH );
+    wOk.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
+    wOk.addListener( SWT.Selection, event -> ok() );
     Button wCancel = new Button( shell, SWT.PUSH );
     wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
     wCancel.addListener( SWT.Selection, event -> cancel() );
 
-    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel }, margin, null );
+    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOk, wCancel }, margin, null );
 
     // Add a tab folder
     //
@@ -186,7 +186,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     fdTabs.left = new FormAttachment( 0, 0 );
     fdTabs.right = new FormAttachment( 100, 0 );
     fdTabs.top = new FormAttachment( 0, 0 );
-    fdTabs.bottom = new FormAttachment( wOK, -margin * 2 );
+    fdTabs.bottom = new FormAttachment( wOk, -margin * 2 );
     wTabs.setLayoutData( fdTabs );
 
     addModelTab();

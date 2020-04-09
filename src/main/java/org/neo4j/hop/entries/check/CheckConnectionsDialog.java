@@ -3,19 +3,18 @@ package org.neo4j.hop.entries.check;
 import org.apache.hop.core.Const;
 import org.apache.hop.core.util.Utils;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.job.JobMeta;
-import org.apache.hop.job.entry.IJobEntry;
-import org.apache.hop.job.entry.IJobEntryDialog;
 import org.apache.hop.metastore.api.exceptions.MetaStoreException;
 import org.apache.hop.metastore.persist.MetaStoreFactory;
-import org.apache.hop.pipeline.transform.BaseTransform;
 import org.apache.hop.ui.core.gui.WindowProperty;
 import org.apache.hop.ui.core.widget.ColumnInfo;
 import org.apache.hop.ui.core.widget.TableView;
 import org.apache.hop.ui.hopgui.HopGui;
-import org.apache.hop.ui.job.dialog.JobDialog;
-import org.apache.hop.ui.job.entry.JobEntryDialog;
 import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
+import org.apache.hop.ui.workflow.action.ActionDialog;
+import org.apache.hop.ui.workflow.dialog.WorkflowDialog;
+import org.apache.hop.workflow.WorkflowMeta;
+import org.apache.hop.workflow.action.IAction;
+import org.apache.hop.workflow.action.IActionDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -35,50 +34,50 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CheckConnectionsDialog extends JobEntryDialog implements IJobEntryDialog {
+public class CheckConnectionsDialog extends ActionDialog implements IActionDialog {
 
   public static final String CHECK_CONNECTIONS_DIALOG = "Neo4jCheckConnectionsDialog";
   private static Class<?> PKG = CheckConnectionsDialog.class; // for i18n purposes, needed by Translator2!!
 
   private Shell shell;
 
-  private CheckConnections jobEntry;
+  private CheckConnections action;
 
   private boolean changed;
 
   private Text wName;
   private TableView wConnections;
 
-  private Button wOK, wCancel;
+  private Button wOk, wCancel;
 
   private String[] availableConnectionNames;
   private MetaStoreFactory<NeoConnection> connectionFactory;
 
-  public CheckConnectionsDialog( Shell parent, IJobEntry jobEntry,JobMeta jobMeta ) {
-    super( parent, jobEntry, jobMeta );
-    this.jobEntry = (CheckConnections) jobEntry;
+  public CheckConnectionsDialog( Shell parent, IAction action, WorkflowMeta workflowMeta ) {
+    super( parent, action, workflowMeta );
+    this.action = (CheckConnections) action;
     connectionFactory = new MetaStoreFactory<>( NeoConnection.class, HopGui.getInstance().getMetaStore(), Neo4jDefaults.NAMESPACE );
 
-    if ( this.jobEntry.getName() == null ) {
-      this.jobEntry.setName( "Check Neo4j Connections" );
+    if ( this.action.getName() == null ) {
+      this.action.setName( "Check Neo4j Connections" );
     }
   }
 
-  @Override public IJobEntry open() {
+  @Override public IAction open() {
 
     Shell parent = getParent();
     Display display = parent.getDisplay();
 
-    shell = new Shell( parent, props.getJobsDialogStyle() );
+    shell = new Shell( parent, props.getWorkflowsDialogStyle() );
     props.setLook( shell );
-    JobDialog.setShellImage( shell, jobEntry );
+    WorkflowDialog.setShellImage( shell, action );
 
     ModifyListener lsMod = new ModifyListener() {
       public void modifyText( ModifyEvent e ) {
-        jobEntry.setChanged();
+        action.setChanged();
       }
     };
-    changed = jobEntry.hasChanged();
+    changed = action.hasChanged();
 
     FormLayout formLayout = new FormLayout();
     formLayout.marginWidth = Const.FORM_MARGIN;
@@ -118,16 +117,16 @@ public class CheckConnectionsDialog extends JobEntryDialog implements IJobEntryD
 
     // Add buttons first, then the list of connections dynamically sizing
     //
-    wOK = new Button( shell, SWT.PUSH );
-    wOK.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
-    wOK.addListener( SWT.Selection, e -> ok() );
+    wOk = new Button( shell, SWT.PUSH );
+    wOk.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
+    wOk.addListener( SWT.Selection, e -> ok() );
     wCancel = new Button( shell, SWT.PUSH );
     wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
     wCancel.addListener( SWT.Selection, e -> cancel() );
 
     // Put these buttons at the bottom
     //
-    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOK, wCancel, }, margin, null );
+    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOk, wCancel, }, margin, null );
 
     try {
       List<String> names = connectionFactory.getElementNames();
@@ -140,13 +139,13 @@ public class CheckConnectionsDialog extends JobEntryDialog implements IJobEntryD
     ColumnInfo[] columns = new ColumnInfo[] {
       new ColumnInfo( "Connection name", ColumnInfo.COLUMN_TYPE_CCOMBO, availableConnectionNames, false ),
     };
-    wConnections = new TableView( jobEntry, shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, columns,
-      jobEntry.getConnectionNames().size(), false, lsMod, props );
+    wConnections = new TableView( action, shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, columns,
+      action.getConnectionNames().size(), false, lsMod, props );
     FormData fdConnections = new FormData();
     fdConnections.left = new FormAttachment( 0, 0 );
     fdConnections.top = new FormAttachment( wName, margin );
     fdConnections.right = new FormAttachment( 100, 0 );
-    fdConnections.bottom = new FormAttachment( wOK, -margin * 2 );
+    fdConnections.bottom = new FormAttachment( wOk, -margin * 2 );
     wConnections.setLayoutData( fdConnections );
 
     // Detect X or ALT-F4 or something that kills this window...
@@ -165,20 +164,20 @@ public class CheckConnectionsDialog extends JobEntryDialog implements IJobEntryD
       }
     }
 
-    return jobEntry;
+    return action;
   }
 
   private void cancel() {
-    jobEntry.setChanged( changed );
-    jobEntry = null;
+    action.setChanged( changed );
+    action = null;
     dispose();
   }
 
   private void getData() {
-    wName.setText( Const.NVL( jobEntry.getName(), "" ) );
+    wName.setText( Const.NVL( action.getName(), "" ) );
     wConnections.removeAll();
-    for ( int i = 0; i < jobEntry.getConnectionNames().size(); i++ ) {
-      wConnections.add( Const.NVL( jobEntry.getConnectionNames().get( i ), "" ) );
+    for ( int i = 0; i < action.getConnectionNames().size(); i++ ) {
+      wConnections.add( Const.NVL( action.getConnectionNames().get( i ), "" ) );
     }
     wConnections.removeEmptyRows();
     wConnections.setRowNums();
@@ -193,13 +192,13 @@ public class CheckConnectionsDialog extends JobEntryDialog implements IJobEntryD
       mb.open();
       return;
     }
-    jobEntry.setName( wName.getText() );
+    action.setName( wName.getText() );
 
     int nrItems = wConnections.nrNonEmpty();
-    jobEntry.setConnectionNames( new ArrayList<>() );
+    action.setConnectionNames( new ArrayList<>() );
     for ( int i = 0; i < nrItems; i++ ) {
       String connectionName = wConnections.getNonEmpty( i ).getText( 1 );
-      jobEntry.getConnectionNames().add( connectionName );
+      action.getConnectionNames().add( connectionName );
     }
 
     dispose();
