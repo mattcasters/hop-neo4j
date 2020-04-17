@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Text;
 import org.neo4j.hop.shared.NeoConnection;
 import org.apache.hop.core.Const;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.ui.core.PropsUI;
+import org.apache.hop.ui.core.PropsUi;
 import org.apache.hop.ui.core.dialog.ErrorDialog;
-import org.apache.hop.ui.core.gui.GUIResource;
+import org.apache.hop.ui.core.gui.GuiResource;
 import org.apache.hop.ui.core.gui.WindowProperty;
 import org.apache.hop.ui.core.widget.CheckBoxVar;
 import org.apache.hop.ui.core.widget.ColumnInfo;
@@ -74,7 +74,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
 
   Control lastControl;
 
-  private PropsUI props;
+  private PropsUi props;
 
   private int middle;
   private int margin;
@@ -99,7 +99,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
   public NeoConnectionDialog( Shell parent, IMetaStore metaStore, NeoConnection neoConnection, IVariables variables ) {
     this.parent = parent;
     this.neoConnection = neoConnection;
-    props = PropsUI.getInstance();
+    props = PropsUi.getInstance();
     returnValue = null;
   }
 
@@ -107,7 +107,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     Display display = parent.getDisplay();
     shell = new Shell( parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MAX | SWT.MIN );
     props.setLook( shell );
-    shell.setImage( GUIResource.getInstance().getImageSlave() );
+    shell.setImage( GuiResource.getInstance().getImageSlave() );
 
     middle = props.getMiddlePct();
     margin = Const.MARGIN + 2;

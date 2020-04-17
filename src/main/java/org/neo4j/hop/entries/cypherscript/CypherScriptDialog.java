@@ -4,7 +4,7 @@ import org.apache.hop.core.Const;
 import org.apache.hop.core.util.Utils;
 import org.apache.hop.i18n.BaseMessages;
 import org.apache.hop.ui.core.dialog.ErrorDialog;
-import org.apache.hop.ui.core.gui.GUIResource;
+import org.apache.hop.ui.core.gui.GuiResource;
 import org.apache.hop.ui.core.gui.WindowProperty;
 import org.apache.hop.ui.core.widget.MetaSelectionLine;
 import org.apache.hop.ui.core.widget.TextVar;
@@ -148,7 +148,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
     fdlCypher.top = new FormAttachment( wConnection, margin );
     wlScript.setLayoutData( fdlCypher );
     wScript = new TextVar( workflowMeta, shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
-    wScript.getTextWidget().setFont( GUIResource.getInstance().getFontFixed() );
+    wScript.getTextWidget().setFont( GuiResource.getInstance().getFontFixed() );
     props.setLook( wScript );
     wScript.addModifyListener( lsMod );
     FormData fdCypher = new FormData();

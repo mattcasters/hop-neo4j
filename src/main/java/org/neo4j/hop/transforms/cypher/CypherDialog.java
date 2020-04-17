@@ -16,7 +16,7 @@ import org.apache.hop.ui.core.dialog.EnterNumberDialog;
 import org.apache.hop.ui.core.dialog.EnterTextDialog;
 import org.apache.hop.ui.core.dialog.ErrorDialog;
 import org.apache.hop.ui.core.dialog.PreviewRowsDialog;
-import org.apache.hop.ui.core.gui.GUIResource;
+import org.apache.hop.ui.core.gui.GuiResource;
 import org.apache.hop.ui.core.widget.ColumnInfo;
 import org.apache.hop.ui.core.widget.MetaSelectionLine;
 import org.apache.hop.ui.core.widget.TableView;
@@ -364,7 +364,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     fdlCypher.top = new FormAttachment( lastControl, margin );
     wlCypher.setLayoutData( fdlCypher );
     wCypher = new Text( wComposite, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
-    wCypher.setFont( GUIResource.getInstance().getFontFixed() );
+    wCypher.setFont( GuiResource.getInstance().getFontFixed() );
     props.setLook( wCypher );
     wCypher.addModifyListener( lsMod );
     FormData fdCypher = new FormData();

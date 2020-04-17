@@ -42,12 +42,12 @@ import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.IValueMeta;
 import org.apache.hop.core.variables.Variables;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.ui.core.PropsUI;
+import org.apache.hop.ui.core.PropsUi;
 import org.apache.hop.ui.core.dialog.EnterListDialog;
 import org.apache.hop.ui.core.dialog.EnterSelectionDialog;
 import org.apache.hop.ui.core.dialog.EnterTextDialog;
 import org.apache.hop.ui.core.dialog.ErrorDialog;
-import org.apache.hop.ui.core.gui.GUIResource;
+import org.apache.hop.ui.core.gui.GuiResource;
 import org.apache.hop.ui.core.gui.WindowProperty;
 import org.apache.hop.ui.core.widget.ColumnInfo;
 import org.apache.hop.ui.core.widget.TableView;
@@ -75,7 +75,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
   private CTabFolder wTabs;
 
   private Shell shell;
-  private PropsUI props;
+  private PropsUi props;
 
   private String returnValue;
   private int margin;
@@ -136,7 +136,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     super( parent, SWT.DIALOG_TRIM | SWT.MIN | SWT.MAX | SWT.CLOSE );
     this.inputRowMeta = inputRowMeta;
 
-    props = PropsUI.getInstance();
+    props = PropsUi.getInstance();
     returnValue = null;
 
     // We will only replace at OK
@@ -159,7 +159,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     Display display = parent.getDisplay();
 
     shell = new Shell( parent, SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.DIALOG_TRIM );
-    shell.setImage( GUIResource.getInstance().getImageHopUi() );
+    shell.setImage( GuiResource.getInstance().getImageHopUi() );
     props.setLook( shell );
 
     margin = Const.MARGIN + 2;
@@ -1285,7 +1285,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
 
     Image image = new Image( shell.getDisplay(), 100, 100 );
     GC gc = new GC( image );
-    gc.setFont( GUIResource.getInstance().getFontMediumBold() );
+    gc.setFont( GuiResource.getInstance().getFontMediumBold() );
 
     for ( GraphNode node : graphModel.getNodes() ) {
       Point textExtent = gc.textExtent( node.getName() );
@@ -1649,7 +1649,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     areaOwners = new ArrayList<>();
     GC gc = e.gc;
 
-    gc.setForeground( GUIResource.getInstance().getColorLightGray() );
+    gc.setForeground( GuiResource.getInstance().getColorLightGray() );
     gc.fillRectangle( 0, 0, e.width, e.height );
 
     int margin = 10;
@@ -1660,7 +1660,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
       GraphNode sourceNode = graphModel.findNode( relationship.getNodeSource() );
       GraphNode targetNode = graphModel.findNode( relationship.getNodeTarget() );
       if ( sourceNode != null && targetNode != null ) {
-        gc.setFont( GUIResource.getInstance().getFontMedium() );
+        gc.setFont( GuiResource.getInstance().getFontMedium() );
         Point sourceExtent = gc.textExtent( sourceNode.getName() );
         Point targetExtent = gc.textExtent( targetNode.getName() );
 
@@ -1670,16 +1670,16 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
         int toX = targetNode.getPresentation().getX() + margin + targetExtent.x / 2;
         int toY = targetNode.getPresentation().getY() + margin + targetExtent.y / 2;
 
-        gc.setForeground( GUIResource.getInstance().getColorLightBlue() );
+        gc.setForeground( GuiResource.getInstance().getColorLightBlue() );
         gc.drawLine( fromX, fromY, toX, toY );
 
-        gc.setFont( GUIResource.getInstance().getFontMedium() );
+        gc.setFont( GuiResource.getInstance().getFontMedium() );
         Point relExtent = gc.textExtent( relationship.getName() );
 
         int middleX = fromX + ( toX - fromX ) / 2 - relExtent.x / 2;
         int middleY = fromY + ( toY - fromY ) / 2 - relExtent.y / 2;
 
-        gc.setForeground( GUIResource.getInstance().getColorBlack() );
+        gc.setForeground( GuiResource.getInstance().getColorBlack() );
         gc.drawText( relationship.getName(), middleX, middleY );
         areaOwners.add( new AreaOwner( middleX, middleY, relExtent.x, relExtent.y, AreaType.RELATIONSHIP_LABEL, relationship ) );
       }
@@ -1687,7 +1687,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
 
     // Draw all the nodes
     //
-    gc.setFont( GUIResource.getInstance().getFontMediumBold() );
+    gc.setFont( GuiResource.getInstance().getFontMediumBold() );
     for ( GraphNode graphNode : graphModel.getNodes() ) {
       GraphPresentation presentation = graphNode.getPresentation();
       Point textExtent = gc.textExtent( graphNode.getName() );
@@ -1696,14 +1696,14 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
       int width = textExtent.x + 2 * margin;
       int height = textExtent.y + 2 * margin;
 
-      gc.setForeground( GUIResource.getInstance().getColorBackground() );
+      gc.setForeground( GuiResource.getInstance().getColorBackground() );
       gc.fillRoundRectangle( x, y, width, height, margin, margin );
 
-      gc.setForeground( GUIResource.getInstance().getColorBlue() );
+      gc.setForeground( GuiResource.getInstance().getColorBlue() );
       gc.drawRoundRectangle( x, y, width, height, height / 3, height / 3 );
       areaOwners.add( new AreaOwner( x, y, width, height, AreaType.NODE, graphNode ) );
 
-      gc.setForeground( GUIResource.getInstance().getColorBlack() );
+      gc.setForeground( GuiResource.getInstance().getColorBlack() );
       gc.drawText( graphNode.getName(), x + margin, y + margin );
     }
   }

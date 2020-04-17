@@ -13,9 +13,9 @@ import org.apache.hop.metastore.persist.MetaStoreFactory;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.ITransformDialog;
-import org.apache.hop.ui.core.PropsUI;
+import org.apache.hop.ui.core.PropsUi;
 import org.apache.hop.ui.core.dialog.ErrorDialog;
-import org.apache.hop.ui.core.gui.GUIResource;
+import org.apache.hop.ui.core.gui.GuiResource;
 import org.apache.hop.ui.core.widget.ColumnInfo;
 import org.apache.hop.ui.core.widget.MetaSelectionLine;
 import org.apache.hop.ui.core.widget.TableView;
@@ -334,7 +334,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     };
     fromLabelInf[ 1 ].setUsingVariables( true );
     wFromLabelGrid = new TableView( Variables.getADefaultVariableSpace(), wFromComp, SWT.BORDER
-      | SWT.FULL_SELECTION | SWT.MULTI, fromLabelInf, fromLabelRows, null, PropsUI.getInstance() );
+      | SWT.FULL_SELECTION | SWT.MULTI, fromLabelInf, fromLabelRows, null, PropsUi.getInstance() );
     props.setLook( wFromLabelGrid );
 
     Button wGetFromLabel = new Button( wFromComp, SWT.PUSH );
@@ -464,7 +464,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
 
     wToLabelGrid =
       new TableView( Variables.getADefaultVariableSpace(), wToComp, SWT.BORDER
-        | SWT.FULL_SELECTION | SWT.MULTI, toLabelInf, toLabelRows, null, PropsUI.getInstance() );
+        | SWT.FULL_SELECTION | SWT.MULTI, toLabelInf, toLabelRows, null, PropsUi.getInstance() );
     props.setLook( wToLabelGrid );
 
     Button wGetToLabel = new Button( wToComp, SWT.PUSH );
@@ -509,7 +509,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
 
     wToPropsGrid =
       new TableView( Variables.getADefaultVariableSpace(), wToComp, SWT.BORDER
-        | SWT.FULL_SELECTION | SWT.MULTI, toColinf, toPropsRows, null, PropsUI.getInstance() );
+        | SWT.FULL_SELECTION | SWT.MULTI, toColinf, toPropsRows, null, PropsUi.getInstance() );
 
     props.setLook( wToPropsGrid );
 
@@ -616,7 +616,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
         false ),
     };
     wRelPropsGrid = new TableView( Variables.getADefaultVariableSpace(), wRelationshipsComp, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI,
-      relPropsInf, relPropsRows, null, PropsUI.getInstance() );
+      relPropsInf, relPropsRows, null, PropsUi.getInstance() );
     props.setLook( wRelPropsGrid );
 
     Button wbRelProps = new Button( wRelationshipsComp, SWT.PUSH );
@@ -940,7 +940,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
           0,
           BaseMessages.getString( PKG, "Neo4JOutputDialog.DynamicLabelsWarning.HideNextTime" ), "N".equalsIgnoreCase(
           props.getCustomParameter( STRING_DYNAMIC_LABELS_WARNING, "Y" ) ) );
-      MessageDialogWithToggle.setDefaultImage( GUIResource.getInstance().getImageHopUi() );
+      MessageDialogWithToggle.setDefaultImage( GuiResource.getInstance().getImageHopUi() );
       md.open();
       props.setCustomParameter( STRING_DYNAMIC_LABELS_WARNING, md.getToggleState() ? "N" : "Y" );
       props.saveProps();
