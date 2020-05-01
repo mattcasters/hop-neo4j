@@ -18,6 +18,7 @@ import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
 import org.apache.hop.metastore.api.IMetaStore;
+import org.neo4j.hop.ui.transforms.graph.GraphOutputDialog;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
   public static final String TARGET_TYPE = "target_type";
   public static final String TARGET_NAME = "target_name";
   public static final String TARGET_PROPERTY = "target_property";
+  public static final String VALIDATE_AGAINST_MODEL = "validate_against_model";
 
   @Injection( name = CONNECTION )
   private String connectionName;
@@ -65,6 +67,9 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
 
   @Injection( name = RETURN_GRAPH_FIELD )
   private String returnGraphField;
+
+  @Injection( name = VALIDATE_AGAINST_MODEL )
+  private boolean validatingAgainstModel;
 
   @InjectionDeep
   private List<FieldModelMapping> fieldModelMappings;
@@ -112,6 +117,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
     xml.append( XmlHandler.addTagValue( CREATE_INDEXES, creatingIndexes ) );
     xml.append( XmlHandler.addTagValue( RETURNING_GRAPH, returningGraph ) );
     xml.append( XmlHandler.addTagValue( RETURN_GRAPH_FIELD, returnGraphField ) );
+    xml.append( XmlHandler.addTagValue( VALIDATE_AGAINST_MODEL, validatingAgainstModel ) );
 
     xml.append( XmlHandler.openTag( MAPPINGS ) );
     for ( FieldModelMapping fieldModelMapping : fieldModelMappings ) {
@@ -134,6 +140,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
     creatingIndexes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, CREATE_INDEXES ) );
     returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, RETURNING_GRAPH ) );
     returnGraphField = XmlHandler.getTagValue( stepnode, RETURN_GRAPH_FIELD );
+    validatingAgainstModel = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, VALIDATE_AGAINST_MODEL ) );
 
     // Parse parameter mappings
     //
@@ -262,5 +269,21 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
    */
   public void setReturnGraphField( String returnGraphField ) {
     this.returnGraphField = returnGraphField;
+  }
+
+  /**
+   * Gets validatingAgainstModel
+   *
+   * @return value of validatingAgainstModel
+   */
+  public boolean isValidatingAgainstModel() {
+    return validatingAgainstModel;
+  }
+
+  /**
+   * @param validatingAgainstModel The validatingAgainstModel to set
+   */
+  public void setValidatingAgainstModel( boolean validatingAgainstModel ) {
+    this.validatingAgainstModel = validatingAgainstModel;
   }
 }

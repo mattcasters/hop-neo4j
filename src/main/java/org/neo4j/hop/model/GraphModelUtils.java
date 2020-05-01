@@ -15,15 +15,6 @@ import org.neo4j.hop.ui.model.GraphModelDialog;
 public class GraphModelUtils {
   private static Class<?> PKG = GraphModelUtils.class; // for i18n purposes, needed by Translator2!!
 
-  private static MetaStoreFactory<GraphModel> staticFactory;
-
-  public static MetaStoreFactory<GraphModel> getModelFactory( IMetaStore metaStore ) {
-    if ( staticFactory == null ) {
-      staticFactory = new MetaStoreFactory<>( GraphModel.class, metaStore, Neo4jDefaults.NAMESPACE );
-    }
-    return staticFactory;
-  }
-
   public static GraphModel newModel( Shell shell, MetaStoreFactory<GraphModel> factory, IRowMeta inputRowMeta ) {
     GraphModel graphModel = new GraphModel();
     boolean ok = false;

@@ -1,6 +1,7 @@
 package org.neo4j.hop.transforms.output;
 
 import org.neo4j.hop.shared.MetaStoreUtil;
+import org.neo4j.hop.shared.NeoConnection;
 import org.neo4j.hop.shared.NeoConnectionUtils;
 import org.neo4j.hop.transforms.BaseNeoTransform;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -665,7 +666,7 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
       try {
         // To correct lazy programmers who built certain PDI steps...
         //
-        data.neoConnection = NeoConnectionUtils.getConnectionFactory( metaStore ).loadElement( meta.getConnection() );
+        data.neoConnection = NeoConnection.createFactory(metaStore).loadElement( meta.getConnection() );
         if (data.neoConnection==null) {
           log.logError("Connection '"+meta.getConnection()+"' could not be found in the metastore "+MetaStoreUtil.getMetaStoreDescription(metaStore));
           return false;

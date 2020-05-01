@@ -1,4 +1,4 @@
-package org.neo4j.hop.transforms.cypher;
+package org.neo4j.hop.ui.transforms.cypher;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -56,7 +56,10 @@ import org.neo4j.hop.core.data.GraphPropertyDataType;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.neo4j.hop.shared.NeoConnection;
 import org.neo4j.hop.shared.NeoConnectionUtils;
-import org.neo4j.hop.transforms.output.Neo4JOutputDialog;
+import org.neo4j.hop.transforms.cypher.CypherMeta;
+import org.neo4j.hop.transforms.cypher.ParameterMapping;
+import org.neo4j.hop.transforms.cypher.ReturnValue;
+import org.neo4j.hop.ui.transforms.output.Neo4JOutputDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -652,7 +655,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
   private synchronized void preview() {
     CypherMeta oneMeta = new CypherMeta();
     this.getInfo( oneMeta );
-    PipelineMeta previewMeta = PipelinePreviewFactory.generatePreviewPipeline( this.pipelineMeta, oneMeta, this.wTransformName.getText() );
+    PipelineMeta previewMeta = PipelinePreviewFactory.generatePreviewPipeline( this.pipelineMeta, this.pipelineMeta.getMetaStore(), oneMeta, this.wTransformName.getText() );
     this.pipelineMeta.getVariable( "Internal.Transformation.Filename.Directory" );
     previewMeta.getVariable( "Internal.Transformation.Filename.Directory" );
     EnterNumberDialog
@@ -691,7 +694,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     getInfo( meta );
 
     try {
-      NeoConnection neoConnection = NeoConnectionUtils.getConnectionFactory( metaStore ).loadElement( meta.getConnectionName() );
+      NeoConnection neoConnection = NeoConnection.createFactory( metaStore ).loadElement( meta.getConnectionName() );
       neoConnection.initializeVariablesFrom( pipelineMeta );
       driver = neoConnection.getDriver( log );
       session = driver.session();

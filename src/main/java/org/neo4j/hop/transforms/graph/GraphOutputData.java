@@ -1,5 +1,6 @@
 package org.neo4j.hop.transforms.graph;
 
+import org.neo4j.hop.model.validation.ModelValidator;
 import org.neo4j.hop.transforms.BaseNeoTransformData;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
@@ -28,4 +29,5 @@ public class GraphOutputData extends BaseNeoTransformData implements ITransformD
   public Map<String, CypherParameters> cypherMap;
   public HashMap<String, Map<GraphProperty, Integer>> relationshipPropertyIndexMap;
   public boolean version4;
+  public ModelValidator modelValidator;
 }

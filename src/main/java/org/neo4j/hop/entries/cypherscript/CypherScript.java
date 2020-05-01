@@ -69,7 +69,7 @@ public class CypherScript extends ActionBase implements IAction {
 
   @Override public Result execute( Result result, int nr ) throws HopException {
 
-    MetaStoreFactory<NeoConnection> connectionFactory = new MetaStoreFactory<>( NeoConnection.class, metaStore, Neo4jDefaults.NAMESPACE );
+    MetaStoreFactory<NeoConnection> connectionFactory = NeoConnection.createFactory( metaStore );
 
     // Replace variables & parameters
     //

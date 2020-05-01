@@ -1,4 +1,4 @@
-package org.neo4j.hop.transforms.output;
+package org.neo4j.hop.ui.transforms.output;
 
 
 import org.apache.hop.core.Const;
@@ -48,6 +48,7 @@ import org.neo4j.hop.core.Neo4jDefaults;
 import org.neo4j.hop.core.Neo4jUtil;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.neo4j.hop.shared.NeoConnection;
+import org.neo4j.hop.transforms.output.Neo4JOutputMeta;
 
 
 public class Neo4JOutputDialog extends BaseTransformDialog implements ITransformDialog {
@@ -909,7 +910,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     // Verify that the defined connection is available
     //
     try {
-      MetaStoreFactory<NeoConnection> factory = new MetaStoreFactory<>( NeoConnection.class, metaStore, Neo4jDefaults.NAMESPACE );
+      MetaStoreFactory<NeoConnection> factory = NeoConnection.createFactory( metaStore );
       NeoConnection connection = factory.loadElement( input.getConnection() );
       if ( connection == null ) {
         message.append( Const.CR );

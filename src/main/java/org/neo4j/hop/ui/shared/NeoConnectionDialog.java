@@ -92,10 +92,6 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
   private TableView wUrls;
   private Button wOk;
 
-  public NeoConnectionDialog( Shell parent, IMetaStore metaStore, NeoConnection neoConnection ) {
-    this(parent, metaStore, neoConnection, neoConnection);
-  }
-
   public NeoConnectionDialog( Shell parent, IMetaStore metaStore, NeoConnection neoConnection, IVariables variables ) {
     this.parent = parent;
     this.neoConnection = neoConnection;

@@ -14,7 +14,7 @@ import org.neo4j.hop.shared.NeoConnection;
   iconImage = "neo4j_logo.svg"
 )
 public class GraphModelGuiPlugin implements IGuiMetaStorePlugin<GraphModel> {
-  @Override public Class<GraphModel> getMetastoreElementClass() {
+  @Override public Class<GraphModel> getMetaStoreElementClass() {
     return GraphModel.class;
   }
 }

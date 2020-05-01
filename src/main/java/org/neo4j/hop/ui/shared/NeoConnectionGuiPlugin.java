@@ -12,7 +12,7 @@ import org.neo4j.hop.shared.NeoConnection;
   iconImage = "neo4j_logo.svg"
 )
 public class NeoConnectionGuiPlugin implements IGuiMetaStorePlugin<NeoConnection> {
-  @Override public Class<NeoConnection> getMetastoreElementClass() {
+  @Override public Class<NeoConnection> getMetaStoreElementClass() {
     return NeoConnection.class;
   }
 }

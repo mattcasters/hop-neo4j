@@ -60,6 +60,7 @@ import org.neo4j.hop.model.GraphPresentation;
 import org.neo4j.hop.model.GraphProperty;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.neo4j.hop.model.GraphRelationship;
+import org.neo4j.hop.model.cw.CypherWorkbenchImporter;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
@@ -330,10 +331,14 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     for ( int i = 0; i < activeNode.getProperties().size(); i++ ) {
       GraphProperty property = activeNode.getProperties().get( i );
       TableItem item = new TableItem( wNodeProperties.table, SWT.NONE );
-      item.setText( 1, Const.NVL( property.getName(), "" ) );
-      item.setText( 2, GraphPropertyType.getCode( property.getType() ) );
-      item.setText( 3, Const.NVL( property.getDescription(), "" ) );
-      item.setText( 4, property.isPrimary() ? "Y" : "N" );
+      int col = 1;
+      item.setText( col++, Const.NVL( property.getName(), "" ) );
+      item.setText( col++, GraphPropertyType.getCode( property.getType() ) );
+      item.setText( col++, Const.NVL( property.getDescription(), "" ) );
+      item.setText( col++, property.isPrimary() ? "Y" : "N" );
+      item.setText( col++, property.isMandatory() ? "Y" : "N" );
+      item.setText( col++, property.isUnique() ? "Y" : "N" );
+      item.setText( col++, property.isIndexed() ? "Y" : "N" );
     }
     wNodeProperties.removeEmptyRows( 1 );
     wNodeProperties.setRowNums();
@@ -363,10 +368,14 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     for ( int i = 0; i < activeRelationship.getProperties().size(); i++ ) {
       GraphProperty property = activeRelationship.getProperties().get( i );
       TableItem item = new TableItem( wRelProperties.table, SWT.NONE );
-      item.setText( 1, Const.NVL( property.getName(), "" ) );
-      item.setText( 2, GraphPropertyType.getCode( property.getType() ) );
-      item.setText( 3, Const.NVL( property.getDescription(), "" ) );
-      item.setText( 4, property.isPrimary() ? "Y" : "N" );
+      int col=1;
+      item.setText( col++, Const.NVL( property.getName(), "" ) );
+      item.setText( col++, GraphPropertyType.getCode( property.getType() ) );
+      item.setText( col++, Const.NVL( property.getDescription(), "" ) );
+      item.setText( col++, property.isPrimary() ? "Y" : "N" );
+      item.setText( col++, property.isMandatory() ? "Y" : "N" );
+      item.setText( col++, property.isUnique() ? "Y" : "N" );
+      item.setText( col++, property.isIndexed() ? "Y" : "N" );
     }
     wRelProperties.removeEmptyRows( 1 );
     wRelProperties.setRowNums();
@@ -457,6 +466,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     props.setLook( wImportGraph );
     FormData fdImportGraph = new FormData();
     fdImportGraph.left = new FormAttachment( middle, 0 );
+    fdImportGraph.right = new FormAttachment( 75, 0 );
     fdImportGraph.top = new FormAttachment( lastControl, 50 );
     wImportGraph.setLayoutData( fdImportGraph );
     wImportGraph.addListener( SWT.Selection, ( e ) -> importGraphFromFile() );
@@ -467,9 +477,22 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     props.setLook( wExportGraph );
     FormData fdExportGraph = new FormData();
     fdExportGraph.left = new FormAttachment( middle, 0 );
+    fdExportGraph.right = new FormAttachment( 75, 0 );
     fdExportGraph.top = new FormAttachment( lastControl, margin );
     wExportGraph.setLayoutData( fdExportGraph );
     wExportGraph.addListener( SWT.Selection, ( e ) -> exportGraphToFile() );
+    lastControl = wExportGraph;
+
+    Button wCypherWorkbenchImportGraph = new Button( wModelComp, SWT.PUSH );
+    wCypherWorkbenchImportGraph.setText( "Import Cypher Workbench model" );
+    props.setLook( wCypherWorkbenchImportGraph );
+    FormData fdCypherWorkbenchImportGraph = new FormData();
+    fdCypherWorkbenchImportGraph.left = new FormAttachment( middle, 0 );
+    fdCypherWorkbenchImportGraph.right = new FormAttachment( 75, 0 );
+    fdCypherWorkbenchImportGraph.top = new FormAttachment( lastControl, 50 );
+    wCypherWorkbenchImportGraph.setLayoutData( fdCypherWorkbenchImportGraph );
+    wCypherWorkbenchImportGraph.addListener( SWT.Selection, ( e ) -> importGraphFromCypherWorkbench() );
+    lastControl = wCypherWorkbenchImportGraph;
 
     FormData fdModelComp = new FormData();
     fdModelComp.left = new FormAttachment( 0, 0 );
@@ -641,6 +664,9 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
       new ColumnInfo( "Property Type", ColumnInfo.COLUMN_TYPE_CCOMBO, GraphPropertyType.getNames(), false ),
       new ColumnInfo( "Description", ColumnInfo.COLUMN_TYPE_TEXT, false ),
       new ColumnInfo( "Primary?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
+      new ColumnInfo( "Mandatory?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
+      new ColumnInfo( "Unique?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
+      new ColumnInfo( "Indexed?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
     };
     ModifyListener propertyModifyListener = modifyEvent -> getNodePropertiesFromView();
     wNodeProperties =
@@ -774,11 +800,16 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
         java.util.List<GraphProperty> properties = new ArrayList<>();
         for ( int i = 0; i < wNodeProperties.nrNonEmpty(); i++ ) {
           TableItem item = wNodeProperties.getNonEmpty( i );
-          String propertyKey = item.getText( 1 );
-          GraphPropertyType propertyType = GraphPropertyType.parseCode( item.getText( 2 ) );
-          String propertyDescription = item.getText( 3 );
-          boolean propertyPrimary = "Y".equalsIgnoreCase( item.getText( 4 ) );
-          properties.add( new GraphProperty( propertyKey, propertyDescription, propertyType, propertyPrimary ) );
+          int col=1;
+          String propertyKey = item.getText( col++ );
+          GraphPropertyType propertyType = GraphPropertyType.parseCode( item.getText( col++ ) );
+          String propertyDescription = item.getText( col++ );
+          boolean propertyPrimary = "Y".equalsIgnoreCase( item.getText( col++ ) );
+          boolean propertyMandatory = "Y".equalsIgnoreCase( item.getText( col++ ) );
+          boolean propertyUnique = "Y".equalsIgnoreCase( item.getText( col++ ) );
+          boolean propertyIndexed = "Y".equalsIgnoreCase( item.getText( col++ ) );
+          properties.add( new GraphProperty( propertyKey, propertyDescription, propertyType, propertyPrimary,
+            propertyMandatory, propertyUnique, propertyIndexed ) );
         }
 
         activeNode.setProperties( properties );
@@ -827,7 +858,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
         }
 
         String propertyName = Neo4jUtil.standardizePropertyName( valueMeta );
-        activeNode.getProperties().add( new GraphProperty( propertyName, "", propertyType, false ) );
+        activeNode.getProperties().add( new GraphProperty( propertyName, "", propertyType, false, false, false, false ) );
       }
       refreshNodeFields();
     }
@@ -1072,10 +1103,12 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
       new ColumnInfo( "Property Type", ColumnInfo.COLUMN_TYPE_CCOMBO, GraphPropertyType.getNames(), false ),
       new ColumnInfo( "Description", ColumnInfo.COLUMN_TYPE_TEXT, false ),
       new ColumnInfo( "Primary?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
+      new ColumnInfo( "Mandatory?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
+      new ColumnInfo( "Unique?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
+      new ColumnInfo( "Indexed?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
     };
     ModifyListener propertyModifyListener = modifyEvent -> getRelationshipPropertiesFromView();
-    wRelProperties =
-      new TableView( new Variables(), wRelComp, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER, propertyColumns, 1, propertyModifyListener, props );
+    wRelProperties = new TableView( new Variables(), wRelComp, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER, propertyColumns, 1, propertyModifyListener, props );
     wRelProperties.table.addListener( SWT.FocusOut, event -> getRelationshipPropertiesFromView() );
     props.setLook( wRelProperties );
     FormData fdRelProperties = new FormData();
@@ -1117,11 +1150,17 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
         java.util.List<GraphProperty> properties = new ArrayList<>();
         for ( int i = 0; i < wRelProperties.nrNonEmpty(); i++ ) {
           TableItem item = wRelProperties.getNonEmpty( i );
-          String propertyKey = item.getText( 1 );
-          GraphPropertyType propertyType = GraphPropertyType.parseCode( item.getText( 2 ) );
-          String propertyDescription = item.getText( 3 );
-          boolean propertyPrimary = "Y".equalsIgnoreCase( item.getText( 4 ) );
-          properties.add( new GraphProperty( propertyKey, propertyDescription, propertyType, propertyPrimary ) );
+          int col=1;
+          String propertyKey = item.getText( col++ );
+          GraphPropertyType propertyType = GraphPropertyType.parseCode( item.getText( col++ ) );
+          String propertyDescription = item.getText( col++ );
+          boolean propertyPrimary = "Y".equalsIgnoreCase( item.getText( col++ ) );
+          boolean propertyMandatory = "Y".equalsIgnoreCase( item.getText( col++ ) );
+          boolean propertyUnique = "Y".equalsIgnoreCase( item.getText( col++ ) );
+          boolean propertyIndexed = "Y".equalsIgnoreCase( item.getText( col++ ) );
+
+          properties.add( new GraphProperty( propertyKey, propertyDescription, propertyType, propertyPrimary,
+            propertyMandatory, propertyUnique, propertyIndexed) );
         }
 
         activeRelationship.setProperties( properties );
@@ -1749,6 +1788,28 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
       dialog.open();
     } catch ( Exception e ) {
       new ErrorDialog( shell, "ERROR", "Error serializing to JSON", e );
+    }
+  }
+
+  private void importGraphFromCypherWorkbench() {
+    try {
+      EnterTextDialog dialog = new EnterTextDialog( shell, "Cypher Workbench Export", "Paste the cypher workbench model export (JSON) below", "{}", true );
+      String jsonModelString = dialog.open();
+      if ( jsonModelString == null ) {
+        return;
+      }
+
+      // The graph model is loaded, replace the one in memory
+      //
+      GraphModel importedModel = CypherWorkbenchImporter.importFromCwJson( jsonModelString );
+      graphModel = CypherWorkbenchImporter.changeNamesToLabels( importedModel );
+
+      // Refresh the dialog.
+      //
+      getData();
+
+    } catch ( Exception e ) {
+      new ErrorDialog( shell, "ERROR", "Error importing JSON", e );
     }
   }
 

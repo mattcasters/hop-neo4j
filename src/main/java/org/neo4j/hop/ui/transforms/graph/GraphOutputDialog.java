@@ -1,4 +1,4 @@
-package org.neo4j.hop.transforms.graph;
+package org.neo4j.hop.ui.transforms.graph;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -42,6 +42,9 @@ import org.neo4j.hop.model.GraphNode;
 import org.neo4j.hop.model.GraphProperty;
 import org.neo4j.hop.model.GraphRelationship;
 import org.neo4j.hop.shared.NeoConnection;
+import org.neo4j.hop.transforms.graph.FieldModelMapping;
+import org.neo4j.hop.transforms.graph.GraphOutputMeta;
+import org.neo4j.hop.transforms.graph.ModelTargetType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +67,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
   private Button wReturnGraph;
   private Label wlReturnGraphField;
   private TextVar wReturnGraphField;
+  private Button wValidateAgainstModel;
 
   private TableView wFieldMappings;
 
@@ -230,6 +234,26 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     wReturnGraphField.setLayoutData( fdReturnGraphField );
     lastControl = wReturnGraphField;
 
+    Label wlValidateAgainstModel = new Label( shell, SWT.RIGHT );
+    wlValidateAgainstModel.setText( "Validate against model?" );
+    wlValidateAgainstModel.setToolTipText( "This validates indexes, constraints and properties as specified in the model" );
+    props.setLook( wlValidateAgainstModel );
+    FormData fdlValidateAgainstModel = new FormData();
+    fdlValidateAgainstModel.left = new FormAttachment( 0, 0 );
+    fdlValidateAgainstModel.right = new FormAttachment( middle, -margin );
+    fdlValidateAgainstModel.top = new FormAttachment( lastControl, 2 * margin );
+    wlValidateAgainstModel.setLayoutData( fdlValidateAgainstModel );
+    wValidateAgainstModel = new Button( shell, SWT.CHECK | SWT.BORDER );
+    wValidateAgainstModel.setToolTipText( returnGraphTooltipText );
+    props.setLook( wValidateAgainstModel );
+    FormData fdValidateAgainstModel = new FormData();
+    fdValidateAgainstModel.left = new FormAttachment( middle, 0 );
+    fdValidateAgainstModel.right = new FormAttachment( 100, 0 );
+    fdValidateAgainstModel.top = new FormAttachment( wlValidateAgainstModel, 0, SWT.CENTER );
+    wValidateAgainstModel.setLayoutData( fdValidateAgainstModel );
+    wValidateAgainstModel.addListener( SWT.Selection, e -> enableFields() );
+    lastControl = wValidateAgainstModel;
+
     // Some buttons at the bottom...
     //
     wOk = new Button( shell, SWT.PUSH );
@@ -341,7 +365,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     // Map input field names to Node/Property values
     //
     try {
-      MetaStoreFactory<GraphModel> modelFactory = GraphModelUtils.getModelFactory( metaStore );
+      MetaStoreFactory<GraphModel> modelFactory = GraphModel.createFactory( metaStore );
 
       if ( activeModel == null ) {
         if ( StringUtils.isEmpty( wModel.getText() ) ) {
@@ -454,6 +478,8 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     wReturnGraph.setSelection( input.isReturningGraph() );
     wReturnGraphField.setText( Const.NVL( input.getReturnGraphField(), "" ) );
 
+    wValidateAgainstModel.setSelection( input.isValidatingAgainstModel() );
+
     enableFields();
   }
 
@@ -461,7 +487,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     // List of models...
     //
     try {
-      MetaStoreFactory<GraphModel> modelFactory = GraphModelUtils.getModelFactory( metaStore );
+      MetaStoreFactory<GraphModel> modelFactory = GraphModel.createFactory( metaStore );
       List<String> modelNames = modelFactory.getElementNames();
       Collections.sort( modelNames );
       wModel.setItems( modelNames.toArray( new String[ 0 ] ) );
@@ -511,6 +537,8 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
 
     input.setReturningGraph( wReturnGraph.getSelection() );
     input.setReturnGraphField( wReturnGraphField.getText() );
+
+    input.setValidatingAgainstModel( wValidateAgainstModel.getSelection() );
 
     List<FieldModelMapping> mappings = new ArrayList<>();
     for ( int i = 0; i < wFieldMappings.nrNonEmpty(); i++ ) {

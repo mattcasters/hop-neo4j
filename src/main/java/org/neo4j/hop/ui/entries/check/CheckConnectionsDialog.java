@@ -1,4 +1,4 @@
-package org.neo4j.hop.entries.check;
+package org.neo4j.hop.ui.entries.check;
 
 import org.apache.hop.core.Const;
 import org.apache.hop.core.util.Utils;
@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.neo4j.hop.core.Neo4jDefaults;
+import org.neo4j.hop.entries.check.CheckConnections;
 import org.neo4j.hop.shared.NeoConnection;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
   public CheckConnectionsDialog( Shell parent, IAction action, WorkflowMeta workflowMeta ) {
     super( parent, action, workflowMeta );
     this.action = (CheckConnections) action;
-    connectionFactory = new MetaStoreFactory<>( NeoConnection.class, HopGui.getInstance().getMetaStore(), Neo4jDefaults.NAMESPACE );
+    connectionFactory = NeoConnection.createFactory(HopGui.getInstance().getMetaStore());
 
     if ( this.action.getName() == null ) {
       this.action.setName( "Check Neo4j Connections" );

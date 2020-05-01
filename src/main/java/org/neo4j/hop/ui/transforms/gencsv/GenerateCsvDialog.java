@@ -1,4 +1,4 @@
-package org.neo4j.hop.transforms.gencsv;
+package org.neo4j.hop.ui.transforms.gencsv;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
@@ -29,6 +29,8 @@ import org.apache.hop.pipeline.transform.ITransformDialog;
 import org.apache.hop.ui.core.widget.TextVar;
 import org.apache.hop.ui.hopgui.HopGui;
 import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
+import org.neo4j.hop.transforms.gencsv.GenerateCsvMeta;
+import org.neo4j.hop.transforms.gencsv.UniquenessStrategy;
 
 public class GenerateCsvDialog extends BaseTransformDialog implements ITransformDialog {
 

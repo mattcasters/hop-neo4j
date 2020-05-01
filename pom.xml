@@ -13,8 +13,8 @@
   <properties>
   
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hop.version>0.1.0-SNAPSHOT</hop.version>
-    <neo4j.driver.version>4.0.0</neo4j.driver.version>
+    <hop.version>0.20-SNAPSHOT</hop.version>
+    <neo4j.driver.version>4.0.1</neo4j.driver.version>
 
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -103,11 +103,6 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>
-
-		<repository>
-			<id>pentaho-releases</id>
-			<url>http://nexus.pentaho.org/content/groups/omni</url>
 		</repository>
 
 	</repositories>

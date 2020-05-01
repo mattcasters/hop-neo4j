@@ -22,6 +22,7 @@ import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
 import org.apache.hop.metastore.api.IMetaStore;
+import org.neo4j.hop.ui.transforms.cypher.CypherDialog;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;

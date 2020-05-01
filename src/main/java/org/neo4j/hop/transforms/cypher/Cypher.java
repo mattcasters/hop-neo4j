@@ -2,6 +2,7 @@ package org.neo4j.hop.transforms.cypher;
 
 
 import org.neo4j.hop.shared.MetaStoreUtil;
+import org.neo4j.hop.shared.NeoConnection;
 import org.neo4j.hop.shared.NeoConnectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.neo4j.driver.Record;
@@ -58,7 +59,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
     }
     try {
 
-      data.neoConnection = NeoConnectionUtils.getConnectionFactory( metaStore ).loadElement( meta.getConnectionName() );
+      data.neoConnection = NeoConnection.createFactory( metaStore ).loadElement( meta.getConnectionName() );
       if (data.neoConnection==null) {
         log.logError("Connection '"+meta.getConnectionName()+"' could not be found in the metastore "+MetaStoreUtil.getMetaStoreDescription(metaStore));
         return false;

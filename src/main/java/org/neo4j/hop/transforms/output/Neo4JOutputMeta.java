@@ -23,6 +23,7 @@ import org.apache.hop.pipeline.transform.ITransformDialog;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
 import org.apache.hop.metastore.api.IMetaStore;
+import org.neo4j.hop.ui.transforms.output.Neo4JOutputDialog;
 import org.w3c.dom.Node;
 
 import java.util.List;

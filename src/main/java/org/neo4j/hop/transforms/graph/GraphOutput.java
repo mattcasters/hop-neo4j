@@ -2,6 +2,8 @@ package org.neo4j.hop.transforms.graph;
 
 import org.apache.hop.metastore.persist.MetaStoreFactory;
 import org.neo4j.hop.model.GraphModelUtils;
+import org.neo4j.hop.model.validation.ModelValidator;
+import org.neo4j.hop.model.validation.NodeProperty;
 import org.neo4j.hop.shared.MetaStoreUtil;
 import org.neo4j.hop.shared.NeoConnection;
 import org.neo4j.hop.shared.NeoConnectionUtils;
@@ -63,7 +65,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
           return false;
         }
 
-        MetaStoreFactory<NeoConnection> connectionFactory = NeoConnectionUtils.getConnectionFactory( metaStore );
+        MetaStoreFactory<NeoConnection> connectionFactory = NeoConnection.createFactory( metaStore );
         data.neoConnection = connectionFactory.loadElement( meta.getConnectionName() );
         if (data.neoConnection==null) {
           log.logError("Connection '"+meta.getConnectionName()+"' could not be found in the metastore "+MetaStoreUtil.getMetaStoreDescription(metaStore));
@@ -88,14 +90,30 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
         logError( "No model name is specified" );
         return false;
       }
-      MetaStoreFactory<GraphModel> modelFactory = GraphModelUtils.getModelFactory( metaStore );
+      MetaStoreFactory<GraphModel> modelFactory = GraphModel.createFactory( metaStore );
       data.graphModel = modelFactory.loadElement( meta.getModel() );
       if ( data.graphModel == null ) {
         logError( "Model '" + meta.getModel() + "' could not be found!" );
         return false;
       }
+
+      data.modelValidator = null;
+      if (meta.isValidatingAgainstModel()) {
+        // Validate the model...
+        //
+        List<NodeProperty> usedNodeProperties = findUsedNodeProperties();
+        data.modelValidator = new ModelValidator( data.graphModel, usedNodeProperties );
+        int nrErrors = data.modelValidator.validateBeforeLoad( log, data.session );
+        if (nrErrors>0) {
+          // There were validation errors, we can stop here...
+          log.logError("Validation against graph model '"+data.graphModel.getName()+"' failed with "+nrErrors+" errors.");
+          return false;
+        } else {
+          log.logBasic("Validation against graph model '"+data.graphModel.getName()+"' was successful.");
+        }
+      }
     } catch ( MetaStoreException e ) {
-      log.logError( "Could not gencsv connection'" + meta.getConnectionName() + "' from the metastore", e );
+      log.logError( "Could not find Neo4j connection'" + meta.getConnectionName() + "'", e );
       return false;
     }
 
@@ -103,6 +121,16 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
     data.nodeCount = countDistinctNodes( meta.getFieldModelMappings() );
 
     return super.init();
+  }
+
+  private List<NodeProperty> findUsedNodeProperties() {
+    List<NodeProperty> list = new ArrayList<>();
+    for (FieldModelMapping fieldModelMapping : meta.getFieldModelMappings()) {
+      if (fieldModelMapping.getTargetType()==ModelTargetType.Node) {
+        list.add(new NodeProperty(fieldModelMapping.getTargetName(), fieldModelMapping.getTargetProperty()));
+      }
+    }
+    return list;
   }
 
   private int countDistinctNodes( List<FieldModelMapping> fieldModelMappings ) {
@@ -149,6 +177,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
       //
       data.outputRowMeta = getInputRowMeta().clone();
       meta.getFields( data.outputRowMeta, getTransformName(), null, getTransformMeta(), this, metaStore );
+
 
       // Get parameter field indexes
       data.fieldIndexes = new int[ meta.getFieldModelMappings().size() ];
