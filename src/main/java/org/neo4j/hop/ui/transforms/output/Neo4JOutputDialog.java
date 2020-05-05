@@ -944,7 +944,6 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
       MessageDialogWithToggle.setDefaultImage( GuiResource.getInstance().getImageHopUi() );
       md.open();
       props.setCustomParameter( STRING_DYNAMIC_LABELS_WARNING, md.getToggleState() ? "N" : "Y" );
-      props.saveProps();
     }
 
   }

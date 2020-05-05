@@ -55,7 +55,7 @@
 							<excludeScope>runtime</excludeScope>
 							<excludeScope>compile</excludeScope>
 							<excludeScope>provided</excludeScope>
-							<excludeArtifactIds>metastore</excludeArtifactIds>
+							<excludeArtifactIds>hop-metastore</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
