@@ -669,8 +669,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
       new ColumnInfo( "Indexed?", ColumnInfo.COLUMN_TYPE_CCOMBO, new String[] { "Y", "N" }, false ),
     };
     ModifyListener propertyModifyListener = modifyEvent -> getNodePropertiesFromView();
-    wNodeProperties =
-      new TableView( new Variables(), wNodesComp, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER, propertyColumns, 1, propertyModifyListener, props );
+    wNodeProperties = new TableView( new Variables(), wNodesComp, SWT.FULL_SELECTION | SWT.MULTI | SWT.BORDER, propertyColumns, 1, propertyModifyListener, props );
     wNodeProperties.table.addListener( SWT.FocusOut, event -> getNodePropertiesFromView() );
     props.setLook( wNodeProperties );
     FormData fdNodeProperties = new FormData();

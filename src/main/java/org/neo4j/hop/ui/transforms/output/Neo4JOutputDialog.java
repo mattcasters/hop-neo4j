@@ -52,7 +52,7 @@ import org.neo4j.hop.transforms.output.Neo4JOutputMeta;
 
 
 public class Neo4JOutputDialog extends BaseTransformDialog implements ITransformDialog {
-  private static Class<?> PKG = Neo4JOutputDialog.class; // for i18n purposes, needed by Translator2!!
+  private static Class<?> PKG = Neo4JOutputMeta.class; // for i18n purposes, needed by Translator2!!
 
   private Neo4JOutputMeta input;
 

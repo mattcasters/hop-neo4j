@@ -1,6 +1,7 @@
 package org.neo4j.hop.transforms.cypher;
 
 
+import org.json.simple.JSONValue;
 import org.neo4j.hop.shared.MetaStoreUtil;
 import org.neo4j.hop.shared.NeoConnection;
 import org.neo4j.hop.shared.NeoConnectionUtils;
@@ -387,11 +388,12 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
             Value recordValue = record.get( returnValue.getName() );
             IValueMeta targetValueMeta = data.outputRowMeta.getValueMeta( index );
             Object value = null;
+            GraphPropertyDataType neoType = data.returnSourceTypeMap.get( returnValue.getName() );
             if ( recordValue != null && !recordValue.isNull()) {
               try {
                 switch ( targetValueMeta.getType() ) {
                   case IValueMeta.TYPE_STRING:
-                    value = recordValue.asString();
+                    value = convertToString(recordValue, neoType);
                     break;
                   case IValueMeta.TYPE_INTEGER:
                     value = recordValue.asLong();
@@ -406,23 +408,22 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
                     value = new BigDecimal( recordValue.asString() );
                     break;
                   case IValueMeta.TYPE_DATE:
-                    GraphPropertyDataType type = data.returnSourceTypeMap.get( returnValue.getName() );
-                    if (type!=null) {
-                     // Standard...
-                     switch(type) {
-                       case LocalDateTime: {
-                         LocalDateTime localDateTime = recordValue.asLocalDateTime();
-                         value = java.sql.Date.valueOf( localDateTime.toLocalDate() );
-                         break;
-                       }
-                       case Date: {
-                         LocalDate localDate = recordValue.asLocalDate();
-                         value = java.sql.Date.valueOf( localDate );
-                         break;
-                       }
-                       default:
-                         throw new HopException( "Conversion from Neo4j daa type "+type.name()+" to a Hop Date isn't supported yet" );
-                     }
+                    if (neoType!=null) {
+                      // Standard...
+                      switch(neoType) {
+                        case LocalDateTime: {
+                          LocalDateTime localDateTime = recordValue.asLocalDateTime();
+                          value = java.sql.Date.valueOf( localDateTime.toLocalDate() );
+                          break;
+                        }
+                        case Date: {
+                          LocalDate localDate = recordValue.asLocalDate();
+                          value = java.sql.Date.valueOf( localDate );
+                          break;
+                        }
+                        default:
+                          throw new HopException( "Conversion from Neo4j daa type "+neoType.name()+" to a Kettle Date isn't supported yet" );
+                      }
                     } else {
                       LocalDate localDate = recordValue.asLocalDate();
                       value = java.sql.Date.valueOf( localDate );
@@ -457,6 +458,27 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
         setOutputDone();
         throw new HopException( "Error found in executing cypher statement" );
       }
+    }
+  }
+
+  /**
+   * Convert the given record value to String.
+   * For complex data types it's a conversion to JSON.
+   *
+   * @param recordValue
+   * @param sourceType
+   * @return
+   */
+  private String convertToString( Value recordValue, GraphPropertyDataType sourceType ) {
+    if (recordValue==null) {
+      return null;
+    }
+    if (sourceType==null) {
+      return JSONValue.toJSONString( recordValue.asObject() );
+    }
+    switch(sourceType){
+      case String: return recordValue.asString();
+      default: return JSONValue.toJSONString( recordValue.asObject() );
     }
   }
 

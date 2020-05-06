@@ -650,10 +650,8 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
     return nodeData;
   }
 
-  public boolean init( ITransformMeta smi, ITransformData sdi ) {
-    meta = (Neo4JOutputMeta) smi;
-    data = (Neo4JOutputData) sdi;
-
+  @Override
+  public boolean init() {
     if ( !meta.isReturningGraph() ) {
 
       // Connect to Neo4j using info metastore Neo4j Connection metadata
@@ -684,9 +682,7 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
     return super.init();
   }
 
-  public void dispose( ITransformMeta smi, ITransformData sdi ) {
-    data = (Neo4JOutputData) sdi;
-
+  public void dispose() {
     if ( !isStopped() ) {
       try {
         wrapUpTransaction();

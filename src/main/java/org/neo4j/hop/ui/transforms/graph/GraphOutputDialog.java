@@ -71,7 +71,6 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
 
   private TableView wFieldMappings;
 
-
   private GraphOutputMeta input;
 
   private GraphModel activeModel;
