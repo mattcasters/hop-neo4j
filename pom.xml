@@ -4,7 +4,7 @@
 
   <groupId>org.neo4j.hop</groupId>
   <artifactId>hop-neo4j</artifactId>
-  <version>5.0.3</version>
+  <version>5.0.4</version>
   <packaging>jar</packaging>
 
   <name>hop-neo4j</name>
@@ -20,7 +20,8 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.build.timestamp.format>yyyy-MM-dd hh.mm.ss</maven.build.timestamp.format>
 
-  </properties>
+		<hop-neo4j-core.version>2.0.4</hop-neo4j-core.version>
+	</properties>
 
   <build>
     <defaultGoal>install</defaultGoal>
@@ -118,7 +119,7 @@
 		<dependency>
 			<groupId>org.neo4j.hop</groupId>
 			<artifactId>hop-neo4j-core</artifactId>
-			<version>2.0.2</version>
+			<version>${hop-neo4j-core.version}</version>
 		</dependency>
 
 		<dependency>
