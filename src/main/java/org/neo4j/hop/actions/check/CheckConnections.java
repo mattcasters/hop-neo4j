@@ -1,4 +1,4 @@
-package org.neo4j.hop.entries.check;
+package org.neo4j.hop.actions.check;
 
 import org.apache.hop.core.Result;
 import org.apache.hop.core.annotations.Action;
@@ -10,8 +10,6 @@ import org.apache.hop.metastore.persist.MetaStoreFactory;
 import org.apache.hop.workflow.action.ActionBase;
 import org.apache.hop.workflow.action.IAction;
 import org.neo4j.driver.Session;
-import org.neo4j.hop.core.Neo4jDefaults;
-import org.neo4j.hop.shared.MetaStoreUtil;
 import org.neo4j.hop.shared.NeoConnection;
 import org.w3c.dom.Node;
 

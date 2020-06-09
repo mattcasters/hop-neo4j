@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.entries.cypherscript;
+package org.neo4j.hop.ui.actions.cypherscript;
 
 import org.apache.hop.core.Const;
 import org.apache.hop.core.util.Utils;
@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.neo4j.hop.entries.cypherscript.CypherScript;
+import org.neo4j.hop.actions.cypherscript.CypherScript;
 import org.neo4j.hop.shared.NeoConnection;
 
 public class CypherScriptDialog extends ActionDialog implements IActionDialog {
@@ -62,7 +62,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
     Shell parent = getParent();
     Display display = parent.getDisplay();
 
-    shell = new Shell( parent, props.getWorkflowsDialogStyle() );
+    shell = new Shell( parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MIN | SWT.MAX );
     props.setLook( shell );
     WorkflowDialog.setShellImage( shell, jobEntry );
 

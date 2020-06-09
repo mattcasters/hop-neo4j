@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.entries.check;
+package org.neo4j.hop.ui.actions.check;
 
 import org.apache.hop.core.Const;
 import org.apache.hop.core.util.Utils;
@@ -27,8 +27,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.neo4j.hop.core.Neo4jDefaults;
-import org.neo4j.hop.entries.check.CheckConnections;
+import org.neo4j.hop.actions.check.CheckConnections;
 import org.neo4j.hop.shared.NeoConnection;
 
 import java.util.ArrayList;
@@ -69,7 +68,7 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     Shell parent = getParent();
     Display display = parent.getDisplay();
 
-    shell = new Shell( parent, props.getWorkflowsDialogStyle() );
+    shell = new Shell( parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MIN | SWT.MAX );
     props.setLook( shell );
     WorkflowDialog.setShellImage( shell, action );
 

@@ -4,7 +4,7 @@
 
   <groupId>org.neo4j.hop</groupId>
   <artifactId>hop-neo4j</artifactId>
-  <version>5.0.4</version>
+  <version>5.0.6</version>
   <packaging>jar</packaging>
 
   <name>hop-neo4j</name>
@@ -13,7 +13,7 @@
   <properties>
   
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hop.version>0.20-SNAPSHOT</hop.version>
+    <hop.version>0.30-SNAPSHOT</hop.version>
     <neo4j.driver.version>4.0.1</neo4j.driver.version>
 
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -56,7 +56,7 @@
 							<excludeScope>runtime</excludeScope>
 							<excludeScope>compile</excludeScope>
 							<excludeScope>provided</excludeScope>
-							<excludeArtifactIds>hop-metastore</excludeArtifactIds>
+							<excludeArtifactIds>hop-metastore,guava,junit</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
