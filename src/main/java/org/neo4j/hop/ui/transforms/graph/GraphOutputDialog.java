@@ -8,7 +8,7 @@ import org.apache.hop.core.exception.HopTransformException;
 import org.apache.hop.core.logging.LogChannel;
 import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.metastore.persist.MetaStoreFactory;
+import org.apache.hop.metadata.api.IHopMetadataSerializer;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.ITransformDialog;
@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.neo4j.hop.model.GraphModel;
-import org.neo4j.hop.model.GraphModelUtils;
 import org.neo4j.hop.model.GraphNode;
 import org.neo4j.hop.model.GraphProperty;
 import org.neo4j.hop.model.GraphRelationship;
@@ -47,8 +46,6 @@ import org.neo4j.hop.transforms.graph.GraphOutputMeta;
 import org.neo4j.hop.transforms.graph.ModelTargetType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class GraphOutputDialog extends BaseTransformDialog implements ITransformDialog {
@@ -79,9 +76,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (GraphOutputMeta) inputMetadata;
 
-    // Hack the metastore...
-    //
-    metaStore = HopGui.getInstance().getMetaStore();
+    metadataProvider = HopGui.getInstance().getMetadataProvider();
   }
 
   @Override
@@ -126,7 +121,8 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     wTransformName.setLayoutData( fdTransformName );
     Control lastControl = wTransformName;
 
-    wConnection = new MetaSelectionLine<>( pipelineMeta, metaStore, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+    wConnection =
+      new MetaSelectionLine<>( pipelineMeta, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -142,7 +138,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     lastControl = wConnection;
 
 
-    wModel = new MetaSelectionLine<>( pipelineMeta, metaStore, GraphModel.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Graph model", "The name of the Neo4j logical Graph Model to use" );
+    wModel = new MetaSelectionLine<>( pipelineMeta, metadataProvider, GraphModel.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Graph model", "The name of the Neo4j logical Graph Model to use" );
     props.setLook( wModel );
     wModel.addModifyListener( lsMod );
     FormData fdModel = new FormData();
@@ -364,13 +360,13 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     // Map input field names to Node/Property values
     //
     try {
-      MetaStoreFactory<GraphModel> modelFactory = GraphModel.createFactory( metaStore );
+      IHopMetadataSerializer<GraphModel> modelSerializer = metadataProvider.getSerializer( GraphModel.class );
 
       if ( activeModel == null ) {
         if ( StringUtils.isEmpty( wModel.getText() ) ) {
           return;
         }
-        activeModel = modelFactory.loadElement( wModel.getText() );
+        activeModel = modelSerializer.load( wModel.getText() );
       }
 
       // Input fields
@@ -453,10 +449,18 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
 
     wTransformName.setText( Const.NVL( transformName, "" ) );
     wConnection.setText( Const.NVL( input.getConnectionName(), "" ) );
-    updateConnectionsCombo();
+    try {
+      wConnection.fillItems();
+    } catch ( HopException e ) {
+      log.logError( "Error getting list of Neo4j Connection names", e );
+    }
 
     wModel.setText( Const.NVL( input.getModel(), "" ) );
-    updateModelsCombo();
+    try {
+      wModel.fillItems();
+    } catch ( HopException e ) {
+      log.logError( "Error getting list of Neo4j Graph Model names", e );
+    }
 
     wBatchSize.setText( Const.NVL( input.getBatchSize(), "" ) );
     wCreateIndexes.setSelection( input.isCreatingIndexes() );
@@ -480,47 +484,6 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     wValidateAgainstModel.setSelection( input.isValidatingAgainstModel() );
 
     enableFields();
-  }
-
-  private void updateModelsCombo() {
-    // List of models...
-    //
-    try {
-      MetaStoreFactory<GraphModel> modelFactory = GraphModel.createFactory( metaStore );
-      List<String> modelNames = modelFactory.getElementNames();
-      Collections.sort( modelNames );
-      wModel.setItems( modelNames.toArray( new String[ 0 ] ) );
-
-      // Importer the active model...
-      //
-      if ( StringUtils.isNotEmpty( wModel.getText() ) ) {
-        activeModel = modelFactory.loadElement( wModel.getText() );
-        if ( activeModel != null ) {
-          // Set combo boxes in the mappings...
-          //
-          List<String> targetNames = new ArrayList<>();
-          targetNames.addAll( Arrays.asList( activeModel.getNodeNames() ) );
-          targetNames.addAll( Arrays.asList( activeModel.getRelationshipNames() ) );
-
-          wFieldMappings.getColumns()[ 2 ].setComboValues( activeModel.getNodeNames() );
-        }
-      } else {
-        activeModel = null;
-      }
-
-    } catch ( Exception e ) {
-      new ErrorDialog( shell, "Error", "Unable to list Neo4j Graph Models", e );
-    }
-  }
-
-  private void updateConnectionsCombo() {
-    // List of connections...
-    //
-    try {
-      wConnection.fillItems();
-    } catch ( Exception e ) {
-      new ErrorDialog( shell, "Error", "Unable to list Neo4j connections", e );
-    }
   }
 
   private void ok() {

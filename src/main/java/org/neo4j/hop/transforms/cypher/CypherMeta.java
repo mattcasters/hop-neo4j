@@ -6,6 +6,7 @@ import org.apache.hop.core.exception.HopTransformException;
 import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.IValueMeta;
 import org.apache.hop.core.variables.IVariables;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.neo4j.hop.core.value.ValueMetaGraph;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.apache.hop.core.Const;
@@ -21,7 +22,6 @@ import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
-import org.apache.hop.metastore.api.IMetaStore;
 import org.neo4j.hop.ui.transforms.cypher.CypherDialog;
 import org.w3c.dom.Node;
 
@@ -130,7 +130,7 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
   }
 
   @Override public void getFields( IRowMeta rowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space,
-                                   IMetaStore metaStore ) throws HopTransformException {
+                                   IHopMetadataProvider metadataProvider ) throws HopTransformException {
 
     if ( usingUnwind ) {
       // Unwind only outputs results, not input
@@ -198,7 +198,7 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IMetaStore metaStore ) throws HopXmlException {
+  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
     connectionName = XmlHandler.getTagValue( stepnode, CONNECTION );
     cypher = XmlHandler.getTagValue( stepnode, CYPHER );
     batchSize = XmlHandler.getTagValue( stepnode, BATCH_SIZE );
@@ -239,7 +239,7 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
       returnValues.add( new ReturnValue( name, type, sourceType ) );
     }
 
-    super.loadXml( stepnode, metaStore );
+    super.loadXml( stepnode, metadataProvider );
   }
 
   /**

@@ -1,6 +1,15 @@
 package org.neo4j.hop.ui.transforms.importer;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Const;
+import org.apache.hop.core.exception.HopTransformException;
+import org.apache.hop.i18n.BaseMessages;
+import org.apache.hop.pipeline.PipelineMeta;
+import org.apache.hop.pipeline.transform.BaseTransformMeta;
+import org.apache.hop.pipeline.transform.ITransformDialog;
+import org.apache.hop.ui.core.widget.TextVar;
+import org.apache.hop.ui.hopgui.HopGui;
+import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -20,15 +29,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.apache.hop.core.Const;
-import org.apache.hop.core.exception.HopTransformException;
-import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.pipeline.PipelineMeta;
-import org.apache.hop.pipeline.transform.BaseTransformMeta;
-import org.apache.hop.pipeline.transform.ITransformDialog;
-import org.apache.hop.ui.core.widget.TextVar;
-import org.apache.hop.ui.hopgui.HopGui;
-import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.neo4j.hop.transforms.importer.ImporterMeta;
 
 public class ImporterDialog extends BaseTransformDialog implements ITransformDialog {
@@ -57,9 +57,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (ImporterMeta) inputMetadata;
 
-    // Hack the metastore...
-    //
-    metaStore = HopGui.getInstance().getMetaStore();
+    metadataProvider = HopGui.getInstance().getMetadataProvider();
   }
 
   @Override public String open() {
@@ -77,7 +75,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     ModifyListener lsMod = e -> input.setChanged();
     changed = input.hasChanged();
 
-    ScrolledComposite wScrolledComposite = new ScrolledComposite( shell, SWT.V_SCROLL| SWT.H_SCROLL );
+    ScrolledComposite wScrolledComposite = new ScrolledComposite( shell, SWT.V_SCROLL | SWT.H_SCROLL );
     FormLayout scFormLayout = new FormLayout();
     wScrolledComposite.setLayout( scFormLayout );
     FormData fdSComposite = new FormData();
@@ -91,9 +89,9 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     props.setLook( wComposite );
     FormData fdComposite = new FormData();
     fdComposite.left = new FormAttachment( 0, 0 );
-    fdComposite.right =  new FormAttachment( 100, 0 );
-    fdComposite.top =  new FormAttachment( 0, 0 );
-    fdComposite.bottom =  new FormAttachment( 100, 0 );
+    fdComposite.right = new FormAttachment( 100, 0 );
+    fdComposite.top = new FormAttachment( 0, 0 );
+    fdComposite.bottom = new FormAttachment( 100, 0 );
     wComposite.setLayoutData( fdComposite );
 
     FormLayout formLayout = new FormLayout();
@@ -123,14 +121,14 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdTransformName.right = new FormAttachment( 100, 0 );
     wTransformName.setLayoutData( fdTransformName );
     Control lastControl = wTransformName;
-    
+
     String[] fieldnames = new String[] {};
     try {
-      fieldnames = pipelineMeta.getPrevTransformFields(transformMeta).getFieldNames();
+      fieldnames = pipelineMeta.getPrevTransformFields( transformMeta ).getFieldNames();
     } catch ( HopTransformException e ) {
-      log.logError("error getting input field names: ", e);
+      log.logError( "error getting input field names: ", e );
     }
-    
+
     // Filename field
     //
     Label wlFilenameField = new Label( wComposite, SWT.RIGHT );
@@ -150,7 +148,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdFilenameField.top = new FormAttachment( wlFilenameField, 0, SWT.CENTER );
     wFilenameField.setLayoutData( fdFilenameField );
     lastControl = wFilenameField;
-    
+
     // FileType field
     //
     Label wlFileTypeField = new Label( wComposite, SWT.RIGHT );
@@ -181,7 +179,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlDatabaseFilename.right = new FormAttachment( middle, -margin );
     fdlDatabaseFilename.top = new FormAttachment( lastControl, 2 * margin );
     wlDatabaseFilename.setLayoutData( fdlDatabaseFilename );
-    wDatabaseFilename = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wDatabaseFilename = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wDatabaseFilename );
     wDatabaseFilename.addModifyListener( lsMod );
     FormData fdDatabaseFilename = new FormData();
@@ -201,7 +199,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlAdminCommand.right = new FormAttachment( middle, -margin );
     fdlAdminCommand.top = new FormAttachment( lastControl, 2 * margin );
     wlAdminCommand.setLayoutData( fdlAdminCommand );
-    wAdminCommand = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wAdminCommand = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wAdminCommand );
     wAdminCommand.addModifyListener( lsMod );
     FormData fdAdminCommand = new FormData();
@@ -221,7 +219,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlBaseFolder.right = new FormAttachment( middle, -margin );
     fdlBaseFolder.top = new FormAttachment( lastControl, 2 * margin );
     wlBaseFolder.setLayoutData( fdlBaseFolder );
-    wBaseFolder = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wBaseFolder = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wBaseFolder );
     wBaseFolder.addModifyListener( lsMod );
     FormData fdBaseFolder = new FormData();
@@ -241,7 +239,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlMaxMemory.right = new FormAttachment( middle, -margin );
     fdlMaxMemory.top = new FormAttachment( lastControl, 2 * margin );
     wlMaxMemory.setLayoutData( fdlMaxMemory );
-    wMaxMemory = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wMaxMemory = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wMaxMemory );
     wMaxMemory.addModifyListener( lsMod );
     FormData fdMaxMemory = new FormData();
@@ -261,7 +259,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlHighIo.right = new FormAttachment( middle, -margin );
     fdlHighIo.top = new FormAttachment( lastControl, 2 * margin );
     wlHighIo.setLayoutData( fdlHighIo );
-    wHighIo = new Button(wComposite, SWT.CHECK | SWT.LEFT );
+    wHighIo = new Button( wComposite, SWT.CHECK | SWT.LEFT );
     props.setLook( wHighIo );
     FormData fdHighIo = new FormData();
     fdHighIo.left = new FormAttachment( middle, 0 );
@@ -280,7 +278,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlIgnoreDuplicateNodes.right = new FormAttachment( middle, -margin );
     fdlIgnoreDuplicateNodes.top = new FormAttachment( lastControl, 2 * margin );
     wlIgnoreDuplicateNodes.setLayoutData( fdlIgnoreDuplicateNodes );
-    wIgnoreDuplicateNodes = new Button(wComposite, SWT.CHECK | SWT.LEFT );
+    wIgnoreDuplicateNodes = new Button( wComposite, SWT.CHECK | SWT.LEFT );
     props.setLook( wIgnoreDuplicateNodes );
     FormData fdIgnoreDuplicateNodes = new FormData();
     fdIgnoreDuplicateNodes.left = new FormAttachment( middle, 0 );
@@ -299,7 +297,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlIgnoreMissingNodes.right = new FormAttachment( middle, -margin );
     fdlIgnoreMissingNodes.top = new FormAttachment( lastControl, 2 * margin );
     wlIgnoreMissingNodes.setLayoutData( fdlIgnoreMissingNodes );
-    wIgnoreMissingNodes = new Button(wComposite, SWT.CHECK | SWT.LEFT );
+    wIgnoreMissingNodes = new Button( wComposite, SWT.CHECK | SWT.LEFT );
     props.setLook( wIgnoreMissingNodes );
     FormData fdIgnoreMissingNodes = new FormData();
     fdIgnoreMissingNodes.left = new FormAttachment( middle, 0 );
@@ -318,7 +316,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlIgnoreExtraColumns.right = new FormAttachment( middle, -margin );
     fdlIgnoreExtraColumns.top = new FormAttachment( lastControl, 2 * margin );
     wlIgnoreExtraColumns.setLayoutData( fdlIgnoreExtraColumns );
-    wIgnoreExtraColumns = new Button(wComposite, SWT.CHECK | SWT.LEFT );
+    wIgnoreExtraColumns = new Button( wComposite, SWT.CHECK | SWT.LEFT );
     props.setLook( wIgnoreExtraColumns );
     FormData fdIgnoreExtraColumns = new FormData();
     fdIgnoreExtraColumns.left = new FormAttachment( middle, 0 );
@@ -337,7 +335,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlMultiLine.right = new FormAttachment( middle, -margin );
     fdlMultiLine.top = new FormAttachment( lastControl, 2 * margin );
     wlMultiLine.setLayoutData( fdlMultiLine );
-    wMultiLine = new Button(wComposite, SWT.CHECK | SWT.LEFT );
+    wMultiLine = new Button( wComposite, SWT.CHECK | SWT.LEFT );
     props.setLook( wMultiLine );
     FormData fdMultiLine = new FormData();
     fdMultiLine.left = new FormAttachment( middle, 0 );
@@ -356,7 +354,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlSkipBadRelationships.right = new FormAttachment( middle, -margin );
     fdlSkipBadRelationships.top = new FormAttachment( lastControl, 2 * margin );
     wlSkipBadRelationships.setLayoutData( fdlSkipBadRelationships );
-    wSkipBadRelationships = new Button(wComposite, SWT.CHECK | SWT.LEFT );
+    wSkipBadRelationships = new Button( wComposite, SWT.CHECK | SWT.LEFT );
     props.setLook( wSkipBadRelationships );
     FormData fdSkipBadRelationships = new FormData();
     fdSkipBadRelationships.left = new FormAttachment( middle, 0 );
@@ -376,7 +374,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlReadBufferSize.right = new FormAttachment( middle, -margin );
     fdlReadBufferSize.top = new FormAttachment( lastControl, 2 * margin );
     wlReadBufferSize.setLayoutData( fdlReadBufferSize );
-    wReadBufferSize = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wReadBufferSize = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wReadBufferSize );
     wReadBufferSize.addModifyListener( lsMod );
     FormData fdReadBufferSize = new FormData();
@@ -385,7 +383,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdReadBufferSize.top = new FormAttachment( wlReadBufferSize, 0, SWT.CENTER );
     wReadBufferSize.setLayoutData( fdReadBufferSize );
     lastControl = wReadBufferSize;
-    
+
 
     // Some buttons
     wOk = new Button( wComposite, SWT.PUSH );
@@ -409,8 +407,8 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
 
     // Add listeners
     //
-    wCancel.addListener( SWT.Selection, e->cancel() );
-    wOk.addListener( SWT.Selection, e->ok() );
+    wCancel.addListener( SWT.Selection, e -> cancel() );
+    wOk.addListener( SWT.Selection, e -> ok() );
 
     lsDef = new SelectionAdapter() {
       public void widgetDefaultSelected( SelectionEvent e ) {
@@ -470,8 +468,8 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     wIgnoreDuplicateNodes.setSelection( input.isIgnoringDuplicateNodes() );
     wIgnoreMissingNodes.setSelection( input.isIgnoringMissingNodes() );
     wIgnoreExtraColumns.setSelection( input.isIgnoringExtraColumns() );
-    wSkipBadRelationships.setSelection( input.isSkippingBadRelationships());
-    wMultiLine.setSelection( input.isMultiLine());
+    wSkipBadRelationships.setSelection( input.isSkippingBadRelationships() );
+    wMultiLine.setSelection( input.isMultiLine() );
     wReadBufferSize.setText( Const.NVL( input.getReadBufferSize(), "" ) );
 
   }
@@ -481,11 +479,11 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
       return;
     }
     transformName = wTransformName.getText(); // return value
-    getInfo(input);
+    getInfo( input );
     dispose();
   }
 
-  private void getInfo( ImporterMeta meta) {
+  private void getInfo( ImporterMeta meta ) {
     meta.setFilenameField( wFilenameField.getText() );
     meta.setFileTypeField( wFileTypeField.getText() );
     meta.setAdminCommand( wAdminCommand.getText() );

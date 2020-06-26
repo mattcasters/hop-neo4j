@@ -1,9 +1,21 @@
 package org.neo4j.hop.ui.shared;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Const;
 import org.apache.hop.core.variables.IVariables;
-import org.apache.hop.metastore.api.IMetaStore;
-import org.apache.hop.metastore.api.dialog.IMetaStoreDialog;
+import org.apache.hop.i18n.BaseMessages;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
+import org.apache.hop.ui.core.PropsUi;
+import org.apache.hop.ui.core.dialog.ErrorDialog;
+import org.apache.hop.ui.core.gui.GuiResource;
+import org.apache.hop.ui.core.gui.WindowProperty;
+import org.apache.hop.ui.core.metastore.IMetadataDialog;
+import org.apache.hop.ui.core.widget.CheckBoxVar;
+import org.apache.hop.ui.core.widget.ColumnInfo;
+import org.apache.hop.ui.core.widget.PasswordTextVar;
+import org.apache.hop.ui.core.widget.TableView;
+import org.apache.hop.ui.core.widget.TextVar;
+import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -22,18 +34,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.neo4j.hop.shared.NeoConnection;
-import org.apache.hop.core.Const;
-import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.ui.core.PropsUi;
-import org.apache.hop.ui.core.dialog.ErrorDialog;
-import org.apache.hop.ui.core.gui.GuiResource;
-import org.apache.hop.ui.core.gui.WindowProperty;
-import org.apache.hop.ui.core.widget.CheckBoxVar;
-import org.apache.hop.ui.core.widget.ColumnInfo;
-import org.apache.hop.ui.core.widget.PasswordTextVar;
-import org.apache.hop.ui.core.widget.TableView;
-import org.apache.hop.ui.core.widget.TextVar;
-import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 
 /**
  * Dialog that allows you to edit the settings of a Neo4j connection
@@ -42,7 +42,7 @@ import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
  * @see NeoConnection
  */
 
-public class NeoConnectionDialog implements IMetaStoreDialog {
+public class NeoConnectionDialog implements IMetadataDialog {
   private static Class<?> PKG = NeoConnectionDialog.class; // for i18n purposes, needed by Translator2!!
 
   private NeoConnection neoConnection;
@@ -58,7 +58,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
   private Label wlDatabaseName;
   private TextVar wDatabaseName;
   private Label wlVersion4;
-  private Button wVersion4;
+  private CheckBoxVar wVersion4;
   private Label wlBoltPort;
   private TextVar wBoltPort;
   private Label wlBrowserPort;
@@ -70,7 +70,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
   private Label wlRouting;
   private CheckBoxVar wRouting;
   private Label wlEncryption;
-  private Button wEncryption;
+  private CheckBoxVar wEncryption;
 
   Control lastControl;
 
@@ -92,7 +92,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
   private TableView wUrls;
   private Button wOk;
 
-  public NeoConnectionDialog( Shell parent, IMetaStore metaStore, NeoConnection neoConnection, IVariables variables ) {
+  public NeoConnectionDialog( Shell parent, IHopMetadataProvider metadataProvider, NeoConnection neoConnection, IVariables variables ) {
     this.parent = parent;
     this.neoConnection = neoConnection;
     props = PropsUi.getInstance();
@@ -103,7 +103,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     Display display = parent.getDisplay();
     shell = new Shell( parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MAX | SWT.MIN );
     props.setLook( shell );
-    shell.setImage( GuiResource.getInstance().getImageSlave() );
+    shell.setImage( GuiResource.getInstance().getImageServer() );
 
     middle = props.getMiddlePct();
     margin = Const.MARGIN + 2;
@@ -240,7 +240,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     fdlVersion4.left = new FormAttachment( 0, 0 );
     fdlVersion4.right = new FormAttachment( middle, -margin );
     wlVersion4.setLayoutData( fdlVersion4 );
-    wVersion4 = new Button( shell, SWT.CHECK );
+    wVersion4 = new CheckBoxVar( neoConnection, shell, SWT.CHECK );
     props.setLook( wVersion4 );
     FormData fdVersion4 = new FormData();
     fdVersion4.top = new FormAttachment( wlVersion4, 0, SWT.CENTER );
@@ -373,7 +373,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     fdlEncryption.left = new FormAttachment( 0, 0 );
     fdlEncryption.right = new FormAttachment( middle, -margin );
     wlEncryption.setLayoutData( fdlEncryption );
-    wEncryption = new Button( shell, SWT.CHECK );
+    wEncryption = new CheckBoxVar( neoConnection, shell, SWT.CHECK );
     props.setLook( wEncryption );
     FormData fdEncryption = new FormData();
     fdEncryption.top = new FormAttachment( wlEncryption, 0, SWT.CENTER );
@@ -584,6 +584,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     wServer.setText( Const.NVL( neoConnection.getServer(), "" ) );
     wDatabaseName.setText( Const.NVL( neoConnection.getDatabaseName(), "" ) );
     wVersion4.setSelection( neoConnection.isVersion4() );
+    wVersion4.setVariableName( Const.NVL(neoConnection.getVersion4Variable(), "") );
     wBoltPort.setText( Const.NVL( neoConnection.getBoltPort(), "" ) );
     wBrowserPort.setText( Const.NVL( neoConnection.getBrowserPort(), "" ) );
     wRouting.setSelection( neoConnection.isRouting() );
@@ -592,6 +593,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     wUsername.setText( Const.NVL( neoConnection.getUsername(), "" ) );
     wPassword.setText( Const.NVL( neoConnection.getPassword(), "" ) );
     wEncryption.setSelection( neoConnection.isUsingEncryption() );
+    wEncryption.setVariableName( Const.NVL(neoConnection.getUsingEncryptionVariable(), "") );
     wConnectionLivenessCheckTimeout.setText( Const.NVL( neoConnection.getConnectionLivenessCheckTimeout(), "" ) );
     wMaxConnectionLifetime.setText( Const.NVL( neoConnection.getMaxConnectionLifetime(), "" ) );
     wMaxConnectionPoolSize.setText( Const.NVL( neoConnection.getMaxConnectionPoolSize(), "" ) );
@@ -633,6 +635,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     neo.setServer( wServer.getText() );
     neo.setDatabaseName( wDatabaseName.getText() );
     neo.setVersion4( wVersion4.getSelection() );
+    neo.setVersion4Variable( wVersion4.getVariableName() );
     neo.setBoltPort( wBoltPort.getText() );
     neo.setBrowserPort( wBrowserPort.getText() );
     neo.setRouting( wRouting.getSelection() );
@@ -641,6 +644,7 @@ public class NeoConnectionDialog implements IMetaStoreDialog {
     neo.setUsername( wUsername.getText() );
     neo.setPassword( wPassword.getText() );
     neo.setUsingEncryption( wEncryption.getSelection() );
+    neo.setUsingEncryptionVariable( wEncryption.getVariableName() );
 
     neo.setConnectionLivenessCheckTimeout( wConnectionLivenessCheckTimeout.getText() );
     neo.setMaxConnectionLifetime( wMaxConnectionLifetime.getText() );

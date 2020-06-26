@@ -51,9 +51,7 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
     super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (GenerateCsvMeta) inputMetadata;
 
-    // Hack the metastore...
-    //
-    metaStore = HopGui.getInstance().getMetaStore();
+    metadataProvider = HopGui.getInstance().getMetadataProvider();
   }
 
   @Override public String open() {

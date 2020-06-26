@@ -1,11 +1,18 @@
 package org.neo4j.hop.transforms.output;
 
-import org.neo4j.hop.shared.MetaStoreUtil;
-import org.neo4j.hop.shared.NeoConnection;
-import org.neo4j.hop.shared.NeoConnectionUtils;
-import org.neo4j.hop.transforms.BaseNeoTransform;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Const;
+import org.apache.hop.core.exception.HopException;
+import org.apache.hop.core.exception.HopValueException;
+import org.apache.hop.core.row.IRowMeta;
+import org.apache.hop.core.row.IValueMeta;
+import org.apache.hop.core.row.RowDataUtil;
+import org.apache.hop.core.util.StringUtil;
+import org.apache.hop.pipeline.Pipeline;
+import org.apache.hop.pipeline.PipelineMeta;
+import org.apache.hop.pipeline.transform.ITransform;
+import org.apache.hop.pipeline.transform.TransformMeta;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.summary.Notification;
 import org.neo4j.driver.summary.ResultSummary;
@@ -16,20 +23,9 @@ import org.neo4j.hop.core.data.GraphPropertyData;
 import org.neo4j.hop.core.data.GraphPropertyDataType;
 import org.neo4j.hop.core.data.GraphRelationshipData;
 import org.neo4j.hop.model.GraphPropertyType;
-import org.apache.hop.core.Const;
-import org.apache.hop.core.exception.HopException;
-import org.apache.hop.core.exception.HopValueException;
-import org.apache.hop.core.row.RowDataUtil;
-import org.apache.hop.core.row.IRowMeta;
-import org.apache.hop.core.row.IValueMeta;
-import org.apache.hop.core.util.StringUtil;
-import org.apache.hop.pipeline.Pipeline;
-import org.apache.hop.pipeline.PipelineMeta;
-import org.apache.hop.pipeline.transform.ITransformData;
-import org.apache.hop.pipeline.transform.ITransform;
-import org.apache.hop.pipeline.transform.TransformMeta;
-import org.apache.hop.pipeline.transform.ITransformMeta;
-import org.apache.hop.metastore.api.exceptions.MetaStoreException;
+import org.neo4j.hop.shared.NeoConnection;
+import org.neo4j.hop.shared.NeoConnectionUtils;
+import org.neo4j.hop.transforms.BaseNeoTransform;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +60,7 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
       first = false;
 
       data.outputRowMeta = getInputRowMeta().clone();
-      meta.getFields( data.outputRowMeta, getTransformName(), null, null, this, metaStore );
+      meta.getFields( data.outputRowMeta, getTransformName(), null, null, this, metadataProvider );
 
       data.fieldNames = data.outputRowMeta.getFieldNames();
       data.fromNodePropIndexes = new int[ meta.getFromNodeProps().length ];
@@ -664,14 +660,14 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
       try {
         // To correct lazy programmers who built certain PDI steps...
         //
-        data.neoConnection = NeoConnection.createFactory(metaStore).loadElement( meta.getConnection() );
-        if (data.neoConnection==null) {
-          log.logError("Connection '"+meta.getConnection()+"' could not be found in the metastore "+MetaStoreUtil.getMetaStoreDescription(metaStore));
+        data.neoConnection = metadataProvider.getSerializer( NeoConnection.class ).load( meta.getConnection() );
+        if ( data.neoConnection == null ) {
+          log.logError( "Connection '" + meta.getConnection() + "' could not be found in the metastore : " + metadataProvider.getDescription() );
           return false;
         }
         data.neoConnection.initializeVariablesFrom( this );
         data.version4 = data.neoConnection.isVersion4();
-      } catch ( MetaStoreException e ) {
+      } catch ( HopException e ) {
         log.logError( "Could not gencsv Neo4j connection '" + meta.getConnection() + "' from the metastore", e );
         return false;
       }

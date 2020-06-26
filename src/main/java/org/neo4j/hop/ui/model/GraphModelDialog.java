@@ -1,9 +1,25 @@
 package org.neo4j.hop.ui.model;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Const;
+import org.apache.hop.core.exception.HopException;
+import org.apache.hop.core.row.IRowMeta;
+import org.apache.hop.core.row.IValueMeta;
 import org.apache.hop.core.variables.IVariables;
-import org.apache.hop.metastore.api.IMetaStore;
-import org.apache.hop.metastore.api.dialog.IMetaStoreDialog;
+import org.apache.hop.core.variables.Variables;
+import org.apache.hop.i18n.BaseMessages;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
+import org.apache.hop.ui.core.PropsUi;
+import org.apache.hop.ui.core.dialog.EnterListDialog;
+import org.apache.hop.ui.core.dialog.EnterSelectionDialog;
+import org.apache.hop.ui.core.dialog.EnterTextDialog;
+import org.apache.hop.ui.core.dialog.ErrorDialog;
+import org.apache.hop.ui.core.gui.GuiResource;
+import org.apache.hop.ui.core.gui.WindowProperty;
+import org.apache.hop.ui.core.metastore.IMetadataDialog;
+import org.apache.hop.ui.core.widget.ColumnInfo;
+import org.apache.hop.ui.core.widget.TableView;
+import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CTabFolder;
@@ -36,22 +52,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.neo4j.hop.core.Neo4jUtil;
-import org.apache.hop.core.Const;
-import org.apache.hop.core.exception.HopException;
-import org.apache.hop.core.row.IRowMeta;
-import org.apache.hop.core.row.IValueMeta;
-import org.apache.hop.core.variables.Variables;
-import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.ui.core.PropsUi;
-import org.apache.hop.ui.core.dialog.EnterListDialog;
-import org.apache.hop.ui.core.dialog.EnterSelectionDialog;
-import org.apache.hop.ui.core.dialog.EnterTextDialog;
-import org.apache.hop.ui.core.dialog.ErrorDialog;
-import org.apache.hop.ui.core.gui.GuiResource;
-import org.apache.hop.ui.core.gui.WindowProperty;
-import org.apache.hop.ui.core.widget.ColumnInfo;
-import org.apache.hop.ui.core.widget.TableView;
-import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.neo4j.hop.model.AreaOwner;
 import org.neo4j.hop.model.AreaType;
 import org.neo4j.hop.model.GraphModel;
@@ -69,7 +69,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
+public class GraphModelDialog extends Dialog implements IMetadataDialog {
 
   private static Class<?> PKG = GraphModelDialog.class; // for i18n purposes, needed by Translator2!!
 
@@ -124,8 +124,8 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
   private Label wlRelTarget;
   private Label wlRelProperties;
 
-  public GraphModelDialog( Shell parent, IMetaStore metaStore, GraphModel graphModel, IVariables variables ) {
-    this(parent, graphModel );
+  public GraphModelDialog( Shell parent, IHopMetadataProvider metadataProvider, GraphModel graphModel, IVariables variables ) {
+    this( parent, graphModel );
   }
 
 
@@ -218,7 +218,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
 
     // We really need a name for the graph model...
     //
-    if ( StringUtils.isEmpty(graphModel.getName())) {
+    if ( StringUtils.isEmpty( graphModel.getName() ) ) {
       MessageBox box = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
       box.setText( "Error" );
       box.setMessage( "Please give this model a name so it can be saved and referenced." );
@@ -368,7 +368,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     for ( int i = 0; i < activeRelationship.getProperties().size(); i++ ) {
       GraphProperty property = activeRelationship.getProperties().get( i );
       TableItem item = new TableItem( wRelProperties.table, SWT.NONE );
-      int col=1;
+      int col = 1;
       item.setText( col++, Const.NVL( property.getName(), "" ) );
       item.setText( col++, GraphPropertyType.getCode( property.getType() ) );
       item.setText( col++, Const.NVL( property.getDescription(), "" ) );
@@ -799,7 +799,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
         java.util.List<GraphProperty> properties = new ArrayList<>();
         for ( int i = 0; i < wNodeProperties.nrNonEmpty(); i++ ) {
           TableItem item = wNodeProperties.getNonEmpty( i );
-          int col=1;
+          int col = 1;
           String propertyKey = item.getText( col++ );
           GraphPropertyType propertyType = GraphPropertyType.parseCode( item.getText( col++ ) );
           String propertyDescription = item.getText( col++ );
@@ -1149,7 +1149,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
         java.util.List<GraphProperty> properties = new ArrayList<>();
         for ( int i = 0; i < wRelProperties.nrNonEmpty(); i++ ) {
           TableItem item = wRelProperties.getNonEmpty( i );
-          int col=1;
+          int col = 1;
           String propertyKey = item.getText( col++ );
           GraphPropertyType propertyType = GraphPropertyType.parseCode( item.getText( col++ ) );
           String propertyDescription = item.getText( col++ );
@@ -1159,7 +1159,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
           boolean propertyIndexed = "Y".equalsIgnoreCase( item.getText( col++ ) );
 
           properties.add( new GraphProperty( propertyKey, propertyDescription, propertyType, propertyPrimary,
-            propertyMandatory, propertyUnique, propertyIndexed) );
+            propertyMandatory, propertyUnique, propertyIndexed ) );
         }
 
         activeRelationship.setProperties( properties );
@@ -1208,7 +1208,7 @@ public class GraphModelDialog extends Dialog implements IMetaStoreDialog {
     GraphRelationship relationship = new GraphRelationship();
     relationship.setName( "Relationship " + ( graphModel.getRelationships().size() + 1 ) );
     graphModel.getRelationships().add( relationship );
-    setActiveRelationship(relationship.getName() );
+    setActiveRelationship( relationship.getName() );
     refreshRelationshipsList();
     refreshRelationshipsFields();
   }

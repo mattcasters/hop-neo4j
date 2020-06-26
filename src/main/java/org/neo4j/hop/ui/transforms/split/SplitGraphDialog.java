@@ -1,6 +1,15 @@
 package org.neo4j.hop.ui.transforms.split;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Const;
+import org.apache.hop.core.exception.HopTransformException;
+import org.apache.hop.i18n.BaseMessages;
+import org.apache.hop.pipeline.PipelineMeta;
+import org.apache.hop.pipeline.transform.BaseTransformMeta;
+import org.apache.hop.pipeline.transform.ITransformDialog;
+import org.apache.hop.ui.core.widget.TextVar;
+import org.apache.hop.ui.hopgui.HopGui;
+import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -20,15 +29,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.apache.hop.core.Const;
-import org.apache.hop.core.exception.HopTransformException;
-import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.pipeline.PipelineMeta;
-import org.apache.hop.pipeline.transform.BaseTransformMeta;
-import org.apache.hop.pipeline.transform.ITransformDialog;
-import org.apache.hop.ui.core.widget.TextVar;
-import org.apache.hop.ui.hopgui.HopGui;
-import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.neo4j.hop.transforms.split.SplitGraphMeta;
 
 public class SplitGraphDialog extends BaseTransformDialog implements ITransformDialog {
@@ -48,9 +48,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (SplitGraphMeta) inputMetadata;
 
-    // Hack the metastore...
-    //
-    metaStore = HopGui.getInstance().getMetaStore();
+    metadataProvider = HopGui.getInstance().getMetadataProvider();
   }
 
   @Override public String open() {
@@ -68,7 +66,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     ModifyListener lsMod = e -> input.setChanged();
     changed = input.hasChanged();
 
-    ScrolledComposite wScrolledComposite = new ScrolledComposite( shell, SWT.V_SCROLL| SWT.H_SCROLL );
+    ScrolledComposite wScrolledComposite = new ScrolledComposite( shell, SWT.V_SCROLL | SWT.H_SCROLL );
     FormLayout scFormLayout = new FormLayout();
     wScrolledComposite.setLayout( scFormLayout );
     FormData fdSComposite = new FormData();
@@ -82,9 +80,9 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     props.setLook( wComposite );
     FormData fdComposite = new FormData();
     fdComposite.left = new FormAttachment( 0, 0 );
-    fdComposite.right =  new FormAttachment( 100, 0 );
-    fdComposite.top =  new FormAttachment( 0, 0 );
-    fdComposite.bottom =  new FormAttachment( 100, 0 );
+    fdComposite.right = new FormAttachment( 100, 0 );
+    fdComposite.top = new FormAttachment( 0, 0 );
+    fdComposite.bottom = new FormAttachment( 100, 0 );
     wComposite.setLayoutData( fdComposite );
 
     FormLayout formLayout = new FormLayout();
@@ -114,14 +112,14 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     fdTransformName.right = new FormAttachment( 100, 0 );
     wTransformName.setLayoutData( fdTransformName );
     Control lastControl = wTransformName;
-    
+
     String[] fieldnames = new String[] {};
     try {
-      fieldnames = pipelineMeta.getPrevTransformFields(transformMeta).getFieldNames();
+      fieldnames = pipelineMeta.getPrevTransformFields( transformMeta ).getFieldNames();
     } catch ( HopTransformException e ) {
-      log.logError("error getting input field names: ", e);
+      log.logError( "error getting input field names: ", e );
     }
-    
+
     // Graph input field
     //
     Label wlGraphField = new Label( wComposite, SWT.RIGHT );
@@ -141,7 +139,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     fdGraphField.top = new FormAttachment( wlGraphField, 0, SWT.CENTER );
     wGraphField.setLayoutData( fdGraphField );
     lastControl = wGraphField;
-    
+
     // Type output field
     //
     Label wlTypeField = new Label( wComposite, SWT.RIGHT );
@@ -171,7 +169,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     fdlIdField.right = new FormAttachment( middle, -margin );
     fdlIdField.top = new FormAttachment( lastControl, 2 * margin );
     wlIdField.setLayoutData( fdlIdField );
-    wIdField = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wIdField = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wIdField );
     wIdField.addModifyListener( lsMod );
     FormData fdIdField = new FormData();
@@ -191,7 +189,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     fdlPropertySetField.right = new FormAttachment( middle, -margin );
     fdlPropertySetField.top = new FormAttachment( lastControl, 2 * margin );
     wlPropertySetField.setLayoutData( fdlPropertySetField );
-    wPropertySetField = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wPropertySetField = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wPropertySetField );
     wPropertySetField.addModifyListener( lsMod );
     FormData fdPropertySetField = new FormData();
@@ -223,8 +221,8 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
 
     // Add listeners
     //
-    wCancel.addListener( SWT.Selection, e->cancel() );
-    wOk.addListener( SWT.Selection, e->ok() );
+    wCancel.addListener( SWT.Selection, e -> cancel() );
+    wOk.addListener( SWT.Selection, e -> ok() );
 
     lsDef = new SelectionAdapter() {
       public void widgetDefaultSelected( SelectionEvent e ) {
@@ -282,11 +280,11 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
       return;
     }
     transformName = wTransformName.getText(); // return value
-    getInfo(input);
+    getInfo( input );
     dispose();
   }
 
-  private void getInfo( SplitGraphMeta meta) {
+  private void getInfo( SplitGraphMeta meta ) {
     meta.setGraphField( wGraphField.getText() );
     meta.setTypeField( wTypeField.getText() );
     meta.setIdField( wIdField.getText() );

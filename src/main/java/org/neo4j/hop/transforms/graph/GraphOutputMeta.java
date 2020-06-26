@@ -2,6 +2,7 @@ package org.neo4j.hop.transforms.graph;
 
 
 import org.apache.hop.core.annotations.Transform;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.neo4j.hop.core.value.ValueMetaGraph;
 import org.apache.hop.core.Const;
 import org.apache.hop.core.exception.HopXmlException;
@@ -17,7 +18,6 @@ import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
-import org.apache.hop.metastore.api.IMetaStore;
 import org.neo4j.hop.ui.transforms.graph.GraphOutputDialog;
 import org.w3c.dom.Node;
 
@@ -98,7 +98,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
   }
 
   @Override public void getFields( IRowMeta rowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space,
-                                   IMetaStore metaStore ) {
+                                   IHopMetadataProvider metadataProvider ) {
 
     if (returningGraph) {
 
@@ -133,7 +133,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IMetaStore metaStore ) throws HopXmlException {
+  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
     connectionName = XmlHandler.getTagValue( stepnode, CONNECTION );
     model = XmlHandler.getTagValue( stepnode, MODEL );
     batchSize = XmlHandler.getTagValue( stepnode, BATCH_SIZE );
@@ -156,7 +156,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
       fieldModelMappings.add( new FieldModelMapping( field, targetType, targetName, targetProperty ) );
     }
 
-    super.loadXml( stepnode, metaStore );
+    super.loadXml( stepnode, metadataProvider );
   }
 
   /**

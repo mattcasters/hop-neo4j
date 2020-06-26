@@ -1,11 +1,19 @@
 package org.neo4j.hop.transforms.cypher;
 
 
-import org.json.simple.JSONValue;
-import org.neo4j.hop.shared.MetaStoreUtil;
-import org.neo4j.hop.shared.NeoConnection;
-import org.neo4j.hop.shared.NeoConnectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Const;
+import org.apache.hop.core.exception.HopException;
+import org.apache.hop.core.exception.HopTransformException;
+import org.apache.hop.core.row.IValueMeta;
+import org.apache.hop.core.row.RowDataUtil;
+import org.apache.hop.core.row.RowMeta;
+import org.apache.hop.pipeline.Pipeline;
+import org.apache.hop.pipeline.PipelineMeta;
+import org.apache.hop.pipeline.transform.BaseTransform;
+import org.apache.hop.pipeline.transform.ITransform;
+import org.apache.hop.pipeline.transform.TransformMeta;
+import org.json.simple.JSONValue;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.TransactionWork;
@@ -16,18 +24,7 @@ import org.neo4j.driver.summary.ResultSummary;
 import org.neo4j.hop.core.data.GraphData;
 import org.neo4j.hop.core.data.GraphPropertyDataType;
 import org.neo4j.hop.model.GraphPropertyType;
-import org.apache.hop.core.Const;
-import org.apache.hop.core.exception.HopException;
-import org.apache.hop.core.exception.HopTransformException;
-import org.apache.hop.core.row.RowDataUtil;
-import org.apache.hop.core.row.RowMeta;
-import org.apache.hop.core.row.IValueMeta;
-import org.apache.hop.pipeline.Pipeline;
-import org.apache.hop.pipeline.PipelineMeta;
-import org.apache.hop.pipeline.transform.BaseTransform;
-import org.apache.hop.pipeline.transform.ITransform;
-import org.apache.hop.pipeline.transform.TransformMeta;
-import org.apache.hop.metastore.api.exceptions.MetaStoreException;
+import org.neo4j.hop.shared.NeoConnection;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -59,15 +56,14 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
       return false;
     }
     try {
-
-      data.neoConnection = NeoConnection.createFactory( metaStore ).loadElement( meta.getConnectionName() );
-      if (data.neoConnection==null) {
-        log.logError("Connection '"+meta.getConnectionName()+"' could not be found in the metastore "+MetaStoreUtil.getMetaStoreDescription(metaStore));
+      data.neoConnection = metadataProvider.getSerializer( NeoConnection.class ).load( meta.getConnectionName() );
+      if ( data.neoConnection == null ) {
+        log.logError( "Connection '" + meta.getConnectionName() + "' could not be found in the metadata: " + metadataProvider.getDescription() );
         return false;
       }
       data.neoConnection.initializeVariablesFrom( this );
 
-    } catch ( MetaStoreException e ) {
+    } catch ( HopException e ) {
       log.logError( "Could not gencsv Neo4j connection '" + meta.getConnectionName() + "' from the metastore", e );
       return false;
     }
@@ -84,7 +80,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
     return super.init();
   }
 
-  @Override public void dispose( ) {
+  @Override public void dispose() {
 
     wrapUpTransaction();
     closeSessionDriver();
@@ -99,7 +95,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
   }
 
   private void createDriverSession() {
-    data.session = data.neoConnection.getSession(log);
+    data.session = data.neoConnection.getSession( log );
   }
 
   private void reconnect() {
@@ -150,7 +146,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
       // get the output fields...
       //
       data.outputRowMeta = data.hasInput ? getInputRowMeta().clone() : new RowMeta();
-      meta.getFields( data.outputRowMeta, getTransformName(), null, getTransformMeta(), this, metaStore );
+      meta.getFields( data.outputRowMeta, getTransformName(), null, getTransformMeta(), this, metadataProvider );
 
       // Create a session
       //
@@ -202,12 +198,12 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
 
     // Create a map between the return value and the source type so we can do the appropriate mapping later...
     //
-    data.returnSourceTypeMap = new HashMap<>(  );
-    for (ReturnValue returnValue : meta.getReturnValues()) {
-      if (StringUtils.isNotEmpty( returnValue.getSourceType() )) {
+    data.returnSourceTypeMap = new HashMap<>();
+    for ( ReturnValue returnValue : meta.getReturnValues() ) {
+      if ( StringUtils.isNotEmpty( returnValue.getSourceType() ) ) {
         String name = returnValue.getName();
         GraphPropertyDataType type = GraphPropertyDataType.parseCode( returnValue.getSourceType() );
-        data.returnSourceTypeMap.put(name, type);
+        data.returnSourceTypeMap.put( name, type );
       }
     }
 
@@ -228,13 +224,13 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
         // retry once after reconnecting.
         // This can fix certain time-out issues
         //
-        if (meta.isRetrying()) {
+        if ( meta.isRetrying() ) {
           reconnect();
           runCypherStatement( row, data.cypher, parameters );
         } else {
           throw e;
         }
-      } catch(HopException e) {
+      } catch ( HopException e ) {
         setErrors( 1 );
         stopAll();
         throw e;
@@ -253,14 +249,14 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
 
   private void runCypherStatement( Object[] row, String cypher, Map<String, Object> parameters ) throws HopException {
     data.cypherStatements.add( new CypherStatement( row, cypher, parameters ) );
-    if ( data.cypherStatements.size() >= data.batchSize || !data.hasInput) {
+    if ( data.cypherStatements.size() >= data.batchSize || !data.hasInput ) {
       runCypherStatementsBatch();
     }
   }
 
   private void runCypherStatementsBatch() throws HopException {
 
-    if (data.cypherStatements==null || data.cypherStatements.size()==0) {
+    if ( data.cypherStatements == null || data.cypherStatements.size() == 0 ) {
       // Nothing to see here, move along
       return;
     }
@@ -273,8 +269,8 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
         Result result = transaction.run( cypherStatement.getCypher(), cypherStatement.getParameters() );
         try {
           getResultRows( result, cypherStatement.getRow(), false );
-        } catch(Exception e) {
-          throw new RuntimeException( "Error parsing result of cypher statement '"+cypherStatement.getCypher()+"'", e );
+        } catch ( Exception e ) {
+          throw new RuntimeException( "Error parsing result of cypher statement '" + cypherStatement.getCypher() + "'", e );
         }
       }
 
@@ -291,8 +287,8 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
         setLinesOutput( getLinesOutput() + data.cypherStatements.size() );
       }
 
-      if (log.isDebug()) {
-        logDebug( "Processed "+nrProcessed+" statements" );
+      if ( log.isDebug() ) {
+        logDebug( "Processed " + nrProcessed + " statements" );
       }
 
       // Clear out the batch of statements.
@@ -300,7 +296,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
       data.cypherStatements.clear();
 
     } catch ( Exception e ) {
-      throw new HopException( "Unable to execute batch of cypher statements ("+data.cypherStatements.size()+")", e );
+      throw new HopException( "Unable to execute batch of cypher statements (" + data.cypherStatements.size() + ")", e );
     }
   }
 
@@ -320,7 +316,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
         // retry once after reconnecting.
         // This can fix certain time-out issues
         //
-        if (meta.isRetrying()) {
+        if ( meta.isRetrying() ) {
           reconnect();
           if ( meta.isReadOnly() ) {
             data.session.readTransaction( cypherTransactionWork );
@@ -373,7 +369,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
           // If we're not returning any values then we simply need to pass the input rows without
           // We're consuming any optional results below
           //
-          putRow(data.outputRowMeta, row);
+          putRow( data.outputRowMeta, row );
         } else {
           // If we're returning values we pass all result records per input row.
           // This can be 0, 1 or more per input row
@@ -479,15 +475,17 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
    * @return
    */
   private String convertToString( Value recordValue, GraphPropertyDataType sourceType ) {
-    if (recordValue==null) {
+    if ( recordValue == null ) {
       return null;
     }
-    if (sourceType==null) {
+    if ( sourceType == null ) {
       return JSONValue.toJSONString( recordValue.asObject() );
     }
-    switch(sourceType){
-      case String: return recordValue.asString();
-      default: return JSONValue.toJSONString( recordValue.asObject() );
+    switch ( sourceType ) {
+      case String:
+        return recordValue.asString();
+      default:
+        return JSONValue.toJSONString( recordValue.asObject() );
     }
   }
 
@@ -506,8 +504,8 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
 
     try {
       wrapUpTransaction();
-    } catch(Exception e) {
-      setErrors( getErrors()+1 );
+    } catch ( Exception e ) {
+      setErrors( getErrors() + 1 );
       stopAll();
       throw new RuntimeException( "Unable to complete batch of records", e );
     }
@@ -516,7 +514,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
 
   private void wrapUpTransaction() {
 
-    if (!isStopped()) {
+    if ( !isStopped() ) {
       try {
         if ( meta.isUsingUnwind() && data.unwindList != null ) {
           if ( data.unwindList.size() > 0 ) {
@@ -525,7 +523,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
         } else {
           // See if there are statements left to execute...
           //
-          if (data.cypherStatements!=null && data.cypherStatements.size()>0) {
+          if ( data.cypherStatements != null && data.cypherStatements.size() > 0 ) {
             runCypherStatementsBatch();
           }
         }

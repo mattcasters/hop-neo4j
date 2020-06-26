@@ -1,14 +1,17 @@
 package org.neo4j.hop.transforms.graph;
 
-import org.apache.hop.metastore.persist.MetaStoreFactory;
-import org.neo4j.hop.model.GraphModelUtils;
-import org.neo4j.hop.model.validation.ModelValidator;
-import org.neo4j.hop.model.validation.NodeProperty;
-import org.neo4j.hop.shared.MetaStoreUtil;
-import org.neo4j.hop.shared.NeoConnection;
-import org.neo4j.hop.shared.NeoConnectionUtils;
-import org.neo4j.hop.transforms.BaseNeoTransform;
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.Const;
+import org.apache.hop.core.exception.HopException;
+import org.apache.hop.core.exception.HopValueException;
+import org.apache.hop.core.row.IRowMeta;
+import org.apache.hop.core.row.IValueMeta;
+import org.apache.hop.core.row.RowDataUtil;
+import org.apache.hop.metadata.api.IHopMetadataSerializer;
+import org.apache.hop.pipeline.Pipeline;
+import org.apache.hop.pipeline.PipelineMeta;
+import org.apache.hop.pipeline.transform.ITransform;
+import org.apache.hop.pipeline.transform.TransformMeta;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.summary.Notification;
 import org.neo4j.driver.summary.ResultSummary;
@@ -23,17 +26,11 @@ import org.neo4j.hop.model.GraphNode;
 import org.neo4j.hop.model.GraphProperty;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.neo4j.hop.model.GraphRelationship;
-import org.apache.hop.core.Const;
-import org.apache.hop.core.exception.HopException;
-import org.apache.hop.core.exception.HopValueException;
-import org.apache.hop.core.row.RowDataUtil;
-import org.apache.hop.core.row.IRowMeta;
-import org.apache.hop.core.row.IValueMeta;
-import org.apache.hop.pipeline.Pipeline;
-import org.apache.hop.pipeline.PipelineMeta;
-import org.apache.hop.pipeline.transform.ITransform;
-import org.apache.hop.pipeline.transform.TransformMeta;
-import org.apache.hop.metastore.api.exceptions.MetaStoreException;
+import org.neo4j.hop.model.validation.ModelValidator;
+import org.neo4j.hop.model.validation.NodeProperty;
+import org.neo4j.hop.shared.NeoConnection;
+import org.neo4j.hop.shared.NeoConnectionUtils;
+import org.neo4j.hop.transforms.BaseNeoTransform;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,10 +62,10 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
           return false;
         }
 
-        MetaStoreFactory<NeoConnection> connectionFactory = NeoConnection.createFactory( metaStore );
-        data.neoConnection = connectionFactory.loadElement( meta.getConnectionName() );
-        if (data.neoConnection==null) {
-          log.logError("Connection '"+meta.getConnectionName()+"' could not be found in the metastore "+MetaStoreUtil.getMetaStoreDescription(metaStore));
+        IHopMetadataSerializer<NeoConnection> serializer = metadataProvider.getSerializer( NeoConnection.class );
+        data.neoConnection = serializer.load( meta.getConnectionName() );
+        if ( data.neoConnection == null ) {
+          log.logError( "Connection '" + meta.getConnectionName() + "' could not be found in the metadata : " + metadataProvider.getDescription() );
           return false;
         }
         data.neoConnection.initializeVariablesFrom( this );
@@ -90,29 +87,29 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
         logError( "No model name is specified" );
         return false;
       }
-      MetaStoreFactory<GraphModel> modelFactory = GraphModel.createFactory( metaStore );
-      data.graphModel = modelFactory.loadElement( meta.getModel() );
+      IHopMetadataSerializer<GraphModel> modelSerializer = metadataProvider.getSerializer( GraphModel.class );
+      data.graphModel = modelSerializer.load( meta.getModel() );
       if ( data.graphModel == null ) {
         logError( "Model '" + meta.getModel() + "' could not be found!" );
         return false;
       }
 
       data.modelValidator = null;
-      if (meta.isValidatingAgainstModel()) {
+      if ( meta.isValidatingAgainstModel() ) {
         // Validate the model...
         //
         List<NodeProperty> usedNodeProperties = findUsedNodeProperties();
         data.modelValidator = new ModelValidator( data.graphModel, usedNodeProperties );
         int nrErrors = data.modelValidator.validateBeforeLoad( log, data.session );
-        if (nrErrors>0) {
+        if ( nrErrors > 0 ) {
           // There were validation errors, we can stop here...
-          log.logError("Validation against graph model '"+data.graphModel.getName()+"' failed with "+nrErrors+" errors.");
+          log.logError( "Validation against graph model '" + data.graphModel.getName() + "' failed with " + nrErrors + " errors." );
           return false;
         } else {
-          log.logBasic("Validation against graph model '"+data.graphModel.getName()+"' was successful.");
+          log.logBasic( "Validation against graph model '" + data.graphModel.getName() + "' was successful." );
         }
       }
-    } catch ( MetaStoreException e ) {
+    } catch ( HopException e ) {
       log.logError( "Could not find Neo4j connection'" + meta.getConnectionName() + "'", e );
       return false;
     }
@@ -125,9 +122,9 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
 
   private List<NodeProperty> findUsedNodeProperties() {
     List<NodeProperty> list = new ArrayList<>();
-    for (FieldModelMapping fieldModelMapping : meta.getFieldModelMappings()) {
-      if (fieldModelMapping.getTargetType()==ModelTargetType.Node) {
-        list.add(new NodeProperty(fieldModelMapping.getTargetName(), fieldModelMapping.getTargetProperty()));
+    for ( FieldModelMapping fieldModelMapping : meta.getFieldModelMappings() ) {
+      if ( fieldModelMapping.getTargetType() == ModelTargetType.Node ) {
+        list.add( new NodeProperty( fieldModelMapping.getTargetName(), fieldModelMapping.getTargetProperty() ) );
       }
     }
     return list;
@@ -143,7 +140,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
     return nodes.size();
   }
 
-  @Override public void dispose( ) {
+  @Override public void dispose() {
 
     wrapUpTransaction();
 
@@ -176,7 +173,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
       // get the output fields...
       //
       data.outputRowMeta = getInputRowMeta().clone();
-      meta.getFields( data.outputRowMeta, getTransformName(), null, getTransformMeta(), this, metaStore );
+      meta.getFields( data.outputRowMeta, getTransformName(), null, getTransformMeta(), this, metadataProvider );
 
 
       // Get parameter field indexes
@@ -723,10 +720,10 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
   }
 
   private String buildParameterClause( String parameterName ) {
-    if (data.version4) {
-      return "$"+parameterName;
+    if ( data.version4 ) {
+      return "$" + parameterName;
     } else {
-      return "{"+parameterName+"}";
+      return "{" + parameterName + "}";
     }
   }
 

@@ -6,8 +6,8 @@ import org.apache.hop.core.annotations.Action;
 import org.apache.hop.core.exception.HopException;
 import org.apache.hop.core.exception.HopXmlException;
 import org.apache.hop.core.xml.XmlHandler;
-import org.apache.hop.metastore.api.IMetaStore;
-import org.apache.hop.metastore.persist.MetaStoreFactory;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
+import org.apache.hop.metadata.api.IHopMetadataSerializer;
 import org.apache.hop.workflow.action.ActionBase;
 import org.apache.hop.workflow.action.IAction;
 import org.neo4j.driver.Session;
@@ -56,7 +56,7 @@ public class CypherScript extends ActionBase implements IAction {
     return xml.toString();
   }
 
-  @Override public void loadXml( Node node, IMetaStore metaStore ) throws HopXmlException {
+  @Override public void loadXml( Node node, IHopMetadataProvider metadataProvider ) throws HopXmlException {
 
     super.loadXml( node );
 
@@ -67,7 +67,7 @@ public class CypherScript extends ActionBase implements IAction {
 
   @Override public Result execute( Result result, int nr ) throws HopException {
 
-    MetaStoreFactory<NeoConnection> connectionFactory = NeoConnection.createFactory( metaStore );
+    IHopMetadataSerializer<NeoConnection> serializer = metadataProvider.getSerializer( NeoConnection.class );
 
     // Replace variables & parameters
     //
@@ -78,7 +78,7 @@ public class CypherScript extends ActionBase implements IAction {
         throw new HopException( "The Neo4j connection name is not set" );
       }
 
-      connection = connectionFactory.loadElement( realConnectionName );
+      connection = serializer.load( realConnectionName );
       if ( connection == null ) {
         throw new HopException( "Unable to find connection with name '" + realConnectionName + "'" );
       }

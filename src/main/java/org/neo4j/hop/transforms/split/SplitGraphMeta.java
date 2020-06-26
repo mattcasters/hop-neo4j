@@ -9,7 +9,7 @@ import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.value.ValueMetaString;
 import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.core.xml.XmlHandler;
-import org.apache.hop.metastore.api.IMetaStore;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
@@ -44,7 +44,7 @@ public class SplitGraphMeta extends BaseTransformMeta implements ITransformMeta<
     propertySetField = "propertySet";
   }
 
-  @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space, IMetaStore metaStore )
+  @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space, IHopMetadataProvider metadataProvider )
     throws HopTransformException {
     if ( StringUtils.isNotEmpty( typeField ) ) {
       ValueMetaString typeValueMeta = new ValueMetaString( space.environmentSubstitute( typeField ) );
@@ -72,7 +72,7 @@ public class SplitGraphMeta extends BaseTransformMeta implements ITransformMeta<
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IMetaStore metaStore ) throws HopXmlException {
+  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
     graphField = XmlHandler.getTagValue( stepnode, GRAPH_FIELD );
     typeField = XmlHandler.getTagValue( stepnode, TYPE_FIELD );
     idField = XmlHandler.getTagValue( stepnode, ID_FIELD );

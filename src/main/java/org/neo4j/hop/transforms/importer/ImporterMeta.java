@@ -7,12 +7,12 @@ import org.apache.hop.core.exception.HopXmlException;
 import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.core.xml.XmlHandler;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
-import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
-import org.apache.hop.metastore.api.IMetaStore;
+import org.apache.hop.pipeline.transform.TransformMeta;
 import org.w3c.dom.Node;
 
 @Transform(
@@ -37,8 +37,8 @@ public class ImporterMeta extends BaseTransformMeta implements ITransformMeta<Im
   public static final String MAX_MEMORY = "max_memory";
   public static final String HIGH_IO = "high_io";
   public static final String MULTI_LINE = "multi_line";
-  public static final String SKIP_BAD_RELATIONSHIPS= "skip_bad_relationships";
-  public static final String READ_BUFFER_SIZE= "read_buffer_size";
+  public static final String SKIP_BAD_RELATIONSHIPS = "skip_bad_relationships";
+  public static final String READ_BUFFER_SIZE = "read_buffer_size";
 
   protected String filenameField;
   protected String fileTypeField;
@@ -64,7 +64,7 @@ public class ImporterMeta extends BaseTransformMeta implements ITransformMeta<Im
     readBufferSize = "4M";
   }
 
-  @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space, IMetaStore metaStore )
+  @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space, IHopMetadataProvider metadataProvider )
     throws HopTransformException {
     // No fields are added by default
   }
@@ -72,23 +72,23 @@ public class ImporterMeta extends BaseTransformMeta implements ITransformMeta<Im
   @Override public String getXml() throws HopException {
     StringBuffer xml = new StringBuffer();
     xml.append( XmlHandler.addTagValue( FILENAME_FIELD, filenameField ) );
-    xml.append( XmlHandler.addTagValue( FILE_TYPE_FIELD , fileTypeField) );
+    xml.append( XmlHandler.addTagValue( FILE_TYPE_FIELD, fileTypeField ) );
     xml.append( XmlHandler.addTagValue( ADMIN_COMMAND, adminCommand ) );
     xml.append( XmlHandler.addTagValue( BASE_FOLDER, baseFolder ) );
     xml.append( XmlHandler.addTagValue( REPORT_FILE, reportFile ) );
     xml.append( XmlHandler.addTagValue( DB_NAME, databaseFilename ) );
-    xml.append( XmlHandler.addTagValue( MAX_MEMORY, maxMemory) );
-    xml.append( XmlHandler.addTagValue( IGNORE_DUPLICATE_NODES, ignoringDuplicateNodes) );
-    xml.append( XmlHandler.addTagValue( IGNORE_MISSING_NODES, ignoringMissingNodes) );
-    xml.append( XmlHandler.addTagValue( IGNORE_EXTRA_COLUMNS, ignoringExtraColumns) );
-    xml.append( XmlHandler.addTagValue( HIGH_IO, highIo) );
-    xml.append( XmlHandler.addTagValue( MULTI_LINE, multiLine) );
-    xml.append( XmlHandler.addTagValue( SKIP_BAD_RELATIONSHIPS, skippingBadRelationships) );
-    xml.append( XmlHandler.addTagValue( READ_BUFFER_SIZE, readBufferSize) );
+    xml.append( XmlHandler.addTagValue( MAX_MEMORY, maxMemory ) );
+    xml.append( XmlHandler.addTagValue( IGNORE_DUPLICATE_NODES, ignoringDuplicateNodes ) );
+    xml.append( XmlHandler.addTagValue( IGNORE_MISSING_NODES, ignoringMissingNodes ) );
+    xml.append( XmlHandler.addTagValue( IGNORE_EXTRA_COLUMNS, ignoringExtraColumns ) );
+    xml.append( XmlHandler.addTagValue( HIGH_IO, highIo ) );
+    xml.append( XmlHandler.addTagValue( MULTI_LINE, multiLine ) );
+    xml.append( XmlHandler.addTagValue( SKIP_BAD_RELATIONSHIPS, skippingBadRelationships ) );
+    xml.append( XmlHandler.addTagValue( READ_BUFFER_SIZE, readBufferSize ) );
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode,IMetaStore metaStore ) throws HopXmlException {
+  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
     filenameField = XmlHandler.getTagValue( stepnode, FILENAME_FIELD );
     fileTypeField = XmlHandler.getTagValue( stepnode, FILE_TYPE_FIELD );
     adminCommand = XmlHandler.getTagValue( stepnode, ADMIN_COMMAND );
@@ -101,8 +101,8 @@ public class ImporterMeta extends BaseTransformMeta implements ITransformMeta<Im
     ignoringExtraColumns = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, IGNORE_EXTRA_COLUMNS ) );
     highIo = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, HIGH_IO ) );
     multiLine = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, MULTI_LINE ) );
-    skippingBadRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, SKIP_BAD_RELATIONSHIPS) );
-    readBufferSize = XmlHandler.getTagValue( stepnode, READ_BUFFER_SIZE);
+    skippingBadRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, SKIP_BAD_RELATIONSHIPS ) );
+    readBufferSize = XmlHandler.getTagValue( stepnode, READ_BUFFER_SIZE );
   }
 
 

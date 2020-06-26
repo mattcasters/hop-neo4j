@@ -6,7 +6,7 @@ import org.apache.hop.core.exception.HopTransformException;
 import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.value.ValueMetaFactory;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.metastore.api.IMetaStore;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.PipelinePreviewFactory;
@@ -55,7 +55,6 @@ import org.neo4j.driver.util.Pair;
 import org.neo4j.hop.core.data.GraphPropertyDataType;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.neo4j.hop.shared.NeoConnection;
-import org.neo4j.hop.shared.NeoConnectionUtils;
 import org.neo4j.hop.transforms.cypher.CypherMeta;
 import org.neo4j.hop.transforms.cypher.ParameterMapping;
 import org.neo4j.hop.transforms.cypher.ReturnValue;
@@ -97,9 +96,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (CypherMeta) inputMetadata;
 
-    // Hack the metastore...
-    //
-    metaStore = HopGui.getInstance().getMetaStore();
+    metadataProvider = HopGui.getInstance().getMetadataProvider();
   }
 
   @Override public String open() {
@@ -164,7 +161,8 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     wTransformName.setLayoutData( fdTransformName );
     Control lastControl = wTransformName;
 
-    wConnection = new MetaSelectionLine<>( pipelineMeta, metaStore, NeoConnection.class, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use");
+    wConnection =
+      new MetaSelectionLine<>( pipelineMeta, metadataProvider, NeoConnection.class, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -174,7 +172,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     wConnection.setLayoutData( fdConnection );
     try {
       wConnection.fillItems();
-    } catch(Exception e) {
+    } catch ( Exception e ) {
       new ErrorDialog( shell, "Error", "Error getting list of connections", e );
     }
     lastControl = wConnection;
@@ -655,7 +653,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
   private synchronized void preview() {
     CypherMeta oneMeta = new CypherMeta();
     this.getInfo( oneMeta );
-    PipelineMeta previewMeta = PipelinePreviewFactory.generatePreviewPipeline( this.pipelineMeta, this.pipelineMeta.getMetaStore(), oneMeta, this.wTransformName.getText() );
+    PipelineMeta previewMeta = PipelinePreviewFactory.generatePreviewPipeline( this.pipelineMeta, HopGui.getInstance().getMetadataProvider(), oneMeta, this.wTransformName.getText() );
     this.pipelineMeta.getVariable( "Internal.Transformation.Filename.Directory" );
     previewMeta.getVariable( "Internal.Transformation.Filename.Directory" );
     EnterNumberDialog
@@ -685,7 +683,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
 
   private void getReturnValues() {
 
-    IMetaStore metaStore = HopGui.getInstance().getMetaStore();
+    IHopMetadataProvider metadataProvider = HopGui.getInstance().getMetadataProvider();
     Driver driver = null;
     Session session = null;
     Transaction transaction = null;
@@ -694,7 +692,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     getInfo( meta );
 
     try {
-      NeoConnection neoConnection = NeoConnection.createFactory( metaStore ).loadElement( meta.getConnectionName() );
+      NeoConnection neoConnection = metadataProvider.getSerializer( NeoConnection.class ).load( meta.getConnectionName() );
       neoConnection.initializeVariablesFrom( pipelineMeta );
       driver = neoConnection.getDriver( log );
       session = driver.session();

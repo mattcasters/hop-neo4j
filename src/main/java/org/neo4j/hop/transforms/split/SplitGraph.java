@@ -1,18 +1,18 @@
 package org.neo4j.hop.transforms.split;
 
 import org.apache.commons.lang.StringUtils;
-import org.neo4j.hop.core.data.GraphData;
-import org.neo4j.hop.core.data.GraphNodeData;
-import org.neo4j.hop.core.data.GraphRelationshipData;
-import org.neo4j.hop.core.value.ValueMetaGraph;
 import org.apache.hop.core.exception.HopException;
-import org.apache.hop.core.row.RowDataUtil;
 import org.apache.hop.core.row.IValueMeta;
+import org.apache.hop.core.row.RowDataUtil;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransform;
 import org.apache.hop.pipeline.transform.ITransform;
 import org.apache.hop.pipeline.transform.TransformMeta;
+import org.neo4j.hop.core.data.GraphData;
+import org.neo4j.hop.core.data.GraphNodeData;
+import org.neo4j.hop.core.data.GraphRelationshipData;
+import org.neo4j.hop.core.value.ValueMetaGraph;
 
 public class SplitGraph extends BaseTransform<SplitGraphMeta, SplitGraphData> implements ITransform<SplitGraphMeta, SplitGraphData> {
 
@@ -33,7 +33,7 @@ public class SplitGraph extends BaseTransform<SplitGraphMeta, SplitGraphData> im
       first = false;
 
       data.outputRowMeta = getInputRowMeta().clone();
-      meta.getFields( data.outputRowMeta, getTransformName(), null, null, getPipelineMeta(), getMetaStore() );
+      meta.getFields( data.outputRowMeta, getTransformName(), null, null, getPipelineMeta(), metadataProvider );
 
       data.graphFieldIndex = getInputRowMeta().indexOfValue( meta.getGraphField() );
       if ( data.graphFieldIndex < 0 ) {

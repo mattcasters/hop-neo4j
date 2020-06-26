@@ -9,7 +9,7 @@ import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.IValueMeta;
 import org.apache.hop.core.variables.Variables;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.metastore.persist.MetaStoreFactory;
+import org.apache.hop.metadata.api.IHopMetadataSerializer;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.ITransformDialog;
@@ -44,7 +44,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.neo4j.hop.core.Neo4jDefaults;
 import org.neo4j.hop.core.Neo4jUtil;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.neo4j.hop.shared.NeoConnection;
@@ -85,9 +84,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     super( parent, (BaseTransformMeta) in, pipelineMeta, sname );
     input = (Neo4JOutputMeta) in;
 
-    // Hack the metastore...
-    //
-    metaStore = HopGui.getInstance().getMetaStore();
+    metadataProvider = HopGui.getInstance().getMetadataProvider();
   }
 
 
@@ -141,7 +138,8 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     wTransformName.setLayoutData( fdTransformName );
     Control lastControl = wTransformName;
 
-    wConnection = new MetaSelectionLine<>( pipelineMeta, metaStore, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+    wConnection =
+      new MetaSelectionLine<>( pipelineMeta, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -910,8 +908,8 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     // Verify that the defined connection is available
     //
     try {
-      MetaStoreFactory<NeoConnection> factory = NeoConnection.createFactory( metaStore );
-      NeoConnection connection = factory.loadElement( input.getConnection() );
+      IHopMetadataSerializer<NeoConnection> connectionSerializer = metadataProvider.getSerializer( NeoConnection.class );
+      NeoConnection connection = connectionSerializer.load( input.getConnection() );
       if ( connection == null ) {
         message.append( Const.CR );
         message.append( BaseMessages.getString( PKG, "Neo4JOutputDialog.Warning.ReferencedNeo4jConnectionDoesntExist", input.getConnection(), Const.CR ) );

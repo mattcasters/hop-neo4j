@@ -101,7 +101,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
     wName.setLayoutData( fdName );
     Control lastControl = wName;
 
-    wConnection = new MetaSelectionLine<>( workflowMeta, metaStore, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+    wConnection = new MetaSelectionLine<>( workflowMeta, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();

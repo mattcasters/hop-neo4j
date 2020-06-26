@@ -1,14 +1,13 @@
 package org.neo4j.hop.ui.actions.check;
 
 import org.apache.hop.core.Const;
+import org.apache.hop.core.exception.HopException;
 import org.apache.hop.core.util.Utils;
 import org.apache.hop.i18n.BaseMessages;
-import org.apache.hop.metastore.api.exceptions.MetaStoreException;
-import org.apache.hop.metastore.persist.MetaStoreFactory;
+import org.apache.hop.metadata.api.IHopMetadataSerializer;
 import org.apache.hop.ui.core.gui.WindowProperty;
 import org.apache.hop.ui.core.widget.ColumnInfo;
 import org.apache.hop.ui.core.widget.TableView;
-import org.apache.hop.ui.hopgui.HopGui;
 import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.apache.hop.ui.workflow.action.ActionDialog;
 import org.apache.hop.ui.workflow.dialog.WorkflowDialog;
@@ -51,12 +50,10 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
   private Button wOk, wCancel;
 
   private String[] availableConnectionNames;
-  private MetaStoreFactory<NeoConnection> connectionFactory;
 
   public CheckConnectionsDialog( Shell parent, IAction action, WorkflowMeta workflowMeta ) {
     super( parent, action, workflowMeta );
     this.action = (CheckConnections) action;
-    connectionFactory = NeoConnection.createFactory(HopGui.getInstance().getMetaStore());
 
     if ( this.action.getName() == null ) {
       this.action.setName( "Check Neo4j Connections" );
@@ -129,10 +126,11 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOk, wCancel, }, margin, null );
 
     try {
-      List<String> names = connectionFactory.getElementNames();
+      IHopMetadataSerializer<NeoConnection> connectionSerializer = metadataProvider.getSerializer( NeoConnection.class );
+      List<String> names = connectionSerializer.listObjectNames();
       Collections.sort( names );
       availableConnectionNames = names.toArray( new String[ 0 ] );
-    } catch ( MetaStoreException e ) {
+    } catch ( HopException e ) {
       availableConnectionNames = new String[] {};
     }
 

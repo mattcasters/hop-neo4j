@@ -8,7 +8,7 @@ import org.apache.hop.core.row.IValueMeta;
 import org.apache.hop.core.row.value.ValueMetaString;
 import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.core.xml.XmlHandler;
-import org.apache.hop.metastore.api.IMetaStore;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
@@ -49,7 +49,7 @@ public class GenerateCsvMeta extends BaseTransformMeta implements ITransformMeta
     fileTypeField = "fileType";
   }
 
-  @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space, IMetaStore metaStore ) {
+  @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space, IHopMetadataProvider metadataProvider ) {
 
     inputRowMeta.clear();
 
@@ -75,7 +75,7 @@ public class GenerateCsvMeta extends BaseTransformMeta implements ITransformMeta
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IMetaStore metaStore ) throws HopXmlException {
+  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
     graphFieldName = XmlHandler.getTagValue( stepnode, GRAPH_FIELD_NAME );
     baseFolder = XmlHandler.getTagValue( stepnode, BASE_FOLDER );
     uniquenessStrategy = UniquenessStrategy.getStrategyFromName( XmlHandler.getTagValue( stepnode, UNIQUENESS_STRATEGY ) );

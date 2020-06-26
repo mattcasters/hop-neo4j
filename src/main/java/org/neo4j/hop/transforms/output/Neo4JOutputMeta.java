@@ -1,11 +1,9 @@
 package org.neo4j.hop.transforms.output;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.hop.core.ICheckResult;
-import org.eclipse.swt.widgets.Shell;
-import org.neo4j.hop.core.value.ValueMetaGraph;
 import org.apache.hop.core.CheckResult;
 import org.apache.hop.core.Const;
+import org.apache.hop.core.ICheckResult;
 import org.apache.hop.core.annotations.Transform;
 import org.apache.hop.core.exception.HopException;
 import org.apache.hop.core.exception.HopTransformException;
@@ -16,13 +14,15 @@ import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.IValueMeta;
 import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.core.xml.XmlHandler;
+import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.ITransformDialog;
-import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
-import org.apache.hop.metastore.api.IMetaStore;
+import org.apache.hop.pipeline.transform.TransformMeta;
+import org.eclipse.swt.widgets.Shell;
+import org.neo4j.hop.core.value.ValueMetaGraph;
 import org.neo4j.hop.ui.transforms.output.Neo4JOutputDialog;
 import org.w3c.dom.Node;
 
@@ -63,8 +63,8 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
   private static final String STRING_CREATE_INDEXES = "create_indexes";
   private static final String STRING_USE_CREATE = "use_create";
   private static final String STRING_ONLY_CREATE_RELATIONSHIPS = "only_create_relationships";
-  private static final String STRING_READ_ONLY_FROM_NODE= "read_only_from_node";
-  private static final String STRING_READ_ONLY_TO_NODE= "read_only_to_node";
+  private static final String STRING_READ_ONLY_FROM_NODE = "read_only_from_node";
+  private static final String STRING_READ_ONLY_TO_NODE = "read_only_to_node";
 
   private static final String STRING_RETURNING_GRAPH = "returning_graph";
   private static final String STRING_RETURN_GRAPH_FIELD = "return_graph_field";
@@ -185,13 +185,13 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
     xml.append( XmlHandler.addTagValue( STRING_KEY, key ) );
     xml.append( XmlHandler.addTagValue( STRING_CREATE_INDEXES, creatingIndexes ) );
     xml.append( XmlHandler.addTagValue( STRING_USE_CREATE, usingCreate ) );
-    xml.append( XmlHandler.addTagValue( STRING_ONLY_CREATE_RELATIONSHIPS, onlyCreatingRelationships) );
+    xml.append( XmlHandler.addTagValue( STRING_ONLY_CREATE_RELATIONSHIPS, onlyCreatingRelationships ) );
     xml.append( XmlHandler.addTagValue( STRING_RETURNING_GRAPH, returningGraph ) );
-    xml.append( XmlHandler.addTagValue( STRING_RETURN_GRAPH_FIELD, returnGraphField) );
+    xml.append( XmlHandler.addTagValue( STRING_RETURN_GRAPH_FIELD, returnGraphField ) );
 
     xml.append( XmlHandler.openTag( STRING_FROM ) );
 
-    xml.append( XmlHandler.addTagValue( STRING_READ_ONLY_FROM_NODE, readOnlyFromNode) );
+    xml.append( XmlHandler.addTagValue( STRING_READ_ONLY_FROM_NODE, readOnlyFromNode ) );
 
     xml.append( XmlHandler.openTag( STRING_LABELS ) );
     for ( int i = 0; i < fromNodeLabels.length; i++ ) {
@@ -214,7 +214,7 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
 
     xml.append( XmlHandler.openTag( STRING_TO ) );
 
-    xml.append( XmlHandler.addTagValue( STRING_READ_ONLY_TO_NODE, readOnlyToNode) );
+    xml.append( XmlHandler.addTagValue( STRING_READ_ONLY_TO_NODE, readOnlyToNode ) );
 
     xml.append( XmlHandler.openTag( STRING_LABELS ) );
     for ( int i = 0; i < toNodeLabels.length; i++ ) {
@@ -251,14 +251,14 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IMetaStore metaStore ) throws HopXmlException {
+  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
 
     connection = XmlHandler.getTagValue( stepnode, STRING_CONNECTION );
     batchSize = XmlHandler.getTagValue( stepnode, STRING_BATCH_SIZE );
     key = XmlHandler.getTagValue( stepnode, STRING_KEY );
     creatingIndexes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_CREATE_INDEXES ) );
     usingCreate = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_USE_CREATE ) );
-    onlyCreatingRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_ONLY_CREATE_RELATIONSHIPS) );
+    onlyCreatingRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_ONLY_CREATE_RELATIONSHIPS ) );
     returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_RETURNING_GRAPH ) );
     returnGraphField = XmlHandler.getTagValue( stepnode, STRING_RETURN_GRAPH_FIELD );
 
@@ -271,7 +271,7 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
     List<Node> fromLabelValueNodes = XmlHandler.getNodes( fromLabelsNode, STRING_VALUE );
 
     fromNodeLabels = new String[ fromLabelNodes.size() ];
-    fromNodeLabelValues = new String[ Math.max(fromLabelValueNodes.size(), fromLabelNodes.size()) ];
+    fromNodeLabelValues = new String[ Math.max( fromLabelValueNodes.size(), fromLabelNodes.size() ) ];
 
     for ( int i = 0; i < fromLabelNodes.size(); i++ ) {
       Node labelNode = fromLabelNodes.get( i );
@@ -307,7 +307,7 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
     List<Node> toLabelValueNodes = XmlHandler.getNodes( toLabelsNode, STRING_VALUE );
 
     toNodeLabels = new String[ toLabelNodes.size() ];
-    toNodeLabelValues = new String[ Math.max(toLabelValueNodes.size(), toLabelNodes.size()) ];
+    toNodeLabelValues = new String[ Math.max( toLabelValueNodes.size(), toLabelNodes.size() ) ];
 
     for ( int i = 0; i < toLabelNodes.size(); i++ ) {
       Node labelNode = toLabelNodes.get( i );
@@ -356,7 +356,7 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
 
 
   @Override public void check( List<ICheckResult> remarks, PipelineMeta pipelineMeta, TransformMeta transformMeta, IRowMeta prev, String[] input,
-                               String[] output, IRowMeta info, IVariables space, IMetaStore metaStore ) {
+                               String[] output, IRowMeta info, IVariables space, IHopMetadataProvider metadataProvider ) {
     CheckResult cr;
     if ( prev == null || prev.size() == 0 ) {
       cr = new CheckResult( CheckResult.TYPE_RESULT_WARNING, "Not receiving any fields from previous steps!", transformMeta );
@@ -376,10 +376,10 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
   }
 
   @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space,
-                                   IMetaStore metaStore ) throws HopTransformException {
-    if (returningGraph) {
+                                   IHopMetadataProvider metadataProvider ) throws HopTransformException {
+    if ( returningGraph ) {
 
-      IValueMeta valueMetaGraph = new ValueMetaGraph( Const.NVL(returnGraphField, "graph") );
+      IValueMeta valueMetaGraph = new ValueMetaGraph( Const.NVL( returnGraphField, "graph" ) );
       valueMetaGraph.setOrigin( name );
       inputRowMeta.addValueMeta( valueMetaGraph );
 
@@ -390,9 +390,9 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
     return super.clone();
   }
 
-  protected boolean dynamicLabels(String[] nodeLabelsFields) {
-    for (String nodeLabelField : nodeLabelsFields) {
-      if ( StringUtils.isNotEmpty( nodeLabelField )) {
+  protected boolean dynamicLabels( String[] nodeLabelsFields ) {
+    for ( String nodeLabelField : nodeLabelsFields ) {
+      if ( StringUtils.isNotEmpty( nodeLabelField ) ) {
         return true;
       }
     }
@@ -412,7 +412,7 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
   }
 
   public boolean isCreatingRelationships() {
-    return StringUtils.isNotEmpty(relationship) || StringUtils.isNotEmpty( relationshipValue );
+    return StringUtils.isNotEmpty( relationship ) || StringUtils.isNotEmpty( relationshipValue );
   }
 
   /**
