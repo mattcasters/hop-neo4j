@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.actions.check;
+package org.neo4j.hop.actions.check;
 
 import org.apache.hop.core.Const;
 import org.apache.hop.core.exception.HopException;
@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.neo4j.hop.actions.check.CheckConnections;
 import org.neo4j.hop.shared.NeoConnection;
 
 import java.util.ArrayList;

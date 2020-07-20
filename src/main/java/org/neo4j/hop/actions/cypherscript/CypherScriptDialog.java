@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.actions.cypherscript;
+package org.neo4j.hop.actions.cypherscript;
 
 import org.apache.hop.core.Const;
 import org.apache.hop.core.util.Utils;
@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.neo4j.hop.actions.cypherscript.CypherScript;
 import org.neo4j.hop.shared.NeoConnection;
 
 public class CypherScriptDialog extends ActionDialog implements IActionDialog {
