@@ -50,9 +50,9 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
 
   private String[] availableConnectionNames;
 
-  public CheckConnectionsDialog( Shell parent, IAction action, WorkflowMeta workflowMeta ) {
-    super( parent, action, workflowMeta );
-    this.action = (CheckConnections) action;
+  public CheckConnectionsDialog( Shell parent, IAction iAction, WorkflowMeta workflowMeta ) {
+    super( parent, workflowMeta );
+    this.action = (CheckConnections) iAction;
 
     if ( this.action.getName() == null ) {
       this.action.setName( "Check Neo4j Connections" );
@@ -125,7 +125,7 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOk, wCancel, }, margin, null );
 
     try {
-      IHopMetadataSerializer<NeoConnection> connectionSerializer = metadataProvider.getSerializer( NeoConnection.class );
+      IHopMetadataSerializer<NeoConnection> connectionSerializer = getMetadataProvider().getSerializer( NeoConnection.class );
       List<String> names = connectionSerializer.listObjectNames();
       Collections.sort( names );
       availableConnectionNames = names.toArray( new String[ 0 ] );

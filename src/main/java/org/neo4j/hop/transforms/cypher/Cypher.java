@@ -29,7 +29,9 @@ import org.neo4j.hop.shared.NeoConnection;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -425,6 +427,11 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
                             value = java.sql.Date.valueOf( localDate );
                             break;
                           }
+                          case DateTime: {
+                            ZonedDateTime zonedDateTime = recordValue.asZonedDateTime();
+                            value =Date.from(zonedDateTime.toInstant());
+                            break;
+                          }
                           default:
                             throw new HopException( "Conversion from Neo4j daa type " + neoType.name() + " to a Kettle Date isn't supported yet" );
                         }
@@ -501,7 +508,6 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
   }
 
   @Override public void batchComplete() {
-
     try {
       wrapUpTransaction();
     } catch ( Exception e ) {

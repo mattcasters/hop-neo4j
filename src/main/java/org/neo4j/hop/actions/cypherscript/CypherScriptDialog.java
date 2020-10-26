@@ -36,7 +36,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
 
   private Shell shell;
 
-  private CypherScript jobEntry;
+  private CypherScript cypherScript;
 
   private boolean changed;
 
@@ -47,12 +47,12 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
 
   private Button wOk, wCancel;
 
-  public CypherScriptDialog( Shell parent, IAction jobEntry, WorkflowMeta jobMeta ) {
-    super( parent, jobEntry, jobMeta );
-    this.jobEntry = (CypherScript) jobEntry;
+  public CypherScriptDialog( Shell parent, IAction iAction, WorkflowMeta workflowMeta ) {
+    super( parent, workflowMeta );
+    this.cypherScript = (CypherScript) iAction;
 
-    if ( this.jobEntry.getName() == null ) {
-      this.jobEntry.setName( "Neo4j Cypher Script" );
+    if ( this.cypherScript.getName() == null ) {
+      this.cypherScript.setName( "Neo4j Cypher Script" );
     }
   }
 
@@ -63,14 +63,14 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
 
     shell = new Shell( parent, SWT.DIALOG_TRIM | SWT.RESIZE | SWT.MIN | SWT.MAX );
     props.setLook( shell );
-    WorkflowDialog.setShellImage( shell, jobEntry );
+    WorkflowDialog.setShellImage( shell, cypherScript );
 
     ModifyListener lsMod = new ModifyListener() {
       public void modifyText( ModifyEvent e ) {
-        jobEntry.setChanged();
+        cypherScript.setChanged();
       }
     };
-    changed = jobEntry.hasChanged();
+    changed = cypherScript.hasChanged();
 
     FormLayout formLayout = new FormLayout();
     formLayout.marginWidth = Const.FORM_MARGIN;
@@ -100,7 +100,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
     wName.setLayoutData( fdName );
     Control lastControl = wName;
 
-    wConnection = new MetaSelectionLine<>( workflowMeta, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+    wConnection = new MetaSelectionLine<>( getWorkflowMeta(), getMetadataProvider(), NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -147,7 +147,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
     fdlCypher.right = new FormAttachment( 100, 0 );
     fdlCypher.top = new FormAttachment( wConnection, margin );
     wlScript.setLayoutData( fdlCypher );
-    wScript = new TextVar( workflowMeta, shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
+    wScript = new TextVar( getWorkflowMeta(), shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
     wScript.getTextWidget().setFont( GuiResource.getInstance().getFontFixed() );
     props.setLook( wScript );
     wScript.addModifyListener( lsMod );
@@ -178,20 +178,20 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
       }
     }
 
-    return jobEntry;
+    return cypherScript;
   }
 
   private void cancel() {
-    jobEntry.setChanged( changed );
-    jobEntry = null;
+    cypherScript.setChanged( changed );
+    cypherScript = null;
     dispose();
   }
 
   private void getData() {
-    wName.setText( Const.NVL( jobEntry.getName(), "" ) );
-    wConnection.setText( Const.NVL( jobEntry.getConnectionName(), "" ) );
-    wScript.setText( Const.NVL( jobEntry.getScript(), "" ) );
-    wReplaceVariables.setSelection( jobEntry.isReplacingVariables() );
+    wName.setText( Const.NVL( cypherScript.getName(), "" ) );
+    wConnection.setText( Const.NVL( cypherScript.getConnectionName(), "" ) );
+    wScript.setText( Const.NVL( cypherScript.getScript(), "" ) );
+    wReplaceVariables.setSelection( cypherScript.isReplacingVariables() );
   }
 
   private void ok() {
@@ -202,10 +202,10 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
       mb.open();
       return;
     }
-    jobEntry.setName( wName.getText() );
-    jobEntry.setConnectionName( wConnection.getText() );
-    jobEntry.setScript( wScript.getText() );
-    jobEntry.setReplacingVariables( wReplaceVariables.getSelection() );
+    cypherScript.setName( wName.getText() );
+    cypherScript.setConnectionName( wConnection.getText() );
+    cypherScript.setScript( wScript.getText() );
+    cypherScript.setReplacingVariables( wReplaceVariables.getSelection() );
 
     dispose();
   }
