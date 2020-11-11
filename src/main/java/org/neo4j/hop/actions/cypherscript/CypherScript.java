@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
   name = "Neo4j Cypher Script",
   description = "Execute a Neo4j Cypher script",
   image = "neo4j_cypher.svg",
-  categoryDescription = "i18n:org.apache.hop.job:JobCategory.Category.Scripting",
+  categoryDescription = "i18n:org.apache.hop.workflow:ActionCategory.Category.Scripting",
   documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/"
 )
 public class CypherScript extends ActionBase implements IAction {

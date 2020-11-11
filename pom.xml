@@ -4,7 +4,7 @@
 
   <groupId>org.neo4j.hop</groupId>
   <artifactId>hop-neo4j</artifactId>
-  <version>6.0.0</version>
+  <version>6.0.1</version>
   <packaging>jar</packaging>
 
   <name>hop-neo4j</name>
@@ -13,8 +13,8 @@
   <properties>
   
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hop.version>0.40-SNAPSHOT</hop.version>
-    <neo4j.driver.version>4.0.1</neo4j.driver.version>
+    <hop.version>0.50-SNAPSHOT</hop.version>
+    <neo4j.driver.version>4.1.1</neo4j.driver.version>
 
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -56,7 +56,7 @@
 							<excludeScope>runtime</excludeScope>
 							<excludeScope>compile</excludeScope>
 							<excludeScope>provided</excludeScope>
-							<excludeArtifactIds>hop-metastore,guava,junit</excludeArtifactIds>
+							<excludeArtifactIds>guava,junit</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
@@ -120,6 +120,7 @@
 			<groupId>org.neo4j.hop</groupId>
 			<artifactId>hop-neo4j-core</artifactId>
 			<version>${hop-neo4j-core.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -135,21 +136,21 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hop</groupId>
+			<groupId>org.apache.hop</groupId>
 			<artifactId>hop-core</artifactId>
 			<version>${hop.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.hop</groupId>
+			<groupId>org.apache.hop</groupId>
 			<artifactId>hop-engine</artifactId>
 			<version>${hop.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.hop</groupId>
+			<groupId>org.apache.hop</groupId>
 			<artifactId>hop-ui-swt</artifactId>
 			<version>${hop.version}</version>
 			<scope>provided</scope>

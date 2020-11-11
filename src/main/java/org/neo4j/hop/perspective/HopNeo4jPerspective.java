@@ -98,7 +98,7 @@ import java.util.Map;
   image = "neo4j_logo.svg"
 )
 @GuiPlugin
-public class HopSearchPerspective implements IHopPerspective {
+public class HopNeo4jPerspective implements IHopPerspective {
 
   public static final String ID_PERSPECTIVE_TOOLBAR_ITEM = "9000-perspective-neo4j";
 
@@ -120,7 +120,7 @@ public class HopSearchPerspective implements IHopPerspective {
   private Button wOnlyRoot;
   private Font defaultTabFont;
 
-  public HopSearchPerspective() {
+  public HopNeo4jPerspective() {
   }
 
   @Override public String getId() {
@@ -779,9 +779,7 @@ public class HopSearchPerspective implements IHopPerspective {
         }
         wExecutions.setText( Const.NVL( searchName, "" ) );
       }
-
-
-    } catch ( Exception e ) {
+    } catch ( Throwable e ) {
       new ErrorDialog( hopGui.getShell(), "Error", "Error searching", e );
     }
   }
@@ -1058,7 +1056,7 @@ public class HopSearchPerspective implements IHopPerspective {
    *
    * @return value of composite
    */
-  @Override public Composite getComposite() {
+  @Override public Composite getControl() {
     return composite;
   }
 

@@ -19,10 +19,10 @@ import java.util.List;
 @Action(
   id = "NEO4J_CHECK_CONNECTIONS",
   name = "Check Neo4j Connections",
-  description = "Check to see if we can connecto to the listed Neo4j databases",
+  description = "Check to see if we can connect to the listed Neo4j databases",
   image = "neo4j_check.svg",
-  categoryDescription = "i18n:org.apache.hop.job:JobCategory.Category.Conditions",
-  documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/"
+  categoryDescription = "i18n:org.apache.hop.workflow:ActionCategory.Category.Conditions",
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/"
 )
 public class CheckConnections extends ActionBase implements IAction {
 
