@@ -1,6 +1,6 @@
 # Documentation
 
-These plugins are an [Apache Hop (incubating)](hop.apache.org) port and a direct mirror of the Kettle Neo4j plugins located here:
+These plugins are an [Apache Hop (incubating)](http://hop.apache.org) port and a direct mirror of the Kettle Neo4j plugins located here:
 
 https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output
 
