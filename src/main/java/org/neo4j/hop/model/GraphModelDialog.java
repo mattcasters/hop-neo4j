@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.model;
+package org.neo4j.hop.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -52,14 +52,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.neo4j.hop.core.Neo4jUtil;
-import org.neo4j.hop.model.AreaOwner;
-import org.neo4j.hop.model.AreaType;
-import org.neo4j.hop.model.GraphModel;
-import org.neo4j.hop.model.GraphNode;
-import org.neo4j.hop.model.GraphPresentation;
-import org.neo4j.hop.model.GraphProperty;
-import org.neo4j.hop.model.GraphPropertyType;
-import org.neo4j.hop.model.GraphRelationship;
 import org.neo4j.hop.model.cw.CypherWorkbenchImporter;
 
 import java.awt.geom.Line2D;
@@ -169,7 +161,7 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     FormLayout formLayout = new FormLayout();
 
     shell.setLayout( formLayout );
-    shell.setText( "Graph Model Editor" );
+    shell.setText( BaseMessages.getString( PKG, "GraphModelDialog.Shell.Title" ) );
 
     Button wOk = new Button( shell, SWT.PUSH );
     wOk.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
@@ -220,8 +212,8 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     //
     if ( StringUtils.isEmpty( graphModel.getName() ) ) {
       MessageBox box = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
-      box.setText( "Error" );
-      box.setMessage( "Please give this model a name so it can be saved and referenced." );
+      box.setText( BaseMessages.getString( PKG, "GraphModelDialog.ErrorModelHasNoName.Title") );
+      box.setMessage( BaseMessages.getString( PKG, "GraphModelDialog.ErrorModelHasNoName.Message") );
       box.open();
       return;
     }
@@ -312,7 +304,6 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     // Refresh the Labels
     //
     monitorLabels = false;
-    // System.out.println( "Adding " + activeNode.getLabels().size() + " labels to the labels view" );
     wNodeLabels.clearAll();
     for ( int i = 0; i < activeNode.getLabels().size(); i++ ) {
       TableItem item = new TableItem( wNodeLabels.table, SWT.NONE );
@@ -428,7 +419,7 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     //  - Description
     //
     Label wlName = new Label( wModelComp, SWT.RIGHT );
-    wlName.setText( "Model name" );
+    wlName.setText( BaseMessages.getString( PKG, "GraphModelDialog.Name.Label") );
     props.setLook( wlName );
     FormData fdlModelName = new FormData();
     fdlModelName.left = new FormAttachment( 0, 0 );
@@ -445,7 +436,7 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     Control lastControl = wModelName;
 
     Label wlModelDescription = new Label( wModelComp, SWT.RIGHT );
-    wlModelDescription.setText( "Model description" );
+    wlModelDescription.setText( BaseMessages.getString( PKG, "GraphModelDialog.Description.Label") );
     props.setLook( wlModelDescription );
     FormData fdlModelDescription = new FormData();
     fdlModelDescription.left = new FormAttachment( 0, 0 );
@@ -462,7 +453,7 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     lastControl = wModelDescription;
 
     Button wImportGraph = new Button( wModelComp, SWT.PUSH );
-    wImportGraph.setText( "Import graph from JSON" );
+    wImportGraph.setText( BaseMessages.getString( PKG, "GraphModelDialog.ImportGraph.Button") );
     props.setLook( wImportGraph );
     FormData fdImportGraph = new FormData();
     fdImportGraph.left = new FormAttachment( middle, 0 );
@@ -473,7 +464,7 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     lastControl = wImportGraph;
 
     Button wExportGraph = new Button( wModelComp, SWT.PUSH );
-    wExportGraph.setText( "Export graph to JSON" );
+    wExportGraph.setText( BaseMessages.getString( PKG, "GraphModelDialog.ExportGraph.Button") );
     props.setLook( wExportGraph );
     FormData fdExportGraph = new FormData();
     fdExportGraph.left = new FormAttachment( middle, 0 );
@@ -484,7 +475,7 @@ public class GraphModelDialog extends Dialog implements IMetadataDialog {
     lastControl = wExportGraph;
 
     Button wCypherWorkbenchImportGraph = new Button( wModelComp, SWT.PUSH );
-    wCypherWorkbenchImportGraph.setText( "Import Cypher Workbench model" );
+    wCypherWorkbenchImportGraph.setText( BaseMessages.getString( PKG, "GraphModelDialog.ImportGraphCW.Button") );
     props.setLook( wCypherWorkbenchImportGraph );
     FormData fdCypherWorkbenchImportGraph = new FormData();
     fdCypherWorkbenchImportGraph.left = new FormAttachment( middle, 0 );

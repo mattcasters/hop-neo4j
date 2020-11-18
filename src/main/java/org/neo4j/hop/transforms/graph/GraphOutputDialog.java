@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.transforms.graph;
+package org.neo4j.hop.transforms.graph;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -101,7 +101,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     int middle = props.getMiddlePct();
     int margin = Const.MARGIN;
 
-    // Step name line
+    // Transform name line
     //
     Label wlTransformName = new Label( shell, SWT.RIGHT );
     wlTransformName.setText( "Transform name" );
@@ -192,7 +192,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
 
     Label wlReturnGraph = new Label( shell, SWT.RIGHT );
     wlReturnGraph.setText( "Return graph data?" );
-    String returnGraphTooltipText = "The update data to be updated in the form of Graph a value in the output of this step";
+    String returnGraphTooltipText = "The update data to be updated in the form of Graph a value in the output of this transform";
     wlReturnGraph.setToolTipText( returnGraphTooltipText );
     props.setLook( wlReturnGraph );
     FormData fdlReturnGraph = new FormData();
@@ -266,7 +266,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     try {
       fieldNames = pipelineMeta.getPrevTransformFields( transformName ).getFieldNames();
     } catch ( Exception e ) {
-      logError( "Unable to get fields from previous steps", e );
+      logError( "Unable to get fields from previous transform", e );
       fieldNames = new String[] {};
     }
 
@@ -422,7 +422,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
           } else if ( activeModel.findRelationship( targetName ) != null ) {
             targetType = "Relationship";
           } else {
-            throw new HopException( "Neither node nor transformation found for target '" + targetName + ": internal error" );
+            throw new HopException( "Neither node nor pipeline found for target '" + targetName + ": internal error" );
           }
 
           wFieldMappings.add( field, targetType, targetName, property );
@@ -525,7 +525,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     try {
       inputRowMeta = pipelineMeta.getPrevTransformFields( transformName );
     } catch ( HopTransformException e ) {
-      LogChannel.GENERAL.logError( "Unable to find step input field", e );
+      LogChannel.GENERAL.logError( "Unable to find transform input field", e );
     }
     return inputRowMeta;
   }

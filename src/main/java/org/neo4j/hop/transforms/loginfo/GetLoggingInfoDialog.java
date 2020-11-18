@@ -105,7 +105,7 @@ public class GetLoggingInfoDialog extends BaseTransformDialog implements ITransf
     int middle = props.getMiddlePct();
     int margin = Const.MARGIN;
 
-    // See if the step receives input.
+    // See if the transform receives input.
     //
     isReceivingInput = pipelineMeta.findNrPrevTransforms( transformMeta ) > 0;
 

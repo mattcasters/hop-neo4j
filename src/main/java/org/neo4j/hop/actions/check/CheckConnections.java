@@ -43,7 +43,7 @@ public class CheckConnections extends ActionBase implements IAction {
 
   @Override public String getXml() {
     StringBuilder xml = new StringBuilder();
-    // Add entry name, type, ...
+    // Add action name, type, ...
     //
     xml.append( super.getXml() );
 
@@ -82,7 +82,7 @@ public class CheckConnections extends ActionBase implements IAction {
       realConnectionNames.add( environmentSubstitute( connectionName ) );
     }
 
-    // Check all the connections.  If any one fails, fail the step
+    // Check all the connections.  If any one fails, fail the transform
     // Check 'm all though, report on all, nr of errors is nr of failed connections
     //
     int testCount = 0;

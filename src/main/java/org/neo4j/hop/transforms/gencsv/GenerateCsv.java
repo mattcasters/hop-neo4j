@@ -27,16 +27,16 @@ import java.util.Map;
 public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData> implements ITransform<GenerateCsvMeta, GenerateCsvData> {
 
   /**
-   * This is the base step that forms that basis for all steps. You can derive from this class to implement your own
-   * steps.
+   * This is the base transform that forms that basis for all transform. You can derive from this class to implement your own
+   * transform.
    *
    * @param transformMeta The TransformMeta object to run.
    * @param meta          the transform specific metadata,
    * @param data          the data object to store temporary data, database connections, caches, result sets,
    *                      hashtables etc.
-   * @param copyNr        The copynumber for this step.
-   * @param pipelineMeta  The TransInfo of which the step transformMeta is part of.
-   * @param pipeline      The (running) transformation to obtain information shared among the steps.
+   * @param copyNr        The copynumber for this transform.
+   * @param pipelineMeta  The TransInfo of which the transform transformMeta is part of.
+   * @param pipeline      The (running) pipeline to obtain information shared among the transform.
    */
   public GenerateCsv( TransformMeta transformMeta, GenerateCsvMeta meta, GenerateCsvData data, int copyNr, PipelineMeta pipelineMeta,
                       Pipeline pipeline ) {
@@ -51,7 +51,7 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
       //
       writeBufferToCsv();
 
-      // Close all files and pass the filenames to the next steps.
+      // Close all files and pass the filenames to the next transform.
       // These are stored in the fileMap
       //
       if ( data.fileMap != null ) {
@@ -89,7 +89,7 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
 
       data.graphFieldIndex = getInputRowMeta().indexOfValue( meta.getGraphFieldName() );
       if ( data.graphFieldIndex < 0 ) {
-        throw new HopException( "Unable to find graph field " + meta.getGraphFieldName() + "' in the step input" );
+        throw new HopException( "Unable to find graph field " + meta.getGraphFieldName() + "' in the transform input" );
       }
       if ( getInputRowMeta().getValueMeta( data.graphFieldIndex ).getType() != ValueMetaGraph.TYPE_GRAPH ) {
         throw new HopException( "Field " + meta.getGraphFieldName() + "' needs to be of type Graph" );
@@ -139,7 +139,7 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
       writeGraphDataToCsvFiles( graphData );
     }
 
-    // Don't pass the rows to the next step, only the file names at the end.
+    // Don't pass the rows to the next transform, only the file names at the end.
     //
     return true;
   }
@@ -163,13 +163,13 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
     for ( GraphNodeData nodeData : graphData.getNodes() ) {
 
       // The files we're generating for import need to have the same sets of properties
-      // This set of properties is the same for every step generating the graph data types.
-      // So we can use the name of the property step given by the step in combination with the
-      // transformation and step name.
+      // This set of properties is the same for every transform generating the graph data types.
+      // So we can use the name of the property transform given by the transform in combination with the
+      // pipeline and transform name.
       //
       String propertySetKey = GenerateCsvData.getPropertySetKey(
-        graphData.getSourceTransformationName(),
-        graphData.getSourceStepName(),
+        graphData.getSourcePipelineName(),
+        graphData.getSourceTransformName(),
         nodeData.getPropertySetId()
       );
 
@@ -228,13 +228,13 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
     for ( GraphRelationshipData relationshipData : graphData.getRelationships() ) {
 
       // The files we're generating for import need to have the same sets of properties
-      // This set of properties is the same for every step generating the graph data types.
-      // So we can use the name of the property step given by the step in combination with the
-      // transformation and step name.
+      // This set of properties is the same for every transform generating the graph data types.
+      // So we can use the name of the property transform given by the transform in combination with the
+      // pipeline and transform name.
       //
       String propertySetKey = GenerateCsvData.getPropertySetKey(
-        graphData.getSourceTransformationName(),
-        graphData.getSourceStepName(),
+        graphData.getSourcePipelineName(),
+        graphData.getSourceTransformName(),
         relationshipData.getPropertySetId()
       );
 
@@ -339,7 +339,7 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
 
         header.append( prop.getId() );
         if ( prop.getType() == null ) {
-          throw new HopException( "This step doesn't support importing data type '" + prop.getType().name() + "' yet." );
+          throw new HopException( "This transform doesn't support importing data type '" + prop.getType().name() + "' yet." );
         }
         header.append( ":" ).append( prop.getType().getImportType() );
       }
@@ -482,7 +482,7 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
 
       header.append( prop.getId() );
       if ( prop.getType() == null ) {
-        throw new HopException( "This step doesn't support importing data type '" + prop.getType().name() + "' yet." );
+        throw new HopException( "This transform doesn't support importing data type '" + prop.getType().name() + "' yet." );
       }
       header.append( ":" ).append( prop.getType().getImportType() );
 
@@ -508,7 +508,7 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
         // Copy the data and calculate a unique property set ID
         //
         GraphNodeData nodeCopy = new GraphNodeData( node );
-        nodeCopy.setPropertySetId( graphData.getSourceTransformationName() + "-" + graphData.getSourceStepName() + "-" + node.getPropertySetId() );
+        nodeCopy.setPropertySetId( graphData.getSourcePipelineName() + "-" + graphData.getSourceTransformName() + "-" + node.getPropertySetId() );
 
         data.indexedGraphData.addAndIndexNode( nodeCopy );
       }
@@ -518,7 +518,7 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
         // Copy the data and calculate a unique property set ID
         //
         GraphRelationshipData relationshipCopy = new GraphRelationshipData( relationship );
-        relationshipCopy.setPropertySetId( graphData.getSourceTransformationName() + "-" + graphData.getSourceStepName() + "-" + relationship.getPropertySetId() );
+        relationshipCopy.setPropertySetId( graphData.getSourcePipelineName() + "-" + graphData.getSourceTransformName() + "-" + relationship.getPropertySetId() );
 
         data.indexedGraphData.addAndIndexRelationship( relationshipCopy );
       }

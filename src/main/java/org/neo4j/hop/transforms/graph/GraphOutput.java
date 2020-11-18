@@ -58,7 +58,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
         // Verify some extra metadata...
         //
         if ( StringUtils.isEmpty( meta.getConnectionName() ) ) {
-          log.logError( "You need to specify a Neo4j connection to use in this step" );
+          log.logError( "You need to specify a Neo4j connection to use in this transform" );
           return false;
         }
 
@@ -156,12 +156,12 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
 
   @Override public boolean processRow() throws HopException {
 
-    // Only if we actually have previous steps to read from...
-    // This way the step also acts as an GraphOutput query step
+    // Only if we actually have previous transform to read from...
+    // This way the transform also acts as an GraphOutput query transform
     //
     Object[] row = getRow();
     if ( row == null ) {
-      // Signal next step(s) we're done processing
+      // Signal next transform(s) we're done processing
       //
       setOutputDone();
       return false;
@@ -272,7 +272,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
   private void createNodePropertyIndexes( GraphOutputMeta meta, GraphOutputData data )
     throws HopException {
 
-    // Only try to create an index on the first step copy
+    // Only try to create an index on the first transform copy
     //
     if ( getCopy() > 0 ) {
       return;
@@ -749,16 +749,16 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
    * @param usage
    */
   protected void updateUsageMap( List<String> nodeLabels, GraphUsage usage ) throws HopValueException {
-    Map<String, Set<String>> stepsMap = data.usageMap.get( usage.name() );
-    if ( stepsMap == null ) {
-      stepsMap = new HashMap<>();
-      data.usageMap.put( usage.name(), stepsMap );
+    Map<String, Set<String>> transformsMap = data.usageMap.get( usage.name() );
+    if ( transformsMap == null ) {
+      transformsMap = new HashMap<>();
+      data.usageMap.put( usage.name(), transformsMap );
     }
 
-    Set<String> labelSet = stepsMap.get( getTransformName() );
+    Set<String> labelSet = transformsMap.get( getTransformName() );
     if ( labelSet == null ) {
       labelSet = new HashSet<>();
-      stepsMap.put( getTransformName(), labelSet );
+      transformsMap.put( getTransformName(), labelSet );
     }
 
     for ( String label : nodeLabels ) {
@@ -783,8 +783,8 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
                                     IRowMeta rowMeta, int[] fieldIndexes ) throws HopException {
 
     GraphData graphData = new GraphData();
-    graphData.setSourceTransformationName( getPipelineMeta().getName() );
-    graphData.setSourceStepName( getTransformMeta().getName() );
+    graphData.setSourcePipelineName( getPipelineMeta().getName() );
+    graphData.setSourceTransformName( getTransformMeta().getName() );
 
     // The strategy is to determine all the nodes involved and the properties to set.
     // Then we can determine the relationships between the nodes

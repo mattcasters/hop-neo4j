@@ -88,21 +88,21 @@ public class ImporterMeta extends BaseTransformMeta implements ITransformMeta<Im
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
-    filenameField = XmlHandler.getTagValue( stepnode, FILENAME_FIELD );
-    fileTypeField = XmlHandler.getTagValue( stepnode, FILE_TYPE_FIELD );
-    adminCommand = XmlHandler.getTagValue( stepnode, ADMIN_COMMAND );
-    baseFolder = XmlHandler.getTagValue( stepnode, BASE_FOLDER );
-    reportFile = XmlHandler.getTagValue( stepnode, REPORT_FILE );
-    databaseFilename = XmlHandler.getTagValue( stepnode, DB_NAME );
-    maxMemory = XmlHandler.getTagValue( stepnode, MAX_MEMORY );
-    ignoringDuplicateNodes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, IGNORE_DUPLICATE_NODES ) );
-    ignoringMissingNodes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, IGNORE_MISSING_NODES ) );
-    ignoringExtraColumns = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, IGNORE_EXTRA_COLUMNS ) );
-    highIo = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, HIGH_IO ) );
-    multiLine = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, MULTI_LINE ) );
-    skippingBadRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, SKIP_BAD_RELATIONSHIPS ) );
-    readBufferSize = XmlHandler.getTagValue( stepnode, READ_BUFFER_SIZE );
+  @Override public void loadXml( Node transformNode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
+    filenameField = XmlHandler.getTagValue( transformNode, FILENAME_FIELD );
+    fileTypeField = XmlHandler.getTagValue( transformNode, FILE_TYPE_FIELD );
+    adminCommand = XmlHandler.getTagValue( transformNode, ADMIN_COMMAND );
+    baseFolder = XmlHandler.getTagValue( transformNode, BASE_FOLDER );
+    reportFile = XmlHandler.getTagValue( transformNode, REPORT_FILE );
+    databaseFilename = XmlHandler.getTagValue( transformNode, DB_NAME );
+    maxMemory = XmlHandler.getTagValue( transformNode, MAX_MEMORY );
+    ignoringDuplicateNodes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, IGNORE_DUPLICATE_NODES ) );
+    ignoringMissingNodes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, IGNORE_MISSING_NODES ) );
+    ignoringExtraColumns = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, IGNORE_EXTRA_COLUMNS ) );
+    highIo = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, HIGH_IO ) );
+    multiLine = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, MULTI_LINE ) );
+    skippingBadRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, SKIP_BAD_RELATIONSHIPS ) );
+    readBufferSize = XmlHandler.getTagValue( transformNode, READ_BUFFER_SIZE );
   }
 
 

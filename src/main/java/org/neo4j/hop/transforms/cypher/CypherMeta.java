@@ -22,7 +22,6 @@ import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
-import org.neo4j.hop.ui.transforms.cypher.CypherDialog;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -198,23 +197,23 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
-    connectionName = XmlHandler.getTagValue( stepnode, CONNECTION );
-    cypher = XmlHandler.getTagValue( stepnode, CYPHER );
-    batchSize = XmlHandler.getTagValue( stepnode, BATCH_SIZE );
-    readOnly = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, READ_ONLY ) );
-    String retryString = XmlHandler.getTagValue( stepnode, RETRY );
+  @Override public void loadXml( Node transformNode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
+    connectionName = XmlHandler.getTagValue( transformNode, CONNECTION );
+    cypher = XmlHandler.getTagValue( transformNode, CYPHER );
+    batchSize = XmlHandler.getTagValue( transformNode, BATCH_SIZE );
+    readOnly = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, READ_ONLY ) );
+    String retryString = XmlHandler.getTagValue( transformNode, RETRY );
     retrying = StringUtils.isEmpty( retryString ) || "Y".equalsIgnoreCase( retryString );
-    cypherFromField = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, CYPHER_FROM_FIELD ) );
-    cypherField = XmlHandler.getTagValue( stepnode, CYPHER_FIELD );
-    usingUnwind = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, UNWIND ) );
-    unwindMapName = XmlHandler.getTagValue( stepnode, UNWIND_MAP );
-    returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, RETURNING_GRAPH ) );
-    returnGraphField = XmlHandler.getTagValue( stepnode, RETURN_GRAPH_FIELD);
+    cypherFromField = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, CYPHER_FROM_FIELD ) );
+    cypherField = XmlHandler.getTagValue( transformNode, CYPHER_FIELD );
+    usingUnwind = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, UNWIND ) );
+    unwindMapName = XmlHandler.getTagValue( transformNode, UNWIND_MAP );
+    returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, RETURNING_GRAPH ) );
+    returnGraphField = XmlHandler.getTagValue( transformNode, RETURN_GRAPH_FIELD);
 
     // Parse parameter mappings
     //
-    Node mappingsNode = XmlHandler.getSubNode( stepnode, MAPPINGS );
+    Node mappingsNode = XmlHandler.getSubNode( transformNode, MAPPINGS );
     List<Node> mappingNodes = XmlHandler.getNodes( mappingsNode, MAPPING );
     parameterMappings = new ArrayList<>();
     for ( Node mappingNode : mappingNodes ) {
@@ -229,7 +228,7 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
 
     // Parse return values
     //
-    Node returnsNode = XmlHandler.getSubNode( stepnode, RETURNS );
+    Node returnsNode = XmlHandler.getSubNode( transformNode, RETURNS );
     List<Node> returnNodes = XmlHandler.getNodes( returnsNode, RETURN );
     returnValues = new ArrayList<>();
     for ( Node returnNode : returnNodes ) {
@@ -239,7 +238,7 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
       returnValues.add( new ReturnValue( name, type, sourceType ) );
     }
 
-    super.loadXml( stepnode, metadataProvider );
+    super.loadXml( transformNode, metadataProvider );
   }
 
   /**

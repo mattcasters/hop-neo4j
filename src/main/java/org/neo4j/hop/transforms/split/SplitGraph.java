@@ -37,7 +37,7 @@ public class SplitGraph extends BaseTransform<SplitGraphMeta, SplitGraphData> im
 
       data.graphFieldIndex = getInputRowMeta().indexOfValue( meta.getGraphField() );
       if ( data.graphFieldIndex < 0 ) {
-        throw new HopException( "Unable to find graph field " + meta.getGraphField() + "' in the step input" );
+        throw new HopException( "Unable to find graph field " + meta.getGraphField() + "' in the transform input" );
       }
       IValueMeta valueMeta = getInputRowMeta().getValueMeta( data.graphFieldIndex );
       if ( valueMeta.getType() != ValueMetaGraph.TYPE_GRAPH ) {

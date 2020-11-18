@@ -171,7 +171,7 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
     }
 
     if ( meta.isReturningGraph() ) {
-      // Let the next steps handle writing to Neo4j
+      // Let the next transform handle writing to Neo4j
       //
       outputGraphValue( getInputRowMeta(), row );
 
@@ -525,8 +525,8 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
     try {
 
       GraphData graphData = new GraphData();
-      graphData.setSourceTransformationName( getPipelineMeta().getName() );
-      graphData.setSourceStepName( getTransformMeta().getName() );
+      graphData.setSourcePipelineName( getPipelineMeta().getName() );
+      graphData.setSourceTransformName( getTransformMeta().getName() );
 
       GraphNodeData sourceNodeData = null;
       GraphNodeData targetNodeData = null;
@@ -653,12 +653,12 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
       // Connect to Neo4j using info metastore Neo4j Connection metadata
       //
       if ( StringUtils.isEmpty( meta.getConnection() ) ) {
-        log.logError( "You need to specify a Neo4j connection to use in this step" );
+        log.logError( "You need to specify a Neo4j connection to use in this transform" );
         return false;
       }
 
       try {
-        // To correct lazy programmers who built certain PDI steps...
+        // To correct lazy programmers who built certain PDI transform...
         //
         data.neoConnection = metadataProvider.getSerializer( NeoConnection.class ).load( meta.getConnection() );
         if ( data.neoConnection == null ) {
@@ -893,16 +893,16 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
       return;
     }
 
-    Map<String, Set<String>> stepsMap = data.usageMap.get( usage.name() );
-    if ( stepsMap == null ) {
-      stepsMap = new HashMap<>();
-      data.usageMap.put( usage.name(), stepsMap );
+    Map<String, Set<String>> transformsMap = data.usageMap.get( usage.name() );
+    if ( transformsMap == null ) {
+      transformsMap = new HashMap<>();
+      data.usageMap.put( usage.name(), transformsMap );
     }
 
-    Set<String> labelSet = stepsMap.get( getTransformName() );
+    Set<String> labelSet = transformsMap.get( getTransformName() );
     if ( labelSet == null ) {
       labelSet = new HashSet<>();
-      stepsMap.put( getTransformName(), labelSet );
+      transformsMap.put( getTransformName(), labelSet );
     }
 
     for ( String label : labels ) {

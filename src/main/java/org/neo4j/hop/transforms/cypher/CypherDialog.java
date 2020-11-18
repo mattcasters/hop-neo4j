@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.transforms.cypher;
+package org.neo4j.hop.transforms.cypher;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -55,10 +55,7 @@ import org.neo4j.driver.util.Pair;
 import org.neo4j.hop.core.data.GraphPropertyDataType;
 import org.neo4j.hop.model.GraphPropertyType;
 import org.neo4j.hop.shared.NeoConnection;
-import org.neo4j.hop.transforms.cypher.CypherMeta;
-import org.neo4j.hop.transforms.cypher.ParameterMapping;
-import org.neo4j.hop.transforms.cypher.ReturnValue;
-import org.neo4j.hop.ui.transforms.output.Neo4JOutputDialog;
+import org.neo4j.hop.transforms.output.Neo4JOutputDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,7 +138,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     int middle = props.getMiddlePct();
     int margin = Const.MARGIN;
 
-    // Step name line
+    // Transform name line
     //
     Label wlTransformName = new Label( wComposite, SWT.RIGHT );
     wlTransformName.setText( "Transform name" );
@@ -393,7 +390,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     try {
       fieldNames = pipelineMeta.getPrevTransformFields( transformName ).getFieldNames();
     } catch ( Exception e ) {
-      logError( "Unable to get fields from previous steps", e );
+      logError( "Unable to get fields from previous transform", e );
       fieldNames = new String[] {};
     }
 
@@ -429,7 +426,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
           ( item, valueMeta ) -> Neo4JOutputDialog.getPropertyNameTypePrimary( item, valueMeta, new int[] { 1 }, new int[] { 3 }, -1 )
         );
       } catch ( Exception ex ) {
-        new ErrorDialog( shell, "Error", "Error getting step input fields", ex );
+        new ErrorDialog( shell, "Error", "Error getting transform input fields", ex );
       }
     } );
 
@@ -575,7 +572,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     try {
       wCypherField.setItems( pipelineMeta.getPrevTransformFields( transformName ).getFieldNames() );
     } catch ( HopTransformException e ) {
-      log.logError( "Error getting fields from previous steps", e );
+      log.logError( "Error getting fields from previous transform", e );
     }
 
     wUnwind.setSelection( input.isUsingUnwind() );

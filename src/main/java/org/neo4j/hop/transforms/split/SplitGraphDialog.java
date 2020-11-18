@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.transforms.split;
+package org.neo4j.hop.transforms.split;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -93,7 +93,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     int middle = props.getMiddlePct();
     int margin = Const.MARGIN;
 
-    // Step name line
+    // Transform name line
     //
     Label wlTransformName = new Label( wComposite, SWT.RIGHT );
     wlTransformName.setText( "Transform name" );

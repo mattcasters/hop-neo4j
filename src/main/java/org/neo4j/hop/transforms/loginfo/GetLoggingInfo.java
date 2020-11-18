@@ -48,16 +48,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Get information from the System or the supervising transformation.
+ * Get information from the System or the supervising pipeline.
  *
  * @author Matt
  * @since 4-aug-2003
  */
 public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLoggingInfoData> implements ITransform<GetLoggingInfoMeta, GetLoggingInfoData> {
 
-  public GetLoggingInfo( TransformMeta stepMeta, GetLoggingInfoMeta meta, GetLoggingInfoData data, int copyNr, PipelineMeta pipelineMeta,
+  public GetLoggingInfo( TransformMeta transformMeta, GetLoggingInfoMeta meta, GetLoggingInfoData data, int copyNr, PipelineMeta pipelineMeta,
                          Pipeline pipeline ) {
-    super( stepMeta, meta, data, copyNr, pipelineMeta, pipeline );
+    super( transformMeta, meta, data, copyNr, pipelineMeta, pipeline );
   }
 
   private Object[] getLoggingInfo( IRowMeta inputRowMeta, Object[] inputRowData ) throws Exception {
@@ -78,40 +78,40 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
       }
 
       switch ( meta.getFieldType()[ i ] ) {
-        case TYPE_SYSTEM_INFO_TRANS_DATE_FROM: {
-          Date previousSuccess = getPreviousTransSuccess( argument );
+        case TYPE_SYSTEM_INFO_PIPELINE_DATE_FROM: {
+          Date previousSuccess = getPreviousPipelineSuccess( argument );
           if ( previousSuccess == null ) {
             previousSuccess = Const.MIN_DATE;
           }
           row[ index ] = previousSuccess;
         }
         break;
-        case TYPE_SYSTEM_INFO_TRANS_DATE_TO:
+        case TYPE_SYSTEM_INFO_PIPELINE_DATE_TO:
           row[ index ] = getPipeline().getExecutionStartDate();
           break;
-        case TYPE_SYSTEM_INFO_JOB_DATE_FROM: {
-          Date previousSuccess = getPreviousJobSuccess( argument );
+        case TYPE_SYSTEM_INFO_WORKFLOW_DATE_FROM: {
+          Date previousSuccess = getPreviousWorkflowSuccess( argument );
           if ( previousSuccess == null ) {
             previousSuccess = Const.MIN_DATE;
           }
           row[ index ] = previousSuccess;
         }
         break;
-        case TYPE_SYSTEM_INFO_JOB_DATE_TO:
+        case TYPE_SYSTEM_INFO_WORKFLOW_DATE_TO:
           row[ index ] = getPipeline().getExecutionStartDate();
           break;
 
-        case TYPE_SYSTEM_INFO_TRANS_PREVIOUS_EXECUTION_DATE:
-          row[ index ] = getPreviousTransExecution( argument );
+        case TYPE_SYSTEM_INFO_PIPELINE_PREVIOUS_EXECUTION_DATE:
+          row[ index ] = getPreviousPipelineExecution( argument );
           break;
-        case TYPE_SYSTEM_INFO_TRANS_PREVIOUS_SUCCESS_DATE:
-          row[ index ] = getPreviousTransSuccess( argument );
+        case TYPE_SYSTEM_INFO_PIPELINE_PREVIOUS_SUCCESS_DATE:
+          row[ index ] = getPreviousPipelineSuccess( argument );
           break;
-        case TYPE_SYSTEM_INFO_JOB_PREVIOUS_EXECUTION_DATE:
-          row[ index ] = getPreviousJobExecution( argument );
+        case TYPE_SYSTEM_INFO_WORKFLOW_PREVIOUS_EXECUTION_DATE:
+          row[ index ] = getPreviousWorkflowExecution( argument );
           break;
-        case TYPE_SYSTEM_INFO_JOB_PREVIOUS_SUCCESS_DATE:
-          row[ index ] = getPreviousJobSuccess( argument );
+        case TYPE_SYSTEM_INFO_WORKFLOW_PREVIOUS_SUCCESS_DATE:
+          row[ index ] = getPreviousWorkflowSuccess( argument );
           break;
 
         default:
@@ -192,7 +192,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
     super.dispose();
   }
 
-  private Date getPreviousTransExecution( String transformationName ) throws Exception {
+  private Date getPreviousPipelineExecution( String pipelineName ) throws Exception {
 
     final NeoConnection connection = LoggingCore.getConnection( getPipeline().getMetadataProvider(), getPipeline() );
     if ( connection == null ) {
@@ -200,11 +200,11 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
     }
 
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put( "type", "TRANS" );
-    parameters.put( "trans", transformationName );
+    parameters.put( "type", "PIPELINE" );
+    parameters.put( "name", pipelineName );
     parameters.put( "status", Pipeline.STRING_FINISHED );
 
-    String cypher = "MATCH(e:Execution { type: $type, name : $trans }) "
+    String cypher = "MATCH(e:Execution { type: $type, name : $name }) "
       + "WHERE e.status = $status "
       + "RETURN e.name AS Name, e.executionStart AS startDate, e.errors AS errors, e.id AS id "
       + "ORDER BY startDate DESC "
@@ -213,7 +213,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
     return getResultStartDate( log, connection, cypher, parameters );
   }
 
-  private Date getPreviousTransSuccess( String transformationName ) throws Exception {
+  private Date getPreviousPipelineSuccess( String pipelineName ) throws Exception {
 
     final NeoConnection connection = LoggingCore.getConnection( getPipeline().getMetadataProvider(), getPipeline() );
     if ( connection == null ) {
@@ -222,10 +222,10 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put( "type", "TRANS" );
-    parameters.put( "trans", transformationName );
+    parameters.put( "name", pipelineName );
     parameters.put( "status", Pipeline.STRING_FINISHED );
 
-    String cypher = "MATCH(e:Execution { type: $type, name : $trans }) "
+    String cypher = "MATCH(e:Execution { type: $type, name : $name }) "
       + "WHERE e.errors = 0 "
       + "  AND e.status = $status "
       + "RETURN e.name AS Name, e.executionStart AS startDate, e.errors AS errors, e.id AS id "
@@ -235,7 +235,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
     return getResultStartDate( log, connection, cypher, parameters );
   }
 
-  private Date getPreviousJobExecution( String jobName ) throws Exception {
+  private Date getPreviousWorkflowExecution( String jobName ) throws Exception {
 
     final NeoConnection connection = LoggingCore.getConnection( getPipeline().getMetadataProvider(), getPipeline() );
     if ( connection == null ) {
@@ -244,7 +244,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put( "type", "JOB" );
-    parameters.put( "job", jobName );
+    parameters.put( "workflow", jobName );
     parameters.put( "status", Pipeline.STRING_FINISHED );
 
     String cypher = "MATCH(e:Execution { type: $type, name : $job }) "
@@ -256,7 +256,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
     return getResultStartDate( log, connection, cypher, parameters );
   }
 
-  private Date getPreviousJobSuccess( String jobName ) throws Exception {
+  private Date getPreviousWorkflowSuccess( String jobName ) throws Exception {
 
     final NeoConnection connection = LoggingCore.getConnection( getPipeline().getMetadataProvider(), getPipeline() );
     if ( connection == null ) {
@@ -265,7 +265,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put( "type", "JOB" );
-    parameters.put( "job", jobName );
+    parameters.put( "workflow", jobName );
     parameters.put( "status", Pipeline.STRING_FINISHED );
 
     String cypher = "MATCH(e:Execution { type: $type, name : $job }) "

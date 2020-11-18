@@ -27,15 +27,15 @@ import org.apache.hop.i18n.BaseMessages;
 public enum GetLoggingInfoTypes {
   TYPE_SYSTEM_INFO_NONE( "", "" ),
 
-  TYPE_SYSTEM_INFO_TRANS_DATE_FROM              ( "Specified transformation: Start of date range", "Types.Desc.TransStartDateRange" ),
-  TYPE_SYSTEM_INFO_TRANS_DATE_TO                ( "Specified transformation: End of date range", "Types.Desc.TransEndDateRange" ),
-  TYPE_SYSTEM_INFO_TRANS_PREVIOUS_EXECUTION_DATE( "Specified transformation : Previous execution date", "Types.Desc.TransPreviousExecutionDate" ),
-  TYPE_SYSTEM_INFO_TRANS_PREVIOUS_SUCCESS_DATE  ( "Specified transformation : Previous success date", "Types.Desc.TransPreviousSuccessDate" ),
+  TYPE_SYSTEM_INFO_PIPELINE_DATE_FROM( "Specified pipeline: Start of date range", "Types.Desc.PipelineStartDateRange" ),
+  TYPE_SYSTEM_INFO_PIPELINE_DATE_TO( "Specified pipeline: End of date range", "Types.Desc.PipelineEndDateRange" ),
+  TYPE_SYSTEM_INFO_PIPELINE_PREVIOUS_EXECUTION_DATE( "Specified pipeline : Previous execution date", "Types.Desc.PipelinePreviousExecutionDate" ),
+  TYPE_SYSTEM_INFO_PIPELINE_PREVIOUS_SUCCESS_DATE( "Specified pipeline : Previous success date", "Types.Desc.PipelinePreviousSuccessDate" ),
 
-  TYPE_SYSTEM_INFO_JOB_DATE_FROM                ( "Specified job: Start of date range", "Types.Desc.JobStartDateRange" ),
-  TYPE_SYSTEM_INFO_JOB_DATE_TO                  ( "Specified job: End of date range", "Types.Desc.JobEndDateRange" ),
-  TYPE_SYSTEM_INFO_JOB_PREVIOUS_EXECUTION_DATE  ( "Specified job: Previous execution date", "Types.Desc.JobPreviousExecutionDate" ),
-  TYPE_SYSTEM_INFO_JOB_PREVIOUS_SUCCESS_DATE    ( "Specified job: Previous success date", "Types.Desc.JobPreviousSuccessDate" ),
+  TYPE_SYSTEM_INFO_WORKFLOW_DATE_FROM( "Specified workflow: Start of date range", "Types.Desc.WorkflowStartDateRange" ),
+  TYPE_SYSTEM_INFO_WORKFLOW_DATE_TO( "Specified workflow: End of date range", "Types.Desc.WorkflowEndDateRange" ),
+  TYPE_SYSTEM_INFO_WORKFLOW_PREVIOUS_EXECUTION_DATE( "Specified workflow: Previous execution date", "Types.Desc.WorkflowPreviousExecutionDate" ),
+  TYPE_SYSTEM_INFO_WORKFLOW_PREVIOUS_SUCCESS_DATE( "Specified workflow: Previous success date", "Types.Desc.WorkflowPreviousSuccessDate" ),
   ;
 
   private String code;

@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.shared;
+package org.neo4j.hop.shared;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.neo4j.hop.shared.NeoConnection;
 
 /**
  * Dialog that allows you to edit the settings of a Neo4j connection

@@ -46,15 +46,15 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
 
   @Override public boolean init() {
 
-    // Is the step getting input?
+    // Is the transform getting input?
     //
-    List<TransformMeta> steps = getPipelineMeta().findPreviousTransforms( getTransformMeta() );
-    data.hasInput = steps != null && steps.size() > 0;
+    List<TransformMeta> transform = getPipelineMeta().findPreviousTransforms( getTransformMeta() );
+    data.hasInput = transform != null && transform.size() > 0;
 
     // Connect to Neo4j
     //
     if ( StringUtils.isEmpty( meta.getConnectionName() ) ) {
-      log.logError( "You need to specify a Neo4j connection to use in this step" );
+      log.logError( "You need to specify a Neo4j connection to use in this transform" );
       return false;
     }
     try {
@@ -122,11 +122,11 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
     //
     Object[] row = new Object[ 0 ];
 
-    // Only if we actually have previous steps to read from...
-    // This way the step also acts as an GraphOutput query step
+    // Only if we actually have previous transform to read from...
+    // This way the transform also acts as an GraphOutput query transform
     //
     if ( data.hasInput ) {
-      // Get a row of data from previous steps...
+      // Get a row of data from previous transform...
       //
       row = getRow();
       if ( row == null ) {
@@ -135,7 +135,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
         //
         wrapUpTransaction();
 
-        // Signal next step(s) we're done processing
+        // Signal next transform(s) we're done processing
         //
         setOutputDone();
         return false;
@@ -349,8 +349,8 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
       if ( meta.isReturningGraph() ) {
 
         GraphData graphData = new GraphData( result );
-        graphData.setSourceTransformationName( getPipelineMeta().getName() );
-        graphData.setSourceStepName( getTransformName() );
+        graphData.setSourcePipelineName( getPipelineMeta().getName() );
+        graphData.setSourceTransformName( getTransformName() );
 
         // Create output row
         Object[] outputRowData;
@@ -455,7 +455,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
               outputRow[ index++ ] = value;
             }
 
-            // Pass the rows to the next steps
+            // Pass the rows to the next transform
             //
             putRow( data.outputRowMeta, outputRow );
           }

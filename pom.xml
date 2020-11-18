@@ -4,7 +4,7 @@
 
   <groupId>org.neo4j.hop</groupId>
   <artifactId>hop-neo4j</artifactId>
-  <version>6.0.1</version>
+  <version>6.0.2</version>
   <packaging>jar</packaging>
 
   <name>hop-neo4j</name>
@@ -20,7 +20,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.build.timestamp.format>yyyy-MM-dd hh.mm.ss</maven.build.timestamp.format>
 
-		<hop-neo4j-core.version>2.0.5</hop-neo4j-core.version>
+		<hop-neo4j-core.version>2.0.6</hop-neo4j-core.version>
 	</properties>
 
   <build>
@@ -38,7 +38,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.10</version>
+				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
@@ -54,7 +54,6 @@
               <excludeScope>test</excludeScope>
               <excludeScope>system</excludeScope>
 							<excludeScope>runtime</excludeScope>
-							<excludeScope>compile</excludeScope>
 							<excludeScope>provided</excludeScope>
 							<excludeArtifactIds>guava,junit</excludeArtifactIds>
 						</configuration>
@@ -114,13 +113,6 @@
 			<artifactId>junit</artifactId>
 			<version>3.8.1</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.neo4j.hop</groupId>
-			<artifactId>hop-neo4j-core</artifactId>
-			<version>${hop-neo4j-core.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

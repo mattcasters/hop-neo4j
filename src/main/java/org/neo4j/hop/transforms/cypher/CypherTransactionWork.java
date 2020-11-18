@@ -8,14 +8,14 @@ import org.apache.hop.core.exception.HopException;
 import java.util.Map;
 
 public class CypherTransactionWork implements TransactionWork<Void> {
-  private final Cypher step;
+  private final Cypher transform;
   private final Object[] currentRow;
   private final boolean unwind;
   private String cypher;
   private Map<String, Object> unwindMap;
 
-  public CypherTransactionWork( Cypher step, Object[] currentRow, boolean unwind, String cypher, Map<String, Object> unwindMap ) {
-    this.step = step;
+  public CypherTransactionWork( Cypher transform, Object[] currentRow, boolean unwind, String cypher, Map<String, Object> unwindMap ) {
+    this.transform = transform;
     this.currentRow = currentRow;
     this.unwind = unwind;
     this.cypher = cypher;
@@ -25,7 +25,7 @@ public class CypherTransactionWork implements TransactionWork<Void> {
   @Override public Void execute( Transaction tx ) {
     Result result = tx.run( cypher, unwindMap );
     try {
-      step.getResultRows( result, currentRow, unwind );
+      transform.getResultRows( result, currentRow, unwind );
       return null;
     } catch ( HopException e ) {
       throw new RuntimeException( "Unable to execute cypher statement '"+cypher+"'", e );

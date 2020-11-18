@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.transforms.gencsv;
+package org.neo4j.hop.transforms.gencsv;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
@@ -96,7 +96,7 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
     int middle = props.getMiddlePct();
     int margin = Const.MARGIN;
 
-    // Step name line
+    // Transform name line
     //
     Label wlTransformName = new Label( wComposite, SWT.RIGHT );
     wlTransformName.setText( "Transform name" );

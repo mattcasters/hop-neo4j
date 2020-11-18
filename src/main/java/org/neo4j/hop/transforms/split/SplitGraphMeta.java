@@ -72,11 +72,11 @@ public class SplitGraphMeta extends BaseTransformMeta implements ITransformMeta<
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
-    graphField = XmlHandler.getTagValue( stepnode, GRAPH_FIELD );
-    typeField = XmlHandler.getTagValue( stepnode, TYPE_FIELD );
-    idField = XmlHandler.getTagValue( stepnode, ID_FIELD );
-    propertySetField = XmlHandler.getTagValue( stepnode, PROPERTY_SET_FIELD );
+  @Override public void loadXml( Node transformNode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
+    graphField = XmlHandler.getTagValue( transformNode, GRAPH_FIELD );
+    typeField = XmlHandler.getTagValue( transformNode, TYPE_FIELD );
+    idField = XmlHandler.getTagValue( transformNode, ID_FIELD );
+    propertySetField = XmlHandler.getTagValue( transformNode, PROPERTY_SET_FIELD );
   }
 
   @Override public SplitGraph createTransform( TransformMeta transformMeta, SplitGraphData iTransformData, int copyNr, PipelineMeta pipelineMeta, Pipeline pipeline ) {

@@ -45,7 +45,7 @@ public class CypherScript extends ActionBase implements IAction {
 
   @Override public String getXml() {
     StringBuilder xml = new StringBuilder();
-    // Add entry name, type, ...
+    // Add action name, type, ...
     //
     xml.append( super.getXml() );
 

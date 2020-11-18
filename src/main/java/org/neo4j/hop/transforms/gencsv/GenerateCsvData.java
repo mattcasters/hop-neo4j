@@ -21,16 +21,16 @@ public class GenerateCsvData extends BaseTransformData implements ITransformData
 
   public Map<String, CsvFile> fileMap;
 
-  public static String getPropertySetKey( String sourceTransformation, String sourceStep, String propertySetId ) {
+  public static String getPropertySetKey( String sourcePipeline, String sourceTransform, String propertySetId ) {
     StringBuilder key = new StringBuilder();
-    if ( StringUtils.isNotEmpty( sourceTransformation ) ) {
-      key.append( sourceTransformation );
+    if ( StringUtils.isNotEmpty( sourcePipeline ) ) {
+      key.append( sourcePipeline );
     }
-    if ( StringUtils.isNotEmpty( sourceStep ) ) {
+    if ( StringUtils.isNotEmpty( sourceTransform ) ) {
       if ( key.length() > 0 ) {
         key.append( "-" );
       }
-      key.append( sourceStep );
+      key.append( sourceTransform );
     }
     if ( StringUtils.isNotEmpty( propertySetId ) ) {
       if ( key.length() > 0 ) {

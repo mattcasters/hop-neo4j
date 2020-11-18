@@ -42,11 +42,11 @@ public class Importer extends BaseTransform<ImporterMeta, ImporterData> implemen
 
       data.filenameFieldIndex = getInputRowMeta().indexOfValue( meta.getFilenameField() );
       if ( data.filenameFieldIndex < 0 ) {
-        throw new HopException( "Unable to find filename field " + meta.getFilenameField() + "' in the step input" );
+        throw new HopException( "Unable to find filename field " + meta.getFilenameField() + "' in the transform input" );
       }
       data.fileTypeFieldIndex = getInputRowMeta().indexOfValue( meta.getFileTypeField() );
       if ( data.fileTypeFieldIndex < 0 ) {
-        throw new HopException( "Unable to find file type field " + meta.getFileTypeField() + "' in the step input" );
+        throw new HopException( "Unable to find file type field " + meta.getFileTypeField() + "' in the transform input" );
       }
 
       if ( StringUtils.isEmpty( meta.getAdminCommand() ) ) {

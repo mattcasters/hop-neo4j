@@ -18,7 +18,6 @@ import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.apache.hop.pipeline.transform.ITransformMeta;
-import org.neo4j.hop.ui.transforms.graph.GraphOutputDialog;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -133,18 +132,18 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
-    connectionName = XmlHandler.getTagValue( stepnode, CONNECTION );
-    model = XmlHandler.getTagValue( stepnode, MODEL );
-    batchSize = XmlHandler.getTagValue( stepnode, BATCH_SIZE );
-    creatingIndexes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, CREATE_INDEXES ) );
-    returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, RETURNING_GRAPH ) );
-    returnGraphField = XmlHandler.getTagValue( stepnode, RETURN_GRAPH_FIELD );
-    validatingAgainstModel = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, VALIDATE_AGAINST_MODEL ) );
+  @Override public void loadXml( Node transformNode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
+    connectionName = XmlHandler.getTagValue( transformNode, CONNECTION );
+    model = XmlHandler.getTagValue( transformNode, MODEL );
+    batchSize = XmlHandler.getTagValue( transformNode, BATCH_SIZE );
+    creatingIndexes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, CREATE_INDEXES ) );
+    returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, RETURNING_GRAPH ) );
+    returnGraphField = XmlHandler.getTagValue( transformNode, RETURN_GRAPH_FIELD );
+    validatingAgainstModel = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, VALIDATE_AGAINST_MODEL ) );
 
     // Parse parameter mappings
     //
-    Node mappingsNode = XmlHandler.getSubNode( stepnode, MAPPINGS );
+    Node mappingsNode = XmlHandler.getSubNode( transformNode, MAPPINGS );
     List<Node> mappingNodes = XmlHandler.getNodes( mappingsNode, MAPPING );
     fieldModelMappings = new ArrayList<>();
     for ( Node mappingNode : mappingNodes ) {
@@ -156,7 +155,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
       fieldModelMappings.add( new FieldModelMapping( field, targetType, targetName, targetProperty ) );
     }
 
-    super.loadXml( stepnode, metadataProvider );
+    super.loadXml( transformNode, metadataProvider );
   }
 
   /**

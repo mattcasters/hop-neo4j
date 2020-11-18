@@ -282,7 +282,7 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
           List<ActionResult> actionResults = workflow.getActionResults();
           for ( ActionResult actionResult : actionResults ) {
             String actionLogChannelId = actionResult.getLogChannelId();
-            String stepLoggingText = HopLogStore.getAppender().getBuffer( actionLogChannelId, true ).toString();
+            String transformLoggingText = HopLogStore.getAppender().getBuffer( actionLogChannelId, true ).toString();
             Result result = actionResult.getResult();
             Map<String, Object> actionPars = new HashMap<>();
             actionPars.put( "workflowName", workflowMeta.getName() );
@@ -293,7 +293,7 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
             actionPars.put( "nr", actionResult.getActionNr() );
             actionPars.put( "comment", actionResult.getComment() );
             actionPars.put( "reason", actionResult.getReason() );
-            actionPars.put( "loggingText", stepLoggingText );
+            actionPars.put( "loggingText", transformLoggingText );
             actionPars.put( "errors", result.getNrErrors() );
             actionPars.put( "linesRead", result.getNrLinesRead() );
             actionPars.put( "linesWritten", result.getNrLinesWritten() );

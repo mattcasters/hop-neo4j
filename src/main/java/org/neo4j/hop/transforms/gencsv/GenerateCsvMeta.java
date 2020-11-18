@@ -75,13 +75,13 @@ public class GenerateCsvMeta extends BaseTransformMeta implements ITransformMeta
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
-    graphFieldName = XmlHandler.getTagValue( stepnode, GRAPH_FIELD_NAME );
-    baseFolder = XmlHandler.getTagValue( stepnode, BASE_FOLDER );
-    uniquenessStrategy = UniquenessStrategy.getStrategyFromName( XmlHandler.getTagValue( stepnode, UNIQUENESS_STRATEGY ) );
-    filesPrefix = XmlHandler.getTagValue( stepnode, FILES_PREFIX );
-    filenameField = XmlHandler.getTagValue( stepnode, FILENAME_FIELD );
-    fileTypeField = XmlHandler.getTagValue( stepnode, FILE_TYPE_FIELD );
+  @Override public void loadXml( Node transformNode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
+    graphFieldName = XmlHandler.getTagValue( transformNode, GRAPH_FIELD_NAME );
+    baseFolder = XmlHandler.getTagValue( transformNode, BASE_FOLDER );
+    uniquenessStrategy = UniquenessStrategy.getStrategyFromName( XmlHandler.getTagValue( transformNode, UNIQUENESS_STRATEGY ) );
+    filesPrefix = XmlHandler.getTagValue( transformNode, FILES_PREFIX );
+    filenameField = XmlHandler.getTagValue( transformNode, FILENAME_FIELD );
+    fileTypeField = XmlHandler.getTagValue( transformNode, FILE_TYPE_FIELD );
   }
 
   @Override public GenerateCsv createTransform( TransformMeta transformMeta, GenerateCsvData data, int copyNr, PipelineMeta pipelineMeta, Pipeline pipeline ) {

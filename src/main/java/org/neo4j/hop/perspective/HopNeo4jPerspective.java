@@ -893,6 +893,8 @@ public class HopNeo4jPerspective implements IHopPerspective {
       if ( transformMeta == null ) {
         return;
       }
+      pipelineMeta.unselectAll();
+      transformMeta.setSelected( true );
       graph.editTransform( pipelineMeta, transformMeta );
     } catch ( Exception e ) {
       new ErrorDialog( hopGui.getShell(), "Error", "Error opening transform in pipeline", e );

@@ -86,7 +86,7 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     int margin = Const.MARGIN;
 
     Label wlName = new Label( shell, SWT.RIGHT );
-    wlName.setText( "Job entry name" );
+    wlName.setText( "Action name" );
     props.setLook( wlName );
     FormData fdlName = new FormData();
     fdlName.left = new FormAttachment( 0, 0 );
@@ -185,7 +185,7 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     if ( Utils.isEmpty( wName.getText() ) ) {
       MessageBox mb = new MessageBox( shell, SWT.OK | SWT.ICON_ERROR );
       mb.setText( "Warning" );
-      mb.setMessage( "The name of the job entry is missing!" );
+      mb.setMessage( "The name of the action is missing!" );
       mb.open();
       return;
     }

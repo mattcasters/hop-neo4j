@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.transforms.importer;
+package org.neo4j.hop.transforms.importer;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
@@ -102,7 +102,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     int middle = props.getMiddlePct();
     int margin = Const.MARGIN;
 
-    // Step name line
+    // Transform name line
     //
     Label wlTransformName = new Label( wComposite, SWT.RIGHT );
     wlTransformName.setText( "Transform name" );

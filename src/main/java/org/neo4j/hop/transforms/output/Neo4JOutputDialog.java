@@ -1,4 +1,4 @@
-package org.neo4j.hop.ui.transforms.output;
+package org.neo4j.hop.transforms.output;
 
 
 import org.apache.hop.core.Const;
@@ -226,7 +226,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
 
     Label wlReturnGraph = new Label( shell, SWT.RIGHT );
     wlReturnGraph.setText( "Return graph data?" );
-    String returnGraphTooltipText = "The update data to be updated in the form of Graph a value in the output of this step";
+    String returnGraphTooltipText = "The update data to be updated in the form of Graph a value in the output of this transform";
     wlReturnGraph.setToolTipText( returnGraphTooltipText );
     props.setLook( wlReturnGraph );
     FormData fdlReturnGraph = new FormData();
@@ -872,7 +872,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     input.setRelPropNames( relPropNames );
     input.setRelPropTypes( relPropTypes );
 
-    // Mark step as changed
+    // Mark transform as changed
     transformMeta.setChanged();
 
     // Show some warnings if needed...

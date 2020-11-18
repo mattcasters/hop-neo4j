@@ -23,7 +23,6 @@ import org.apache.hop.pipeline.transform.ITransformMeta;
 import org.apache.hop.pipeline.transform.TransformMeta;
 import org.eclipse.swt.widgets.Shell;
 import org.neo4j.hop.core.value.ValueMetaGraph;
-import org.neo4j.hop.ui.transforms.output.Neo4JOutputDialog;
 import org.w3c.dom.Node;
 
 import java.util.List;
@@ -32,10 +31,10 @@ import java.util.List;
 @Transform(
   id = "Neo4JOutput",
   image = "neo4j_output.svg",
-  i18nPackageName = "bi.know.kettle.neo4j.steps.output",
-  name = "Neo4JOutput.Step.Name",
-  description = "Neo4JOutput.Step.Description",
-  categoryDescription = "Neo4JOutput.Step.Category",
+  i18nPackageName = "org.neo4j.hop.transforms.output",
+  name = "Neo4JOutput.Transform.Name",
+  description = "Neo4JOutput.Transform.Description",
+  categoryDescription = "Neo4JOutput.Transform.Category",
   documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/Neo4j-Output#description"
 )
 @InjectionSupported( localizationPrefix = "Neo4JOutput.Injection.",
@@ -251,18 +250,18 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
     return xml.toString();
   }
 
-  @Override public void loadXml( Node stepnode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
+  @Override public void loadXml( Node transformNode, IHopMetadataProvider metadataProvider ) throws HopXmlException {
 
-    connection = XmlHandler.getTagValue( stepnode, STRING_CONNECTION );
-    batchSize = XmlHandler.getTagValue( stepnode, STRING_BATCH_SIZE );
-    key = XmlHandler.getTagValue( stepnode, STRING_KEY );
-    creatingIndexes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_CREATE_INDEXES ) );
-    usingCreate = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_USE_CREATE ) );
-    onlyCreatingRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_ONLY_CREATE_RELATIONSHIPS ) );
-    returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( stepnode, STRING_RETURNING_GRAPH ) );
-    returnGraphField = XmlHandler.getTagValue( stepnode, STRING_RETURN_GRAPH_FIELD );
+    connection = XmlHandler.getTagValue( transformNode, STRING_CONNECTION );
+    batchSize = XmlHandler.getTagValue( transformNode, STRING_BATCH_SIZE );
+    key = XmlHandler.getTagValue( transformNode, STRING_KEY );
+    creatingIndexes = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, STRING_CREATE_INDEXES ) );
+    usingCreate = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, STRING_USE_CREATE ) );
+    onlyCreatingRelationships = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, STRING_ONLY_CREATE_RELATIONSHIPS ) );
+    returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, STRING_RETURNING_GRAPH ) );
+    returnGraphField = XmlHandler.getTagValue( transformNode, STRING_RETURN_GRAPH_FIELD );
 
-    Node fromNode = XmlHandler.getSubNode( stepnode, STRING_FROM );
+    Node fromNode = XmlHandler.getSubNode( transformNode, STRING_FROM );
 
     readOnlyFromNode = "Y".equalsIgnoreCase( XmlHandler.getTagValue( fromNode, STRING_READ_ONLY_FROM_NODE ) );
 
@@ -298,7 +297,7 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
       fromNodePropPrimary[ i ] = "Y".equalsIgnoreCase( XmlHandler.getTagValue( propNode, STRING_PROPERTY_PRIMARY ) );
     }
 
-    Node toNode = XmlHandler.getSubNode( stepnode, STRING_TO );
+    Node toNode = XmlHandler.getSubNode( transformNode, STRING_TO );
 
     readOnlyToNode = "Y".equalsIgnoreCase( XmlHandler.getTagValue( toNode, STRING_READ_ONLY_TO_NODE ) );
 
@@ -335,10 +334,10 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
       toNodePropPrimary[ i ] = "Y".equalsIgnoreCase( XmlHandler.getTagValue( propNode, STRING_PROPERTY_PRIMARY ) );
     }
 
-    relationship = XmlHandler.getTagValue( stepnode, STRING_RELATIONSHIP );
-    relationshipValue = XmlHandler.getTagValue( stepnode, STRING_RELATIONSHIP_VALUE );
+    relationship = XmlHandler.getTagValue( transformNode, STRING_RELATIONSHIP );
+    relationshipValue = XmlHandler.getTagValue( transformNode, STRING_RELATIONSHIP_VALUE );
 
-    Node relPropsNode = XmlHandler.getSubNode( stepnode, STRING_RELPROPS );
+    Node relPropsNode = XmlHandler.getSubNode( transformNode, STRING_RELPROPS );
     List<Node> relPropNodes = XmlHandler.getNodes( relPropsNode, STRING_RELPROP );
 
     relProps = new String[ relPropNodes.size() ];
@@ -359,18 +358,18 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
                                String[] output, IRowMeta info, IVariables space, IHopMetadataProvider metadataProvider ) {
     CheckResult cr;
     if ( prev == null || prev.size() == 0 ) {
-      cr = new CheckResult( CheckResult.TYPE_RESULT_WARNING, "Not receiving any fields from previous steps!", transformMeta );
+      cr = new CheckResult( CheckResult.TYPE_RESULT_WARNING, "Not receiving any fields from previous transform!", transformMeta );
       remarks.add( cr );
     } else {
-      cr = new CheckResult( CheckResult.TYPE_RESULT_OK, "Step is connected to previous one, receiving " + prev.size() + " fields", transformMeta );
+      cr = new CheckResult( CheckResult.TYPE_RESULT_OK, "Transform is connected to previous one, receiving " + prev.size() + " fields", transformMeta );
       remarks.add( cr );
     }
 
     if ( input.length > 0 ) {
-      cr = new CheckResult( CheckResult.TYPE_RESULT_OK, "Step is receiving info from other steps.", transformMeta );
+      cr = new CheckResult( CheckResult.TYPE_RESULT_OK, "Transform is receiving info from other transform.", transformMeta );
       remarks.add( cr );
     } else {
-      cr = new CheckResult( CheckResult.TYPE_RESULT_ERROR, "No input received from other steps!", transformMeta );
+      cr = new CheckResult( CheckResult.TYPE_RESULT_ERROR, "No input received from other transform!", transformMeta );
       remarks.add( cr );
     }
   }

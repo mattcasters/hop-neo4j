@@ -160,7 +160,7 @@ public class GetLoggingInfoMeta extends BaseTransformMeta implements ITransformM
         fieldArgument[ i ] = XmlHandler.getTagValue( fnode, "argument" );
       }
     } catch ( Exception e ) {
-      throw new HopXmlException( "Unable to read step information from Xml", e );
+      throw new HopXmlException( "Unable to read transform information from Xml", e );
     }
   }
 
@@ -168,14 +168,14 @@ public class GetLoggingInfoMeta extends BaseTransformMeta implements ITransformM
   public void setDefault() {
     allocate( 4 );
 
-    fieldName[ 0 ] = "startOfTransDelta";
-    fieldType[ 0 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_TRANS_DATE_FROM;
-    fieldName[ 1 ] = "endOfTransDelta";
-    fieldType[ 1 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_TRANS_DATE_TO;
-    fieldName[ 2 ] = "startOfJobDelta";
-    fieldType[ 2 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_JOB_DATE_FROM;
-    fieldName[ 3 ] = "endOfJobDelta";
-    fieldType[ 3 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_JOB_DATE_TO;
+    fieldName[ 0 ] = "startOfPipelineDelta";
+    fieldType[ 0 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_PIPELINE_DATE_FROM;
+    fieldName[ 1 ] = "endOfPipelineDelta";
+    fieldType[ 1 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_PIPELINE_DATE_TO;
+    fieldName[ 2 ] = "startOfWorkflowDelta";
+    fieldType[ 2 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_WORKFLOW_DATE_FROM;
+    fieldName[ 3 ] = "endOfWorkflowDelta";
+    fieldType[ 3 ] = GetLoggingInfoTypes.TYPE_SYSTEM_INFO_WORKFLOW_DATE_TO;
   }
 
   @Override
@@ -185,14 +185,14 @@ public class GetLoggingInfoMeta extends BaseTransformMeta implements ITransformM
       IValueMeta v;
 
       switch ( fieldType[ i ] ) {
-        case TYPE_SYSTEM_INFO_TRANS_DATE_FROM:
-        case TYPE_SYSTEM_INFO_TRANS_DATE_TO:
-        case TYPE_SYSTEM_INFO_JOB_DATE_FROM:
-        case TYPE_SYSTEM_INFO_JOB_DATE_TO:
-        case TYPE_SYSTEM_INFO_TRANS_PREVIOUS_EXECUTION_DATE:
-        case TYPE_SYSTEM_INFO_TRANS_PREVIOUS_SUCCESS_DATE:
-        case TYPE_SYSTEM_INFO_JOB_PREVIOUS_EXECUTION_DATE:
-        case TYPE_SYSTEM_INFO_JOB_PREVIOUS_SUCCESS_DATE:
+        case TYPE_SYSTEM_INFO_PIPELINE_DATE_FROM:
+        case TYPE_SYSTEM_INFO_PIPELINE_DATE_TO:
+        case TYPE_SYSTEM_INFO_WORKFLOW_DATE_FROM:
+        case TYPE_SYSTEM_INFO_WORKFLOW_DATE_TO:
+        case TYPE_SYSTEM_INFO_PIPELINE_PREVIOUS_EXECUTION_DATE:
+        case TYPE_SYSTEM_INFO_PIPELINE_PREVIOUS_SUCCESS_DATE:
+        case TYPE_SYSTEM_INFO_WORKFLOW_PREVIOUS_EXECUTION_DATE:
+        case TYPE_SYSTEM_INFO_WORKFLOW_PREVIOUS_SUCCESS_DATE:
           v = new ValueMetaDate( fieldName[ i ] );
           break;
         default:
@@ -224,21 +224,21 @@ public class GetLoggingInfoMeta extends BaseTransformMeta implements ITransformM
   }
 
   @Override
-  public void check( List<ICheckResult> remarks, PipelineMeta pipelineMeta, TransformMeta stepMeta,
+  public void check( List<ICheckResult> remarks, PipelineMeta pipelineMeta, TransformMeta transformMeta,
                      IRowMeta prev, String[] input, String[] output, IRowMeta info, IVariables space,
                      IHopMetadataProvider metadataProvider ) {
-    // See if we have input streams leading to this step!
+    // See if we have input streams leading to this transform!
     int nrRemarks = remarks.size();
     for ( int i = 0; i < fieldName.length; i++ ) {
       if ( fieldType[ i ].ordinal() <= GetLoggingInfoTypes.TYPE_SYSTEM_INFO_NONE.ordinal() ) {
         CheckResult cr = new CheckResult( ICheckResult.TYPE_RESULT_ERROR,
-          BaseMessages.getString( PKG, "SystemDataMeta.CheckResult.FieldHasNoType", fieldName[ i ] ), stepMeta );
+          BaseMessages.getString( PKG, "SystemDataMeta.CheckResult.FieldHasNoType", fieldName[ i ] ), transformMeta );
         remarks.add( cr );
       }
     }
     if ( remarks.size() == nrRemarks ) {
       CheckResult cr = new CheckResult( ICheckResult.TYPE_RESULT_OK,
-        BaseMessages.getString( PKG, "SystemDataMeta.CheckResult.AllTypesSpecified" ), stepMeta );
+        BaseMessages.getString( PKG, "SystemDataMeta.CheckResult.AllTypesSpecified" ), transformMeta );
       remarks.add( cr );
     }
   }
