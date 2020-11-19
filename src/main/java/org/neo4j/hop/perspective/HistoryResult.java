@@ -270,40 +270,28 @@ public class HistoryResult {
   }
 
   public String getErrorPathCommand() {
-    StringBuilder pathCypher = new StringBuilder(  );
-
-    pathCypher.append( "MATCH(top:Execution { name : \"" + getName() + "\", type : \"" + getType() + "\", id : \"" + getId() + "\"})-[rel:EXECUTES*]-(err:Execution) " ).append( Const.CR );
-    pathCypher.append( "   , p=shortestpath((top)-[:EXECUTES*]-(err)) " ).append( Const.CR );
-    pathCypher.append( "WHERE top.registrationDate IS NOT NULL " ).append( Const.CR );
-    pathCypher.append( "  AND err.errors > 0 " ).append( Const.CR );
-    pathCypher.append( "  AND size((err)-[:EXECUTES]->())=0 " ).append( Const.CR );
-    pathCypher.append( "RETURN p " ).append( Const.CR );
-    pathCypher.append( "ORDER BY size(RELATIONSHIPS(p)) DESC " ).append( Const.CR );
-    pathCypher.append( "LIMIT 5" ).append( Const.CR );
-
-    return pathCypher.toString();
-  }
-
-  public String getShortestPathCommand() {
     StringBuilder cmd = new StringBuilder(  );
 
-    cmd.append( "MATCH(se:Execution { name : \"" + getName() + "\", type : \"" + getType() + "\", id : \"" + getId() + "\"})" ).append(Const.CR);
-    cmd.append( ", (je:Execution { root : true }) " ).append(Const.CR);
-    cmd.append( "  , p=shortestpath((se)-[:EXECUTES*]-(je)) " ).append(Const.CR);
-    cmd.append( "WHERE se.registrationDate IS NOT NULL " ).append(Const.CR);
-    cmd.append( "RETURN p " ).append(Const.CR);
-    cmd.append( "LIMIT 1 " ).append(Const.CR);
+    cmd.append( "MATCH(top:Execution { name : \"" + getName() + "\", type : \"" + getType() + "\", id : \"" + getId() + "\"})-[rel:EXECUTES*]-(err:Execution) " ).append( Const.CR );
+    cmd.append( "   , p=shortestpath((top)-[:EXECUTES*]-(err)) " ).append( Const.CR );
+    cmd.append( "WHERE top.registrationDate IS NOT NULL " ).append( Const.CR );
+    cmd.append( "  AND err.errors > 0 " ).append( Const.CR );
+    cmd.append( "  AND size((err)-[:EXECUTES]->())=0 " ).append( Const.CR );
+    cmd.append( "RETURN p " ).append( Const.CR );
+    cmd.append( "ORDER BY size(RELATIONSHIPS(p)) DESC " ).append( Const.CR );
+    cmd.append( "LIMIT 5" ).append( Const.CR );
 
     return cmd.toString();
   }
 
-  public String getShortestPathWithMetadataCommand( int pathIndex ) {
+  public String getErrorPathWithMetadataCommand( int pathIndex ) {
     StringBuilder cmd = new StringBuilder(  );
 
-    cmd.append( "MATCH(se:Execution { name : \"" + getName() + "\", type : \"" + getType() + "\", id : \"" + getId() + "\"})" ).append(Const.CR);
-    cmd.append( ", (je:Execution { root : true }) " ).append(Const.CR);
-    cmd.append( "  , p=shortestpath((se)-[:EXECUTES*]-(je)) " ).append(Const.CR);
-    cmd.append( "WHERE se.registrationDate IS NOT NULL " ).append(Const.CR);
+    cmd.append( "MATCH(top:Execution { name : \"" + getName() + "\", type : \"" + getType() + "\", id : \"" + getId() + "\"})-[rel:EXECUTES*]-(err:Execution) " ).append( Const.CR );
+    cmd.append( "   , p=shortestpath((top)-[:EXECUTES*]-(err)) " ).append( Const.CR );
+    cmd.append( "WHERE top.registrationDate IS NOT NULL " ).append( Const.CR );
+    cmd.append( "  AND err.errors > 0 " ).append( Const.CR );
+    cmd.append( "  AND size((err)-[:EXECUTES]->())=0 " ).append( Const.CR );
 
     // Now link the metadata...
     //
