@@ -381,6 +381,11 @@ public class NeoConnectionDialog implements IMetadataDialog {
     fdEncryption.left = new FormAttachment( middle, 0 );
     fdEncryption.right = new FormAttachment( 95, 0 );
     wEncryption.setLayoutData( fdEncryption );
+    wEncryption.addSelectionListener( new SelectionAdapter() {
+      @Override public void widgetSelected( SelectionEvent e ) {
+        enableFields();
+      }
+    } );
     lastControl = wEncryption;
 
     // Trust Level?
@@ -591,6 +596,11 @@ public class NeoConnectionDialog implements IMetadataDialog {
     ) {
       control.setEnabled( hasNoUrls );
     }
+
+    boolean encryption = wEncryption.getSelection();
+    wlTrustAllCertificates.setEnabled( encryption );
+    wTrustAllCertificates.setEnabled( encryption );
+    wTrustAllCertificates.getTextVar().setEnabled( encryption );
   }
 
   public void dispose() {

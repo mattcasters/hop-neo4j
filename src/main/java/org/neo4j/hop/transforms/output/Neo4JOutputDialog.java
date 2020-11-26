@@ -354,7 +354,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     fdFromLabelGrid.left = new FormAttachment( middle, margin );
     fdFromLabelGrid.top = new FormAttachment( lastFromControl, margin );
     fdFromLabelGrid.right = new FormAttachment( wGetFromLabel, 0 );
-    fdFromLabelGrid.bottom = new FormAttachment( 0, margin * 2 + 150 );
+    fdFromLabelGrid.bottom = new FormAttachment( 0, margin * 2 + (int)(props.getZoomFactor()*150) );
     wFromLabelGrid.setLayoutData( fdFromLabelGrid );
     lastFromControl = wFromLabelGrid;
 
@@ -483,7 +483,8 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     fdToLabelGrid.left = new FormAttachment( middle, margin );
     fdToLabelGrid.right = new FormAttachment( wGetToLabel, 0 );
     fdToLabelGrid.top = new FormAttachment( lastToControl, margin );
-    fdToLabelGrid.bottom = new FormAttachment( 0, margin * 2 + 150 );
+    fdToLabelGrid.bottom = new FormAttachment( 0, margin * 2 + (int)(props.getZoomFactor()*150) );
+    fdToLabelGrid.bottom = new FormAttachment( 0, margin * 2 + (int)(props.getZoomFactor()*150) );
     wToLabelGrid.setLayoutData( fdToLabelGrid );
     lastToControl = wToLabelGrid;
 

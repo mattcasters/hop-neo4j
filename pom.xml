@@ -4,7 +4,7 @@
 
   <groupId>org.neo4j.hop</groupId>
   <artifactId>hop-neo4j</artifactId>
-  <version>6.0.3</version>
+  <version>6.0.4</version>
   <packaging>jar</packaging>
 
   <name>hop-neo4j</name>
