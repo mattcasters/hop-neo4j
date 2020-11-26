@@ -70,6 +70,8 @@ public class NeoConnectionDialog implements IMetadataDialog {
   private CheckBoxVar wRouting;
   private Label wlEncryption;
   private CheckBoxVar wEncryption;
+  private Label wlTrustAllCertificates;
+  private CheckBoxVar wTrustAllCertificates;
 
   Control lastControl;
 
@@ -381,6 +383,24 @@ public class NeoConnectionDialog implements IMetadataDialog {
     wEncryption.setLayoutData( fdEncryption );
     lastControl = wEncryption;
 
+    // Trust Level?
+    wlTrustAllCertificates = new Label( shell, SWT.RIGHT );
+    wlTrustAllCertificates.setText( BaseMessages.getString( PKG, "NeoConnectionDialog.TrustAllCertificates.Label" ) );
+    props.setLook( wlTrustAllCertificates );
+    FormData fdlTrustAllCertificates = new FormData();
+    fdlTrustAllCertificates.top = new FormAttachment( lastControl, margin );
+    fdlTrustAllCertificates.left = new FormAttachment( 0, 0 );
+    fdlTrustAllCertificates.right = new FormAttachment( middle, -margin );
+    wlTrustAllCertificates.setLayoutData( fdlTrustAllCertificates );
+    wTrustAllCertificates = new CheckBoxVar( neoConnection, shell, SWT.CHECK );
+    props.setLook( wEncryption );
+    FormData fdTrustAllCertificates = new FormData();
+    fdTrustAllCertificates.top = new FormAttachment( wlTrustAllCertificates, 0, SWT.CENTER );
+    fdTrustAllCertificates.left = new FormAttachment( middle, 0 );
+    fdTrustAllCertificates.right = new FormAttachment( 95, 0 );
+    wTrustAllCertificates.setLayoutData( fdTrustAllCertificates );
+    lastControl = wlTrustAllCertificates;
+
     gAdvanced = new Group( shell, SWT.SHADOW_ETCHED_IN );
     props.setLook( gAdvanced );
     FormLayout advancedLayout = new FormLayout();
@@ -593,6 +613,8 @@ public class NeoConnectionDialog implements IMetadataDialog {
     wPassword.setText( Const.NVL( neoConnection.getPassword(), "" ) );
     wEncryption.setSelection( neoConnection.isUsingEncryption() );
     wEncryption.setVariableName( Const.NVL(neoConnection.getUsingEncryptionVariable(), "") );
+    wTrustAllCertificates.setSelection( neoConnection.isTrustAllCertificates() );
+    wTrustAllCertificates.setVariableName( Const.NVL(neoConnection.getTrustAllCertificatesVariable(), "") );
     wConnectionLivenessCheckTimeout.setText( Const.NVL( neoConnection.getConnectionLivenessCheckTimeout(), "" ) );
     wMaxConnectionLifetime.setText( Const.NVL( neoConnection.getMaxConnectionLifetime(), "" ) );
     wMaxConnectionPoolSize.setText( Const.NVL( neoConnection.getMaxConnectionPoolSize(), "" ) );
@@ -644,6 +666,8 @@ public class NeoConnectionDialog implements IMetadataDialog {
     neo.setPassword( wPassword.getText() );
     neo.setUsingEncryption( wEncryption.getSelection() );
     neo.setUsingEncryptionVariable( wEncryption.getVariableName() );
+    neo.setTrustAllCertificates( wTrustAllCertificates.getSelection() );
+    neo.setTrustAllCertificatesVariable( wTrustAllCertificates.getVariableName() );
 
     neo.setConnectionLivenessCheckTimeout( wConnectionLivenessCheckTimeout.getText() );
     neo.setMaxConnectionLifetime( wMaxConnectionLifetime.getText() );

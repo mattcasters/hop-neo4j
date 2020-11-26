@@ -74,6 +74,12 @@ public class NeoConnection extends Variables implements IHopMetadata {
   private String usingEncryptionVariable;
 
   @HopMetadataProperty
+  private boolean trustAllCertificates;
+
+  @HopMetadataProperty
+  private String trustAllCertificatesVariable;
+
+  @HopMetadataProperty
   private List<String> manualUrls;
 
   @HopMetadataProperty
@@ -111,6 +117,7 @@ public class NeoConnection extends Variables implements IHopMetadata {
     this();
     super.initializeVariablesFrom( parent );
     usingEncryption = true;
+    trustAllCertificates = false;
   }
 
   public NeoConnection( IVariables parent, NeoConnection source ) {
@@ -126,6 +133,8 @@ public class NeoConnection extends Variables implements IHopMetadata {
     this.password = source.password;
     this.usingEncryption = source.usingEncryption;
     this.usingEncryptionVariable = source.usingEncryptionVariable;
+    this.trustAllCertificates = source.trustAllCertificates;
+    this.trustAllCertificatesVariable = source.trustAllCertificatesVariable;
     this.connectionLivenessCheckTimeout = source.connectionLivenessCheckTimeout;
     this.maxConnectionLifetime = source.maxConnectionLifetime;
     this.maxConnectionPoolSize = source.maxConnectionPoolSize;
@@ -313,6 +322,16 @@ public class NeoConnection extends Variables implements IHopMetadata {
     return false;
   }
 
+  public boolean trustAllCertificatesVariableSet() {
+    if ( !Utils.isEmpty( trustAllCertificatesVariable ) ) {
+      String value = environmentSubstitute( trustAllCertificatesVariable );
+      if ( !Utils.isEmpty( value ) ) {
+        return ValueMetaString.convertStringToBoolean( value );
+      }
+    }
+    return false;
+  }
+
   public boolean version4VariableSet() {
     if ( !Utils.isEmpty( version4Variable ) ) {
       String value = environmentSubstitute( version4Variable );
@@ -335,6 +354,9 @@ public class NeoConnection extends Variables implements IHopMetadata {
       Config.ConfigBuilder configBuilder;
       if ( encryptionVariableSet() || usingEncryption ) {
         configBuilder = Config.builder().withEncryption();
+        if ( trustAllCertificatesVariableSet() || trustAllCertificates ) {
+          configBuilder = configBuilder.withTrustStrategy(Config.TrustStrategy.trustAllCertificates());
+        }
       } else {
         configBuilder = Config.builder().withoutEncryption();
       }
@@ -574,6 +596,22 @@ public class NeoConnection extends Variables implements IHopMetadata {
   }
 
   /**
+   * Gets usingTrustAllCertificates
+   *
+   * @return value of usingTrustAllCertificates
+   */
+  public boolean isTrustAllCertificates() {
+    return trustAllCertificates;
+  }
+
+  /**
+   * @param trustAllCertificates The trustAllCertificates to set
+   */
+  public void setTrustAllCertificates( boolean trustAllCertificates ) {
+    this.trustAllCertificates = trustAllCertificates;
+  }
+
+  /**
    * Gets manualUrls
    *
    * @return value of manualUrls
@@ -715,6 +753,22 @@ public class NeoConnection extends Variables implements IHopMetadata {
    */
   public void setUsingEncryptionVariable( String usingEncryptionVariable ) {
     this.usingEncryptionVariable = usingEncryptionVariable;
+  }
+
+  /**
+   * Gets trustAllCertificatesVariable
+   *
+   * @return value of trustAllCertificatesVariable
+   */
+  public String getTrustAllCertificatesVariable() {
+    return trustAllCertificatesVariable;
+  }
+
+  /**
+   * @param trustAllCertificatesVariable The trustAllCertificatesVariable to set
+   */
+  public void setTrustAllCertificatesVariable( String trustAllCertificatesVariable ) {
+    this.trustAllCertificatesVariable = trustAllCertificatesVariable;
   }
 
   /**
