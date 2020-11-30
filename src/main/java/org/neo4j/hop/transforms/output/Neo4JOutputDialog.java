@@ -152,7 +152,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     } catch ( Exception e ) {
       new ErrorDialog( shell, "Error", "Error getting list of connections", e );
     }
-
+    lastControl = wConnection;
 
     wlBatchSize = new Label( shell, SWT.RIGHT );
     wlBatchSize.setText( "Batch size (rows)" );
