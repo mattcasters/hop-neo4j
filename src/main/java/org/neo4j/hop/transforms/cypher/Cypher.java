@@ -181,6 +181,7 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData> implements ITr
 
     if ( meta.isCypherFromField() ) {
       data.cypher = getInputRowMeta().getString( row, data.cypherFieldIndex );
+      log.logDetailed( "Cypher statement from field is: "+data.cypher );
     }
 
     // Do the value mapping and conversion to the parameters
