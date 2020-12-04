@@ -159,7 +159,7 @@ public class PipelineLoggingExtensionPoint implements IExtensionPoint<IPipelineE
             StringBuilder hopCypher = new StringBuilder();
             hopCypher.append( "MATCH (from:Transform { pipelineName : $pipelineName, name : $fromTransform }) " );
             hopCypher.append( "MATCH (to:Transform { pipelineName : $pipelineName, name : $toTransform }) " );
-            hopCypher.append( "MERGE (from)-[rel:WRITES_TO]->(to) " );
+            hopCypher.append( "MERGE (from)-[rel:PRECEDES]->(to) " );
             transaction.run( hopCypher.toString(), hopPars );
           }
 
