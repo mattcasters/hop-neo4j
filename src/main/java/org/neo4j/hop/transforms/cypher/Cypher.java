@@ -326,11 +326,11 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData>
             nrProcessed = data.session.writeTransaction(transactionWork);
             setLinesOutput(getLinesOutput() + data.cypherStatements.size());
           }
-        } catch(Exception e) {
-          if (attempt+1>=data.attempts) {
+        } catch (Exception e) {
+          if (attempt + 1 >= data.attempts) {
             throw e;
           } else {
-            logBasic( "Retrying unwind after error: "+e.getMessage() );
+            logBasic("Retrying unwind after error: " + e.getMessage());
           }
         }
       }
@@ -354,13 +354,25 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData>
     unwindMap.put(data.unwindMapName, data.unwindList);
     List<Object[]> resultRows = null;
     CypherTransactionWork cypherTransactionWork =
-        new CypherTransactionWork(this, new Object[0], true, data.cypher, unwindMap, data.attempts );
+        new CypherTransactionWork(this, new Object[0], true, data.cypher, unwindMap);
 
     try {
-      if (meta.isReadOnly()) {
-        data.session.readTransaction(cypherTransactionWork);
-      } else {
-        data.session.writeTransaction(cypherTransactionWork);
+      for (int attempt = 0; attempt < data.attempts; attempt++) {
+        try {
+          if (meta.isReadOnly()) {
+            data.session.readTransaction(cypherTransactionWork);
+          } else {
+            data.session.writeTransaction(cypherTransactionWork);
+          }
+          // Stop the attempts now
+          break;
+        } catch (Exception e) {
+          if (attempt + 1 >= data.attempts) {
+            throw e;
+          } else {
+            log.logBasic("Retrying transaction after attempt #"+(attempt+1)+" with error : "+e.getMessage());
+          }
+        }
       }
     } catch (ServiceUnavailableException e) {
       // retry once after reconnecting.
@@ -535,9 +547,9 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData>
   /**
    * Convert the given record value to String. For complex data types it's a conversion to JSON.
    *
-   * @param recordValue
-   * @param sourceType
-   * @return
+   * @param recordValue The record value to convert to String
+   * @param sourceType The Neo4j source type
+   * @return The String value of the record value
    */
   private String convertToString(Value recordValue, GraphPropertyDataType sourceType) {
     if (recordValue == null) {
