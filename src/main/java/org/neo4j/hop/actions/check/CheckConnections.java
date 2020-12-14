@@ -4,6 +4,7 @@ import org.apache.hop.core.Result;
 import org.apache.hop.core.annotations.Action;
 import org.apache.hop.core.exception.HopException;
 import org.apache.hop.core.exception.HopXmlException;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.core.xml.XmlHandler;
 import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.metadata.api.IHopMetadataSerializer;
@@ -57,8 +58,7 @@ public class CheckConnections extends ActionBase implements IAction {
     return xml.toString();
   }
 
-  @Override public void loadXml( Node node, IHopMetadataProvider metadataProvider ) throws HopXmlException {
-
+  @Override public void loadXml( Node node, IHopMetadataProvider iHopMetadataProvider, IVariables iVariables ) throws HopXmlException {
     super.loadXml( node );
 
     connectionNames = new ArrayList<>();
@@ -79,7 +79,7 @@ public class CheckConnections extends ActionBase implements IAction {
     //
     List<String> realConnectionNames = new ArrayList<>();
     for ( String connectionName : connectionNames ) {
-      realConnectionNames.add( environmentSubstitute( connectionName ) );
+      realConnectionNames.add( resolve( connectionName ) );
     }
 
     // Check all the connections.  If any one fails, fail the transform
@@ -93,9 +93,8 @@ public class CheckConnections extends ActionBase implements IAction {
         if ( connection == null ) {
           throw new HopException( "Unable to find connection with name '" + connectionName + "'" );
         }
-        connection.initializeVariablesFrom( this );
 
-        Session session = connection.getSession( log );
+        Session session = connection.getSession( log, this);
         session.close();
 
       } catch ( Exception e ) {

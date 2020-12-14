@@ -5,6 +5,7 @@ import org.apache.hop.core.Result;
 import org.apache.hop.core.annotations.Action;
 import org.apache.hop.core.exception.HopException;
 import org.apache.hop.core.exception.HopXmlException;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.core.xml.XmlHandler;
 import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.metadata.api.IHopMetadataSerializer;
@@ -56,9 +57,7 @@ public class CypherScript extends ActionBase implements IAction {
     return xml.toString();
   }
 
-  @Override
-  public void loadXml(Node node, IHopMetadataProvider metadataProvider) throws HopXmlException {
-
+  @Override public void loadXml( Node node, IHopMetadataProvider iHopMetadataProvider, IVariables iVariables ) throws HopXmlException {
     super.loadXml(node);
 
     connectionName = XmlHandler.getTagValue(node, "connection");
@@ -75,7 +74,7 @@ public class CypherScript extends ActionBase implements IAction {
     // Replace variables & parameters
     //
     NeoConnection connection;
-    String realConnectionName = environmentSubstitute(connectionName);
+    String realConnectionName = resolve(connectionName);
     try {
       if (StringUtils.isEmpty(realConnectionName)) {
         throw new HopException("The Neo4j connection name is not set");
@@ -94,21 +93,17 @@ public class CypherScript extends ActionBase implements IAction {
 
     String realScript;
     if (replacingVariables) {
-      realScript = environmentSubstitute(script);
+      realScript = resolve(script);
     } else {
       realScript = script;
     }
-
-    // Share variables with the connection metadata
-    //
-    connection.initializeVariablesFrom(this);
 
     Session session = null;
     int nrExecuted = 0;
 
     // Connect to the database
     //
-    session = connection.getSession(log);
+    session = connection.getSession(log, this);
 
     TransactionWork<Integer> transactionWork =
         transaction -> {

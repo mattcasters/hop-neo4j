@@ -33,7 +33,7 @@ public class SplitGraph extends BaseTransform<SplitGraphMeta, SplitGraphData> im
       first = false;
 
       data.outputRowMeta = getInputRowMeta().clone();
-      meta.getFields( data.outputRowMeta, getTransformName(), null, null, getPipelineMeta(), metadataProvider );
+      meta.getFields( data.outputRowMeta, getTransformName(), null, null, this, metadataProvider );
 
       data.graphFieldIndex = getInputRowMeta().indexOfValue( meta.getGraphField() );
       if ( data.graphFieldIndex < 0 ) {
@@ -46,15 +46,15 @@ public class SplitGraph extends BaseTransform<SplitGraphMeta, SplitGraphData> im
 
       data.typeField = null;
       if ( StringUtils.isNotEmpty( meta.getTypeField() ) ) {
-        data.typeField = environmentSubstitute( meta.getTypeField() );
+        data.typeField = resolve( meta.getTypeField() );
       }
       data.idField = null;
       if ( StringUtils.isNotEmpty( meta.getIdField() ) ) {
-        data.idField = environmentSubstitute( meta.getIdField() );
+        data.idField = resolve( meta.getIdField() );
       }
       data.propertySetField = null;
       if ( StringUtils.isNotEmpty( meta.getPropertySetField() ) ) {
-        data.propertySetField = environmentSubstitute( meta.getPropertySetField() );
+        data.propertySetField = resolve( meta.getPropertySetField() );
       }
     }
 

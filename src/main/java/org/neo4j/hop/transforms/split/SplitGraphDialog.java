@@ -3,6 +3,7 @@ package org.neo4j.hop.transforms.split;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
 import org.apache.hop.core.exception.HopTransformException;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.i18n.BaseMessages;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
@@ -44,8 +45,8 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
 
   private SplitGraphMeta input;
 
-  public SplitGraphDialog( Shell parent, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
-    super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
+  public SplitGraphDialog( Shell parent, IVariables variables, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
+    super( parent, variables, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (SplitGraphMeta) inputMetadata;
 
     metadataProvider = HopGui.getInstance().getMetadataProvider();
@@ -115,7 +116,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
 
     String[] fieldnames = new String[] {};
     try {
-      fieldnames = pipelineMeta.getPrevTransformFields( transformMeta ).getFieldNames();
+      fieldnames = pipelineMeta.getPrevTransformFields( variables, transformMeta ).getFieldNames();
     } catch ( HopTransformException e ) {
       log.logError( "error getting input field names: ", e );
     }
@@ -150,7 +151,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     fdlTypeField.right = new FormAttachment( middle, -margin );
     fdlTypeField.top = new FormAttachment( lastControl, 2 * margin );
     wlTypeField.setLayoutData( fdlTypeField );
-    wTypeField = new TextVar( pipelineMeta, wComposite, SWT.CHECK | SWT.BORDER );
+    wTypeField = new TextVar(variables, wComposite, SWT.CHECK | SWT.BORDER );
     props.setLook( wTypeField );
     FormData fdTypeField = new FormData();
     fdTypeField.left = new FormAttachment( middle, 0 );
@@ -169,7 +170,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     fdlIdField.right = new FormAttachment( middle, -margin );
     fdlIdField.top = new FormAttachment( lastControl, 2 * margin );
     wlIdField.setLayoutData( fdlIdField );
-    wIdField = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wIdField = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wIdField );
     wIdField.addModifyListener( lsMod );
     FormData fdIdField = new FormData();
@@ -189,7 +190,7 @@ public class SplitGraphDialog extends BaseTransformDialog implements ITransformD
     fdlPropertySetField.right = new FormAttachment( middle, -margin );
     fdlPropertySetField.top = new FormAttachment( lastControl, 2 * margin );
     wlPropertySetField.setLayoutData( fdlPropertySetField );
-    wPropertySetField = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wPropertySetField = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wPropertySetField );
     wPropertySetField.addModifyListener( lsMod );
     FormData fdPropertySetField = new FormData();

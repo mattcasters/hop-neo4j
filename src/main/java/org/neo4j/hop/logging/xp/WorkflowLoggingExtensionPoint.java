@@ -6,10 +6,9 @@ import org.apache.hop.core.extension.ExtensionPoint;
 import org.apache.hop.core.extension.IExtensionPoint;
 import org.apache.hop.core.logging.HopLogStore;
 import org.apache.hop.core.logging.ILogChannel;
-import org.apache.hop.core.logging.ILoggingObject;
 import org.apache.hop.core.logging.LoggingHierarchy;
 import org.apache.hop.core.logging.LoggingObjectType;
-import org.apache.hop.core.logging.LoggingRegistry;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.pipeline.IExecutionFinishedListener;
 import org.apache.hop.workflow.ActionResult;
 import org.apache.hop.workflow.WorkflowHopMeta;
@@ -24,7 +23,6 @@ import org.neo4j.hop.logging.util.LoggingCore;
 import org.neo4j.hop.shared.NeoConnection;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +41,7 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
   public static final String EXECUTION_TYPE_WORKFLOW = LoggingObjectType.WORKFLOW.name();
   public static final String EXECUTION_TYPE_ACTION = LoggingObjectType.ACTION.name();
 
-  @Override public void callExtensionPoint( ILogChannel log, IWorkflowEngine<WorkflowMeta> workflow ) throws HopException {
+  @Override public void callExtensionPoint( ILogChannel log, IVariables variables, IWorkflowEngine<WorkflowMeta> workflow ) throws HopException {
     // See if logging is enabled
     //
     if ( !LoggingCore.isEnabled( workflow ) ) {
@@ -64,7 +62,7 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
       }
       log.logDetailed( "Logging workflow information to Neo4j connection : " + connection.getName() );
 
-      Session session = connection.getSession( log );
+      Session session = connection.getSession( log, variables);
 
       logWorkflowMetadata( log, session, connection, workflow );
       logStartOfWorkflow( log, session, connection, workflow );

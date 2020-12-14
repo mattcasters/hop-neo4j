@@ -25,6 +25,7 @@ package org.neo4j.hop.transforms.loginfo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
 import org.apache.hop.core.exception.HopException;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.i18n.BaseMessages;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineMeta;
@@ -75,8 +76,8 @@ public class GetLoggingInfoDialog extends BaseTransformDialog implements ITransf
 
   private boolean isReceivingInput = false;
 
-  public GetLoggingInfoDialog( Shell parent, Object in, PipelineMeta pipelineMeta, String sname ) {
-    super( parent, (BaseTransformMeta) in, pipelineMeta, sname );
+  public GetLoggingInfoDialog( Shell parent, IVariables variables, Object in, PipelineMeta pipelineMeta, String sname ) {
+    super( parent, variables, (BaseTransformMeta) in, pipelineMeta, sname );
     input = (GetLoggingInfoMeta) in;
   }
 
@@ -164,7 +165,7 @@ public class GetLoggingInfoDialog extends BaseTransformDialog implements ITransf
     colinf[2].setUsingVariables( true );
 
 
-    wFields = new TableView( pipelineMeta, shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI,
+    wFields = new TableView( variables, shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI,
       colinf, FieldsRows, lsMod, props );
 
     fdFields = new FormData();
@@ -284,7 +285,7 @@ public class GetLoggingInfoDialog extends BaseTransformDialog implements ITransf
       getInfo( oneMeta );
 
       PipelineMeta previewMeta = PipelinePreviewFactory.generatePreviewPipeline(
-        pipelineMeta,
+        variables,
         metadataProvider,
         oneMeta,
         wTransformname.getText() );
@@ -297,7 +298,7 @@ public class GetLoggingInfoDialog extends BaseTransformDialog implements ITransf
       if ( previewSize > 0 ) {
         PipelinePreviewProgressDialog progressDialog =
           new PipelinePreviewProgressDialog(
-            shell, previewMeta, new String[] { wTransformname.getText() }, new int[] { previewSize } );
+            shell, variables, previewMeta, new String[] { wTransformname.getText() }, new int[] { previewSize } );
         progressDialog.open();
 
         if ( !progressDialog.isCancelled() ) {
@@ -312,7 +313,7 @@ public class GetLoggingInfoDialog extends BaseTransformDialog implements ITransf
             etd.open();
           }
 
-          PreviewRowsDialog prd = new PreviewRowsDialog( shell, pipelineMeta, SWT.NONE, wTransformname.getText(),
+          PreviewRowsDialog prd = new PreviewRowsDialog( shell, variables, SWT.NONE, wTransformname.getText(),
             progressDialog.getPreviewRowsMeta( wTransformname.getText() ),
             progressDialog.getPreviewRows( wTransformname.getText() ),
             loggingText );

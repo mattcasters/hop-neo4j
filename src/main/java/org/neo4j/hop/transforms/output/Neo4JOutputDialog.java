@@ -7,6 +7,7 @@ import org.apache.hop.core.exception.HopException;
 import org.apache.hop.core.exception.HopTransformException;
 import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.IValueMeta;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.core.variables.Variables;
 import org.apache.hop.i18n.BaseMessages;
 import org.apache.hop.metadata.api.IHopMetadataSerializer;
@@ -80,8 +81,8 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
   private Button wReadOnlyFromNode;
   private Button wReadOnlyToNode;
 
-  public Neo4JOutputDialog( Shell parent, Object in, PipelineMeta pipelineMeta, String sname ) {
-    super( parent, (BaseTransformMeta) in, pipelineMeta, sname );
+  public Neo4JOutputDialog( Shell parent, IVariables variables, Object in, PipelineMeta pipelineMeta, String sname ) {
+    super( parent, variables, (BaseTransformMeta) in, pipelineMeta, sname );
     input = (Neo4JOutputMeta) in;
 
     metadataProvider = HopGui.getInstance().getMetadataProvider();
@@ -101,7 +102,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
 
     // Fields
     try {
-      IRowMeta prevFields = pipelineMeta.getPrevTransformFields( transformName );
+      IRowMeta prevFields = pipelineMeta.getPrevTransformFields( variables, transformName );
       fieldNames = prevFields.getFieldNames();
     } catch ( HopTransformException kse ) {
       logError( BaseMessages.getString( PKG, "TripleOutput.Log.ErrorGettingFieldNames" ) );
@@ -139,7 +140,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     Control lastControl = wTransformName;
 
     wConnection =
-      new MetaSelectionLine<>( pipelineMeta, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+      new MetaSelectionLine<>( variables, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -162,7 +163,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     fdlBatchSize.right = new FormAttachment( middle, -margin );
     fdlBatchSize.top = new FormAttachment( lastControl, 2 * margin );
     wlBatchSize.setLayoutData( fdlBatchSize );
-    wBatchSize = new TextVar( pipelineMeta, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wBatchSize = new TextVar(variables, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wBatchSize );
     wBatchSize.addModifyListener( lsMod );
     FormData fdBatchSize = new FormData();
@@ -253,7 +254,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     fdlReturnGraphField.right = new FormAttachment( middle, -margin );
     fdlReturnGraphField.top = new FormAttachment( lastControl, 2 * margin );
     wlReturnGraphField.setLayoutData( fdlReturnGraphField );
-    wReturnGraphField = new TextVar( pipelineMeta, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wReturnGraphField = new TextVar(variables, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wReturnGraphField );
     wReturnGraphField.addModifyListener( lsMod );
     FormData fdReturnGraphField = new FormData();
@@ -588,7 +589,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
     fdlRelValue.left = new FormAttachment( 0, 0 );
     fdlRelValue.top = new FormAttachment( lastControl, margin * 2 );
     wlRelValue.setLayoutData( fdlRelValue );
-    wRelValue = new TextVar( pipelineMeta, wRelationshipsComp, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wRelValue = new TextVar(variables, wRelationshipsComp, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wRelValue );
     wRelValue.addModifyListener( lsMod );
     FormData fdRelValue = new FormData();
@@ -950,7 +951,7 @@ public class Neo4JOutputDialog extends BaseTransformDialog implements ITransform
 
   private void get( int button ) {
     try {
-      IRowMeta r = pipelineMeta.getPrevTransformFields( transformName );
+      IRowMeta r = pipelineMeta.getPrevTransformFields( variables, transformName );
       if ( r != null && !r.isEmpty() ) {
         switch ( button ) {
           /* 0: from labels grid

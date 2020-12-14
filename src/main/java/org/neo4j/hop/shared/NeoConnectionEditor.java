@@ -13,7 +13,6 @@ import org.apache.hop.ui.core.widget.PasswordTextVar;
 import org.apache.hop.ui.core.widget.TableView;
 import org.apache.hop.ui.core.widget.TextVar;
 import org.apache.hop.ui.hopgui.HopGui;
-import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -627,20 +626,21 @@ public class NeoConnectionEditor extends MetadataEditor<NeoConnection> {
   }
 
   public void test() {
-    NeoConnection neo = new NeoConnection(metadata); // parent as variable space
+    IVariables variables =manager.getVariables();
+    NeoConnection neo = new NeoConnection(manager.getVariables(), metadata); // parent as variable space
     try {
       getWidgetsContent(neo);
-      neo.test();
+      neo.test(variables);
       MessageBox box = new MessageBox(hopGui.getShell(), SWT.OK);
       box.setText("OK");
       String message = "Connection successful!" + Const.CR;
       message += Const.CR;
-      message += "URL : " + neo.getUrl();
+      message += "URL : " + neo.getUrl(variables);
       box.setMessage(message);
       box.open();
     } catch (Exception e) {
       new ErrorDialog(
-          hopGui.getShell(), "Error", "Error connecting to Neo with URL : " + neo.getUrl(), e);
+          hopGui.getShell(), "Error", "Error connecting to Neo with URL : " + neo.getUrl(variables), e);
     }
   }
 

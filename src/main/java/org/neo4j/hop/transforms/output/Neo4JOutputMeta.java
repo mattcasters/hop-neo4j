@@ -144,8 +144,8 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
     return new Neo4JOutputData();
   }
 
-  public ITransformDialog getDialog( Shell shell, ITransformMeta meta, PipelineMeta pipelineMeta, String name ) {
-    return new Neo4JOutputDialog( shell, meta, pipelineMeta, name );
+  public ITransformDialog getDialog( Shell shell, IVariables variables, ITransformMeta meta, PipelineMeta pipelineMeta, String name ) {
+    return new Neo4JOutputDialog( shell, variables, meta, pipelineMeta, name );
   }
 
   public void setDefault() {

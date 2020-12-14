@@ -8,8 +8,8 @@ import org.apache.hop.core.logging.LogChannel;
 import org.apache.hop.core.row.value.ValueMetaString;
 import org.apache.hop.core.util.Utils;
 import org.apache.hop.core.variables.IVariables;
-import org.apache.hop.core.variables.Variables;
 import org.apache.hop.metadata.api.HopMetadata;
+import org.apache.hop.metadata.api.HopMetadataBase;
 import org.apache.hop.metadata.api.HopMetadataProperty;
 import org.apache.hop.metadata.api.IHopMetadata;
 import org.neo4j.driver.AuthTokens;
@@ -33,12 +33,9 @@ import java.util.concurrent.TimeUnit;
   key = "neo4j-connection",
   name = "Neo4j Connection",
   description = "A shared connection to a Neo4j server",
-  iconImage = "neo4j_logo.svg"
+  image = "neo4j_logo.svg"
 )
-public class NeoConnection extends Variables implements IHopMetadata {
-
-  @HopMetadataProperty
-  private String name;
+public class NeoConnection extends HopMetadataBase implements IHopMetadata {
 
   @HopMetadataProperty
   private String server;
@@ -115,7 +112,6 @@ public class NeoConnection extends Variables implements IHopMetadata {
 
   public NeoConnection( IVariables parent ) {
     this();
-    super.initializeVariablesFrom( parent );
     usingEncryption = true;
     trustAllCertificates = false;
   }
@@ -174,13 +170,14 @@ public class NeoConnection extends Variables implements IHopMetadata {
    * Get a Neo4j session to work with
    *
    * @param log The logchannel to log to
+   * @param variables
    * @return The Neo4j session
    */
-  public Session getSession( ILogChannel log ) {
-    Driver driver = getDriver( log );
+  public Session getSession( ILogChannel log, IVariables variables ) {
+    Driver driver = getDriver( log, variables);
     SessionConfig.Builder cfgBuilder = SessionConfig.builder();
     if ( StringUtils.isNotEmpty( databaseName ) ) {
-      String realDatabaseName = environmentSubstitute( databaseName );
+      String realDatabaseName = variables.resolve( databaseName );
       if ( StringUtils.isNotEmpty( realDatabaseName ) ) {
         cfgBuilder.withDatabase( realDatabaseName );
       }
@@ -192,15 +189,16 @@ public class NeoConnection extends Variables implements IHopMetadata {
    * Test this connection to Neo4j
    *
    * @throws Exception In case anything goes wrong
+   * @param variables
    */
-  public void test() throws Exception {
+  public void test( IVariables variables ) throws Exception {
 
     Session session = null;
     try {
-      Driver driver = getDriver( LogChannel.GENERAL );
+      Driver driver = getDriver( LogChannel.GENERAL, variables);
       SessionConfig.Builder builder = SessionConfig.builder();
       if ( StringUtils.isNotEmpty( databaseName ) ) {
-        builder = builder.withDatabase( environmentSubstitute( databaseName ) );
+        builder = builder.withDatabase( variables.resolve( databaseName ) );
       }
       session = driver.session( builder.build() );
       // Do something with the session otherwise it doesn't test the connection
@@ -219,7 +217,7 @@ public class NeoConnection extends Variables implements IHopMetadata {
     }
   }
 
-  public List<URI> getURIs() throws URISyntaxException {
+  public List<URI> getURIs( IVariables variables ) throws URISyntaxException {
 
     List<URI> uris = new ArrayList<>();
 
@@ -233,8 +231,8 @@ public class NeoConnection extends Variables implements IHopMetadata {
       // Construct the URIs from the entered values
       //
       List<String> serverStrings = new ArrayList<>();
-      String serversString = environmentSubstitute( server );
-      if ( isUsingRouting() ) {
+      String serversString = variables.resolve( server );
+      if ( isUsingRouting(variables) ) {
         for ( String serverString : serversString.split( "," ) ) {
           serverStrings.add( serverString );
         }
@@ -245,7 +243,7 @@ public class NeoConnection extends Variables implements IHopMetadata {
       for ( String serverString : serverStrings ) {
         // Trim excess spaces from server name
         //
-        String url = getUrl( Const.trim( serverString ) );
+        String url = getUrl( Const.trim( serverString ), variables);
         uris.add( new URI( url ) );
       }
     }
@@ -253,7 +251,7 @@ public class NeoConnection extends Variables implements IHopMetadata {
     return uris;
   }
 
-  public String getUrl( String hostname ) {
+  public String getUrl( String hostname, IVariables variables ) {
 
     /*
      * Construct the following URL:
@@ -276,11 +274,11 @@ public class NeoConnection extends Variables implements IHopMetadata {
     // Port
     //
     if ( StringUtils.isNotEmpty( boltPort ) && hostname != null && !hostname.contains( ":" ) ) {
-      url += ":" + environmentSubstitute( boltPort );
+      url += ":" + variables.resolve( boltPort );
     }
 
-    String routingPolicyString = environmentSubstitute( routingPolicy );
-    if ( isUsingRouting() && StringUtils.isNotEmpty( routingPolicyString ) ) {
+    String routingPolicyString = variables.resolve( routingPolicy );
+    if ( isUsingRouting(variables) && StringUtils.isNotEmpty( routingPolicyString ) ) {
       try {
         url += "?policy=" + URLEncoder.encode( routingPolicyString, "UTF-8" );
       } catch ( Exception e ) {
@@ -296,11 +294,12 @@ public class NeoConnection extends Variables implements IHopMetadata {
    * Get a list of all URLs, not just the first in case of routing.
    *
    * @return
+   * @param variables
    */
-  public String getUrl() {
+  public String getUrl( IVariables variables ) {
     StringBuffer urls = new StringBuffer();
     try {
-      for ( URI uri : getURIs() ) {
+      for ( URI uri : getURIs(variables) ) {
         if ( urls.length() > 0 ) {
           urls.append( "," );
         }
@@ -312,9 +311,9 @@ public class NeoConnection extends Variables implements IHopMetadata {
     return urls.toString();
   }
 
-  public boolean encryptionVariableSet() {
+  public boolean encryptionVariableSet( IVariables variables ) {
     if ( !Utils.isEmpty( usingEncryptionVariable ) ) {
-      String value = environmentSubstitute( usingEncryptionVariable );
+      String value = variables.resolve( usingEncryptionVariable );
       if ( !Utils.isEmpty( value ) ) {
         return ValueMetaString.convertStringToBoolean( value );
       }
@@ -322,9 +321,9 @@ public class NeoConnection extends Variables implements IHopMetadata {
     return false;
   }
 
-  public boolean trustAllCertificatesVariableSet() {
+  public boolean trustAllCertificatesVariableSet( IVariables variables ) {
     if ( !Utils.isEmpty( trustAllCertificatesVariable ) ) {
-      String value = environmentSubstitute( trustAllCertificatesVariable );
+      String value = variables.resolve( trustAllCertificatesVariable );
       if ( !Utils.isEmpty( value ) ) {
         return ValueMetaString.convertStringToBoolean( value );
       }
@@ -332,9 +331,9 @@ public class NeoConnection extends Variables implements IHopMetadata {
     return false;
   }
 
-  public boolean version4VariableSet() {
+  public boolean version4VariableSet( IVariables variables ) {
     if ( !Utils.isEmpty( version4Variable ) ) {
-      String value = environmentSubstitute( version4Variable );
+      String value = variables.resolve( version4Variable );
       if ( !Utils.isEmpty( value ) ) {
         return ValueMetaString.convertStringToBoolean( value );
       }
@@ -344,54 +343,54 @@ public class NeoConnection extends Variables implements IHopMetadata {
 
 
 
-  public Driver getDriver( ILogChannel log ) {
+  public Driver getDriver( ILogChannel log, IVariables variables ) {
 
     try {
-      List<URI> uris = getURIs();
+      List<URI> uris = getURIs(variables);
 
-      String realUsername = environmentSubstitute( username );
-      String realPassword = Encr.decryptPasswordOptionallyEncrypted( environmentSubstitute( password ) );
+      String realUsername = variables.resolve( username );
+      String realPassword = Encr.decryptPasswordOptionallyEncrypted( variables.resolve( password ) );
       Config.ConfigBuilder configBuilder;
-      if ( encryptionVariableSet() || usingEncryption ) {
+      if ( encryptionVariableSet(variables) || usingEncryption ) {
         configBuilder = Config.builder().withEncryption();
-        if ( trustAllCertificatesVariableSet() || trustAllCertificates ) {
+        if ( trustAllCertificatesVariableSet(variables) || trustAllCertificates ) {
           configBuilder = configBuilder.withTrustStrategy(Config.TrustStrategy.trustAllCertificates());
         }
       } else {
         configBuilder = Config.builder().withoutEncryption();
       }
       if ( StringUtils.isNotEmpty( connectionLivenessCheckTimeout ) ) {
-        long seconds = Const.toLong( environmentSubstitute( connectionLivenessCheckTimeout ), -1L );
+        long seconds = Const.toLong( variables.resolve( connectionLivenessCheckTimeout ), -1L );
         if ( seconds > 0 ) {
           configBuilder = configBuilder.withConnectionLivenessCheckTimeout( seconds, TimeUnit.MILLISECONDS );
         }
       }
       if ( StringUtils.isNotEmpty( maxConnectionLifetime ) ) {
-        long seconds = Const.toLong( environmentSubstitute( maxConnectionLifetime ), -1L );
+        long seconds = Const.toLong( variables.resolve( maxConnectionLifetime ), -1L );
         if ( seconds > 0 ) {
           configBuilder = configBuilder.withMaxConnectionLifetime( seconds, TimeUnit.MILLISECONDS );
         }
       }
       if ( StringUtils.isNotEmpty( maxConnectionPoolSize ) ) {
-        int size = Const.toInt( environmentSubstitute( maxConnectionPoolSize ), -1 );
+        int size = Const.toInt( variables.resolve( maxConnectionPoolSize ), -1 );
         if ( size > 0 ) {
           configBuilder = configBuilder.withMaxConnectionPoolSize( size );
         }
       }
       if ( StringUtils.isNotEmpty( connectionAcquisitionTimeout ) ) {
-        long seconds = Const.toLong( environmentSubstitute( connectionAcquisitionTimeout ), -1L );
+        long seconds = Const.toLong( variables.resolve( connectionAcquisitionTimeout ), -1L );
         if ( seconds > 0 ) {
           configBuilder = configBuilder.withConnectionAcquisitionTimeout( seconds, TimeUnit.MILLISECONDS );
         }
       }
       if ( StringUtils.isNotEmpty( connectionTimeout ) ) {
-        long seconds = Const.toLong( environmentSubstitute( connectionTimeout ), -1L );
+        long seconds = Const.toLong( variables.resolve( connectionTimeout ), -1L );
         if ( seconds > 0 ) {
           configBuilder = configBuilder.withConnectionTimeout( seconds, TimeUnit.MILLISECONDS );
         }
       }
       if ( StringUtils.isNotEmpty( maxTransactionRetryTime ) ) {
-        long seconds = Const.toLong( environmentSubstitute( maxTransactionRetryTime ), -1L );
+        long seconds = Const.toLong( variables.resolve( maxTransactionRetryTime ), -1L );
         if ( seconds > 0 ) {
           configBuilder = configBuilder.withMaxTransactionRetryTime( seconds, TimeUnit.MILLISECONDS );
         }
@@ -399,7 +398,7 @@ public class NeoConnection extends Variables implements IHopMetadata {
 
       Config config = configBuilder.build();
 
-      if ( isUsingRouting() ) {
+      if ( isUsingRouting(variables) ) {
         return GraphDatabase.routingDriver( uris, AuthTokens.basic( realUsername, realPassword ), config );
       } else {
         return GraphDatabase.driver( uris.get( 0 ), AuthTokens.basic( realUsername, realPassword ), config );
@@ -409,9 +408,9 @@ public class NeoConnection extends Variables implements IHopMetadata {
     }
   }
 
-  public boolean isUsingRouting() {
+  public boolean isUsingRouting( IVariables variables ) {
     if ( !Utils.isEmpty( routingVariable ) ) {
-      String value = environmentSubstitute( routingVariable );
+      String value = variables.resolve( routingVariable );
       if ( !Utils.isEmpty( value ) ) {
         return ValueMetaString.convertStringToBoolean( value );
       }

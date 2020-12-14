@@ -8,6 +8,7 @@ import org.apache.hop.core.logging.HopLogStore;
 import org.apache.hop.core.logging.ILogChannel;
 import org.apache.hop.core.logging.LoggingHierarchy;
 import org.apache.hop.core.logging.LoggingObjectType;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.pipeline.Pipeline;
 import org.apache.hop.pipeline.PipelineHopMeta;
 import org.apache.hop.pipeline.PipelineMeta;
@@ -44,7 +45,7 @@ public class PipelineLoggingExtensionPoint implements IExtensionPoint<IPipelineE
   public static final String EXECUTION_TYPE_PIPELINE = LoggingObjectType.PIPELINE.name();
   public static final String EXECUTION_TYPE_TRANSFORM = LoggingObjectType.TRANSFORM.name();
 
-  @Override public void callExtensionPoint( ILogChannel log, IPipelineEngine<PipelineMeta> pipeline ) throws HopException {
+  @Override public void callExtensionPoint( ILogChannel log, IVariables variables, IPipelineEngine<PipelineMeta> pipeline ) throws HopException {
 
     // See if logging is enabled
     //
@@ -67,7 +68,7 @@ public class PipelineLoggingExtensionPoint implements IExtensionPoint<IPipelineE
       }
       log.logDetailed( "Logging pipeline information to Neo4j connection : " + connection.getName() );
 
-      Session session = connection.getSession( log );
+      Session session = connection.getSession( log, variables);
 
       logPipelineMetadata( log, session, connection, pipeline );
       logStartOfPipeline( log, session, connection, pipeline );
@@ -121,7 +122,7 @@ public class PipelineLoggingExtensionPoint implements IExtensionPoint<IPipelineE
             transformPars.put( "transformName", transformMeta.getName() );
             transformPars.put( "description", transformMeta.getDescription() );
             transformPars.put( "pluginId", transformMeta.getPluginId() );
-            transformPars.put( "copies", transformMeta.getCopies() );
+            transformPars.put( "copies", transformMeta.getCopies(pipeline) );
             transformPars.put( "locationX", transformMeta.getLocation().x );
             transformPars.put( "locationY", transformMeta.getLocation().y );
 

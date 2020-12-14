@@ -74,7 +74,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
       if ( StringUtils.isEmpty( argument ) ) {
         argument = getPipeline().getPipelineMeta().getName();
       } else {
-        argument = environmentSubstitute( argument );
+        argument = resolve( argument );
       }
 
       switch ( meta.getFieldType()[ i ] ) {
@@ -279,7 +279,7 @@ public class GetLoggingInfo extends BaseTransform<GetLoggingInfoMeta, GetLogging
   }
 
   private Date getResultStartDate( ILogChannel log, NeoConnection connection, String cypher, Map<String, Object> parameters ) throws Exception {
-    return LoggingCore.executeCypher( log, connection, cypher, parameters, result -> {
+    return LoggingCore.executeCypher( log, this, connection, cypher, parameters, result -> {
       try {
         return getResultDate( result, "startDate" );
       } catch ( ParseException e ) {

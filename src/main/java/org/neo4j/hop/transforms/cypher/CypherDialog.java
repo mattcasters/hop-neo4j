@@ -5,6 +5,7 @@ import org.apache.hop.core.Const;
 import org.apache.hop.core.exception.HopTransformException;
 import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.core.row.value.ValueMetaFactory;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.i18n.BaseMessages;
 import org.apache.hop.metadata.api.IHopMetadataProvider;
 import org.apache.hop.pipeline.Pipeline;
@@ -71,7 +72,8 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
   private MetaSelectionLine<NeoConnection> wConnection;
   private TextVar wBatchSize;
   private Button wReadOnly;
-  private Button wRetry;
+  private Button wRetryOnDisconnect;
+  private TextVar wNrRetriesOnError;
   private Button wCypherFromField;
   private CCombo wCypherField;
   private Button wUnwind;
@@ -89,8 +91,8 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
 
   private CypherMeta input;
 
-  public CypherDialog( Shell parent, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
-    super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
+  public CypherDialog( Shell parent, IVariables variables, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
+    super( parent, variables, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (CypherMeta) inputMetadata;
 
     metadataProvider = HopGui.getInstance().getMetadataProvider();
@@ -159,7 +161,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     Control lastControl = wTransformName;
 
     wConnection =
-      new MetaSelectionLine<>( pipelineMeta, metadataProvider, NeoConnection.class, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+      new MetaSelectionLine<>( variables, metadataProvider, NeoConnection.class, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -182,7 +184,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     fdlBatchSize.right = new FormAttachment( middle, -margin );
     fdlBatchSize.top = new FormAttachment( lastControl, 2 * margin );
     wlBatchSize.setLayoutData( fdlBatchSize );
-    wBatchSize = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wBatchSize = new TextVar( variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wBatchSize );
     wBatchSize.addModifyListener( lsMod );
     FormData fdBatchSize = new FormData();
@@ -210,22 +212,39 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     lastControl = wReadOnly;
 
     Label wlRetry = new Label( wComposite, SWT.RIGHT );
-    wlRetry.setText( "Retry connecting after disconnection? " );
+    wlRetry.setText( "Reconnect once after disconnection? " );
     props.setLook( wlRetry );
     FormData fdlRetry = new FormData();
     fdlRetry.left = new FormAttachment( 0, 0 );
     fdlRetry.right = new FormAttachment( middle, -margin );
     fdlRetry.top = new FormAttachment( lastControl, 2 * margin );
     wlRetry.setLayoutData( fdlRetry );
-    wRetry = new Button( wComposite, SWT.CHECK | SWT.BORDER );
-    props.setLook( wRetry );
+    wRetryOnDisconnect = new Button( wComposite, SWT.CHECK | SWT.BORDER );
+    props.setLook( wRetryOnDisconnect );
     FormData fdRetry = new FormData();
     fdRetry.left = new FormAttachment( middle, 0 );
     fdRetry.right = new FormAttachment( 100, 0 );
     fdRetry.top = new FormAttachment( wlRetry, 0, SWT.CENTER );
-    wRetry.setLayoutData( fdRetry );
-    lastControl = wRetry;
+    wRetryOnDisconnect.setLayoutData( fdRetry );
+    lastControl = wRetryOnDisconnect;
 
+    Label wlNrRetriesOnError = new Label( wComposite, SWT.RIGHT );
+    wlNrRetriesOnError.setText( "Number of retries on error" );
+    props.setLook( wlNrRetriesOnError );
+    FormData fdlNrRetriesOnError = new FormData();
+    fdlNrRetriesOnError.left = new FormAttachment( 0, 0 );
+    fdlNrRetriesOnError.right = new FormAttachment( middle, -margin );
+    fdlNrRetriesOnError.top = new FormAttachment( lastControl, 2 * margin );
+    wlNrRetriesOnError.setLayoutData( fdlNrRetriesOnError );
+    wNrRetriesOnError = new TextVar( variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    props.setLook( wNrRetriesOnError );
+    wNrRetriesOnError.addModifyListener( lsMod );
+    FormData fdNrRetriesOnError = new FormData();
+    fdNrRetriesOnError.left = new FormAttachment( middle, 0 );
+    fdNrRetriesOnError.right = new FormAttachment( 100, 0 );
+    fdNrRetriesOnError.top = new FormAttachment( wlNrRetriesOnError, 0, SWT.CENTER );
+    wNrRetriesOnError.setLayoutData( fdNrRetriesOnError );
+    lastControl = wNrRetriesOnError;
 
     Label wlCypherFromField = new Label( wComposite, SWT.RIGHT );
     wlCypherFromField.setText( "Get Cypher from input field? " );
@@ -300,7 +319,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     fdlUnwindMap.right = new FormAttachment( middle, -margin );
     fdlUnwindMap.top = new FormAttachment( lastControl, 2 * margin );
     wlUnwindMap.setLayoutData( fdlUnwindMap );
-    wUnwindMap = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wUnwindMap = new TextVar( variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wUnwindMap );
     wUnwindMap.addModifyListener( lsMod );
     FormData fdUnwindMap = new FormData();
@@ -343,7 +362,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     fdlReturnGraphField.right = new FormAttachment( middle, -margin );
     fdlReturnGraphField.top = new FormAttachment( lastControl, 2 * margin );
     wlReturnGraphField.setLayoutData( fdlReturnGraphField );
-    wReturnGraphField = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wReturnGraphField = new TextVar( variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wReturnGraphField );
     wReturnGraphField.addModifyListener( lsMod );
     FormData fdReturnGraphField = new FormData();
@@ -388,7 +407,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
 
     String[] fieldNames;
     try {
-      fieldNames = pipelineMeta.getPrevTransformFields( transformName ).getFieldNames();
+      fieldNames = pipelineMeta.getPrevTransformFields( variables, transformName ).getFieldNames();
     } catch ( Exception e ) {
       logError( "Unable to get fields from previous transform", e );
       fieldNames = new String[] {};
@@ -420,7 +439,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     wbGetParameters.setLayoutData( fdbGetParameters );
     wbGetParameters.addListener( SWT.Selection, ( e ) -> {
       try {
-        IRowMeta r = pipelineMeta.getPrevTransformFields( transformMeta );
+        IRowMeta r = pipelineMeta.getPrevTransformFields( variables, transformMeta );
 
         BaseTransformDialog.getFieldsFromPrevious( r, wParameters, 2, new int[] { 2 }, new int[] {}, -1, -1,
           ( item, valueMeta ) -> Neo4JOutputDialog.getPropertyNameTypePrimary( item, valueMeta, new int[] { 1 }, new int[] { 3 }, -1 )
@@ -430,7 +449,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
       }
     } );
 
-    wParameters = new TableView( pipelineMeta, wComposite, SWT.FULL_SELECTION | SWT.MULTI, parameterColumns,
+    wParameters = new TableView( variables, wComposite, SWT.FULL_SELECTION | SWT.MULTI, parameterColumns,
       input.getParameterMappings().size(), lsMod, props );
     props.setLook( wParameters );
     wParameters.addModifyListener( lsMod );
@@ -469,7 +488,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     wbGetReturnFields.setLayoutData( fdbGetReturnFields );
     wbGetReturnFields.addListener( SWT.Selection, ( e ) -> getReturnValues() );
 
-    wReturns = new TableView( pipelineMeta, wComposite, SWT.FULL_SELECTION | SWT.MULTI, returnColumns, input.getReturnValues().size(), lsMod, props );
+    wReturns = new TableView( variables, wComposite, SWT.FULL_SELECTION | SWT.MULTI, returnColumns, input.getReturnValues().size(), lsMod, props );
     props.setLook( wReturns );
     wReturns.addModifyListener( lsMod );
     FormData fdReturns = new FormData();
@@ -505,8 +524,9 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     wConnection.addSelectionListener( lsDef );
     wTransformName.addSelectionListener( lsDef );
     wBatchSize.addSelectionListener( lsDef );
+    wNrRetriesOnError.addSelectionListener( lsDef );
     wReadOnly.addSelectionListener( lsDef );
-    wRetry.addSelectionListener( lsDef );
+    wRetryOnDisconnect.addSelectionListener( lsDef );
     wCypherFromField.addSelectionListener( lsDef );
     wCypherField.addSelectionListener( lsDef );
     wUnwind.addSelectionListener( lsDef );
@@ -566,11 +586,12 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     wConnection.setText( Const.NVL( input.getConnectionName(), "" ) );
 
     wReadOnly.setSelection( input.isReadOnly() );
-    wRetry.setSelection( input.isRetrying() );
+    wRetryOnDisconnect.setSelection( input.isRetryingOnDisconnect() );
+    wNrRetriesOnError.setText( Const.NVL(input.getNrRetriesOnError(), "") );
     wCypherFromField.setSelection( input.isCypherFromField() );
     wCypherField.setText( Const.NVL( input.getCypherField(), "" ) );
     try {
-      wCypherField.setItems( pipelineMeta.getPrevTransformFields( transformName ).getFieldNames() );
+      wCypherField.setItems( pipelineMeta.getPrevTransformFields( variables, transformName ).getFieldNames() );
     } catch ( HopTransformException e ) {
       log.logError( "Error getting fields from previous transform", e );
     }
@@ -622,7 +643,8 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     meta.setCypher( wCypher.getText() );
 
     meta.setReadOnly( wReadOnly.getSelection() );
-    meta.setRetrying( wRetry.getSelection() );
+    meta.setRetryingOnDisconnect( wRetryOnDisconnect.getSelection() );
+    meta.setNrRetriesOnError( wNrRetriesOnError.getText() );
     meta.setCypherFromField( wCypherFromField.getSelection() );
     meta.setCypherField( wCypherField.getText() );
 
@@ -650,9 +672,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
   private synchronized void preview() {
     CypherMeta oneMeta = new CypherMeta();
     this.getInfo( oneMeta );
-    PipelineMeta previewMeta = PipelinePreviewFactory.generatePreviewPipeline( this.pipelineMeta, HopGui.getInstance().getMetadataProvider(), oneMeta, this.wTransformName.getText() );
-    this.pipelineMeta.getVariable( "Internal.Transformation.Filename.Directory" );
-    previewMeta.getVariable( "Internal.Transformation.Filename.Directory" );
+    PipelineMeta previewMeta = PipelinePreviewFactory.generatePreviewPipeline( variables, HopGui.getInstance().getMetadataProvider(), oneMeta, this.wTransformName.getText() );
     EnterNumberDialog
       numberDialog = new EnterNumberDialog( this.shell, this.props.getDefaultPreviewSize(),
       BaseMessages.getString( PKG, "CypherDialog.PreviewSize.DialogTitle" ),
@@ -660,7 +680,8 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
     );
     int previewSize = numberDialog.open();
     if ( previewSize > 0 ) {
-      PipelinePreviewProgressDialog progressDialog = new PipelinePreviewProgressDialog( this.shell, previewMeta, new String[] { this.wTransformName.getText() }, new int[] { previewSize } );
+      PipelinePreviewProgressDialog progressDialog = new PipelinePreviewProgressDialog( this.shell, variables,
+        previewMeta, new String[] { this.wTransformName.getText() }, new int[] { previewSize } );
       progressDialog.open();
       Pipeline pipeline = progressDialog.getPipeline();
       String loggingText = progressDialog.getLoggingText();
@@ -672,7 +693,7 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
         etd.open();
       }
 
-      PreviewRowsDialog prd = new PreviewRowsDialog( this.shell, this.pipelineMeta, 0, this.wTransformName.getText(), progressDialog.getPreviewRowsMeta( this.wTransformName.getText() ),
+      PreviewRowsDialog prd = new PreviewRowsDialog( this.shell, variables, 0, this.wTransformName.getText(), progressDialog.getPreviewRowsMeta( this.wTransformName.getText() ),
         progressDialog.getPreviewRows( this.wTransformName.getText() ), loggingText );
       prd.open();
     }
@@ -690,15 +711,14 @@ public class CypherDialog extends BaseTransformDialog implements ITransformDialo
 
     try {
       NeoConnection neoConnection = metadataProvider.getSerializer( NeoConnection.class ).load( meta.getConnectionName() );
-      neoConnection.initializeVariablesFrom( pipelineMeta );
-      driver = neoConnection.getDriver( log );
+      driver = neoConnection.getDriver( log, variables);
       session = driver.session();
       transaction = session.beginTransaction();
       Map<String, Object> parameters = new HashMap<>();
       for ( ParameterMapping mapping : meta.getParameterMappings() ) {
-        parameters.put( pipelineMeta.environmentSubstitute( mapping.getParameter() ), "" );
+        parameters.put( variables.resolve( mapping.getParameter() ), "" );
       }
-      String cypher = pipelineMeta.environmentSubstitute( wCypher.getText() );
+      String cypher = variables.resolve( wCypher.getText() );
       Result result = transaction.run( cypher, parameters );
 
       // Evaluate the result

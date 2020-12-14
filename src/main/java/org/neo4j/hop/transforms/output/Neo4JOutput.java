@@ -101,13 +101,13 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
       data.relationshipIndex = data.outputRowMeta.indexOfValue( meta.getRelationship() );
       data.fromLabelValues = new String[ meta.getFromNodeLabelValues().length ];
       for ( int i = 0; i < meta.getFromNodeLabelValues().length; i++ ) {
-        data.fromLabelValues[ i ] = environmentSubstitute( meta.getFromNodeLabelValues()[ i ] );
+        data.fromLabelValues[ i ] = resolve( meta.getFromNodeLabelValues()[ i ] );
       }
       data.toLabelValues = new String[ meta.getToNodeLabelValues().length ];
       for ( int i = 0; i < meta.getToNodeLabelValues().length; i++ ) {
-        data.toLabelValues[ i ] = environmentSubstitute( meta.getToNodeLabelValues()[ i ] );
+        data.toLabelValues[ i ] = resolve( meta.getToNodeLabelValues()[ i ] );
       }
-      data.relationshipLabelValue = environmentSubstitute( meta.getRelationshipValue() );
+      data.relationshipLabelValue = resolve( meta.getRelationshipValue() );
 
       data.unwindList = new ArrayList<>();
 
@@ -155,7 +155,7 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
       if ( meta.isReturningGraph() ) {
         log.logBasic( "Writing to output graph field, not to Neo4j" );
       } else {
-        data.session = data.neoConnection.getSession( log );
+        data.session = data.neoConnection.getSession( log, this );
 
         // Create indexes for the primary properties of the From and To nodes
         //
@@ -665,14 +665,13 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
           log.logError( "Connection '" + meta.getConnection() + "' could not be found in the metastore : " + metadataProvider.getDescription() );
           return false;
         }
-        data.neoConnection.initializeVariablesFrom( this );
         data.version4 = data.neoConnection.isVersion4();
       } catch ( HopException e ) {
         log.logError( "Could not gencsv Neo4j connection '" + meta.getConnection() + "' from the metastore", e );
         return false;
       }
 
-      data.batchSize = Const.toLong( environmentSubstitute( meta.getBatchSize() ), 1 );
+      data.batchSize = Const.toLong( resolve( meta.getBatchSize() ), 1 );
     }
 
     return super.init();

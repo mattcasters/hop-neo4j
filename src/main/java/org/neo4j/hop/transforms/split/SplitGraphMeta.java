@@ -47,17 +47,17 @@ public class SplitGraphMeta extends BaseTransformMeta implements ITransformMeta<
   @Override public void getFields( IRowMeta inputRowMeta, String name, IRowMeta[] info, TransformMeta nextStep, IVariables space, IHopMetadataProvider metadataProvider )
     throws HopTransformException {
     if ( StringUtils.isNotEmpty( typeField ) ) {
-      ValueMetaString typeValueMeta = new ValueMetaString( space.environmentSubstitute( typeField ) );
+      ValueMetaString typeValueMeta = new ValueMetaString( space.resolve( typeField ) );
       typeValueMeta.setOrigin( name );
       inputRowMeta.addValueMeta( typeValueMeta );
     }
     if ( StringUtils.isNotEmpty( idField ) ) {
-      ValueMetaString idValueMeta = new ValueMetaString( space.environmentSubstitute( idField ) );
+      ValueMetaString idValueMeta = new ValueMetaString( space.resolve( idField ) );
       idValueMeta.setOrigin( name );
       inputRowMeta.addValueMeta( idValueMeta );
     }
     if ( StringUtils.isNotEmpty( propertySetField ) ) {
-      ValueMetaString propertySetValueMeta = new ValueMetaString( space.environmentSubstitute( propertySetField ) );
+      ValueMetaString propertySetValueMeta = new ValueMetaString( space.resolve( propertySetField ) );
       propertySetValueMeta.setOrigin( name );
       inputRowMeta.addValueMeta( propertySetValueMeta );
     }

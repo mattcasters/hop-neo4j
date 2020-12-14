@@ -7,6 +7,7 @@ import org.apache.hop.core.exception.HopException;
 import org.apache.hop.core.exception.HopTransformException;
 import org.apache.hop.core.logging.LogChannel;
 import org.apache.hop.core.row.IRowMeta;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.i18n.BaseMessages;
 import org.apache.hop.metadata.api.IHopMetadataSerializer;
 import org.apache.hop.pipeline.PipelineMeta;
@@ -72,8 +73,8 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
 
   private GraphModel activeModel;
 
-  public GraphOutputDialog( Shell parent, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
-    super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
+  public GraphOutputDialog( Shell parent, IVariables variables, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
+    super( parent, variables, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (GraphOutputMeta) inputMetadata;
 
     metadataProvider = HopGui.getInstance().getMetadataProvider();
@@ -122,7 +123,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     Control lastControl = wTransformName;
 
     wConnection =
-      new MetaSelectionLine<>( pipelineMeta, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+      new MetaSelectionLine<>( variables, metadataProvider, NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -138,7 +139,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     lastControl = wConnection;
 
 
-    wModel = new MetaSelectionLine<>( pipelineMeta, metadataProvider, GraphModel.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Graph model", "The name of the Neo4j logical Graph Model to use" );
+    wModel = new MetaSelectionLine<>( variables, metadataProvider, GraphModel.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Graph model", "The name of the Neo4j logical Graph Model to use" );
     props.setLook( wModel );
     wModel.addModifyListener( lsMod );
     FormData fdModel = new FormData();
@@ -161,7 +162,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     fdlBatchSize.right = new FormAttachment( middle, -margin );
     fdlBatchSize.top = new FormAttachment( lastControl, 2 * margin );
     wlBatchSize.setLayoutData( fdlBatchSize );
-    wBatchSize = new TextVar( pipelineMeta, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wBatchSize = new TextVar( variables, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wBatchSize );
     wBatchSize.addModifyListener( lsMod );
     FormData fdBatchSize = new FormData();
@@ -219,7 +220,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     fdlReturnGraphField.right = new FormAttachment( middle, -margin );
     fdlReturnGraphField.top = new FormAttachment( lastControl, 2 * margin );
     wlReturnGraphField.setLayoutData( fdlReturnGraphField );
-    wReturnGraphField = new TextVar( pipelineMeta, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wReturnGraphField = new TextVar( variables, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wReturnGraphField );
     wReturnGraphField.addModifyListener( lsMod );
     FormData fdReturnGraphField = new FormData();
@@ -264,7 +265,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
 
     String[] fieldNames;
     try {
-      fieldNames = pipelineMeta.getPrevTransformFields( transformName ).getFieldNames();
+      fieldNames = pipelineMeta.getPrevTransformFields( variables, transformName ).getFieldNames();
     } catch ( Exception e ) {
       logError( "Unable to get fields from previous transform", e );
       fieldNames = new String[] {};
@@ -288,7 +289,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     fdlFieldMappings.right = new FormAttachment( middle, -margin );
     fdlFieldMappings.top = new FormAttachment( lastControl, margin );
     wlFieldMappings.setLayoutData( fdlFieldMappings );
-    wFieldMappings = new TableView( pipelineMeta, shell, SWT.FULL_SELECTION | SWT.MULTI, parameterColumns, input.getFieldModelMappings().size(), lsMod, props );
+    wFieldMappings = new TableView( variables, shell, SWT.FULL_SELECTION | SWT.MULTI, parameterColumns, input.getFieldModelMappings().size(), lsMod, props );
     props.setLook( wFieldMappings );
     wFieldMappings.addModifyListener( lsMod );
     FormData fdFieldMappings = new FormData();
@@ -371,7 +372,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
 
       // Input fields
       //
-      IRowMeta inputRowMeta = pipelineMeta.getPrevTransformFields( transformMeta );
+      IRowMeta inputRowMeta = pipelineMeta.getPrevTransformFields( variables, transformMeta );
       String[] inputFields = inputRowMeta.getFieldNames();
 
       // Node properties
@@ -523,7 +524,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
   private IRowMeta getInputRowMeta() {
     IRowMeta inputRowMeta = null;
     try {
-      inputRowMeta = pipelineMeta.getPrevTransformFields( transformName );
+      inputRowMeta = pipelineMeta.getPrevTransformFields( variables, transformName );
     } catch ( HopTransformException e ) {
       LogChannel.GENERAL.logError( "Unable to find transform input field", e );
     }

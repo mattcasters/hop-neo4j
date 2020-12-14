@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.exception.HopException;
 import org.apache.hop.metadata.api.HopMetadata;
+import org.apache.hop.metadata.api.HopMetadataBase;
 import org.apache.hop.metadata.api.HopMetadataProperty;
 import org.apache.hop.metadata.api.IHopMetadata;
 import org.json.simple.JSONArray;
@@ -22,11 +23,9 @@ import java.util.List;
   key = "neo4j-graph-model",
   name = "Neo4j Graph Model",
   description = "Description of the nodes, relationships, indexes... of a Neo4j graph",
-  iconImage = "neo4j_logo.svg"
+  image = "neo4j_logo.svg"
 )
-public class GraphModel implements IHopMetadata {
-  @HopMetadataProperty
-  protected String name;
+public class GraphModel extends HopMetadataBase implements IHopMetadata {
 
   @HopMetadataProperty
   protected String description;
@@ -331,15 +330,6 @@ public class GraphModel implements IHopMetadata {
     }
     Arrays.sort( names );
     return names;
-  }
-
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName( String name ) {
-    this.name = name;
   }
 
   public String getDescription() {

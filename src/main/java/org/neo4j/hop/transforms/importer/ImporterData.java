@@ -19,6 +19,8 @@ public class ImporterData extends BaseTransformData implements ITransformData {
 
   public int filenameFieldIndex;
   public int fileTypeFieldIndex;
+  public String badTolerance;
   public String readBufferSize;
   public String maxMemory;
+  public String processors;
 }

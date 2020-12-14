@@ -68,11 +68,10 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
           log.logError( "Connection '" + meta.getConnectionName() + "' could not be found in the metadata : " + metadataProvider.getDescription() );
           return false;
         }
-        data.neoConnection.initializeVariablesFrom( this );
 
         if ( !meta.isReturningGraph() ) {
           try {
-            data.session = data.neoConnection.getSession( log );
+            data.session = data.neoConnection.getSession( log, this );
             data.version4 = data.neoConnection.isVersion4();
           } catch ( Exception e ) {
             log.logError( "Unable to get or create Neo4j database driver for database '" + data.neoConnection.getName() + "'", e );
@@ -80,7 +79,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
           }
         }
 
-        data.batchSize = Const.toLong( environmentSubstitute( meta.getBatchSize() ), 1 );
+        data.batchSize = Const.toLong( resolve( meta.getBatchSize() ), 1 );
       }
 
       if ( StringUtils.isEmpty( meta.getModel() ) ) {

@@ -43,6 +43,7 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
   public static final String BATCH_SIZE = "batch_size";
   public static final String READ_ONLY = "read_only";
   public static final String RETRY = "retry";
+  public static final String NR_RETRIES_ON_ERROR = "nr_retries_on_error";
   public static final String CYPHER_FROM_FIELD = "cypher_from_field";
   public static final String CYPHER_FIELD = "cypher_field";
   public static final String UNWIND = "unwind";
@@ -80,7 +81,10 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
   private boolean readOnly;
 
   @Injection( name = RETRY )
-  private boolean retrying;
+  private boolean retryingOnDisconnect;
+
+  @Injection( name = NR_RETRIES_ON_ERROR )
+  private String nrRetriesOnError;
 
   @Injection( name = CYPHER_FROM_FIELD )
   private boolean cypherFromField;
@@ -113,7 +117,7 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
   }
 
   @Override public void setDefault() {
-    retrying = true;
+    retryingOnDisconnect = true;
   }
 
   @Override public Cypher createTransform( TransformMeta transformMeta, CypherData iTransformData, int i, PipelineMeta pipelineMeta, Pipeline pipeline ) {
@@ -165,7 +169,8 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
     xml.append( XmlHandler.addTagValue( CYPHER, cypher ) );
     xml.append( XmlHandler.addTagValue( BATCH_SIZE, batchSize ) );
     xml.append( XmlHandler.addTagValue( READ_ONLY, readOnly ) );
-    xml.append( XmlHandler.addTagValue( RETRY, retrying ) );
+    xml.append( XmlHandler.addTagValue( NR_RETRIES_ON_ERROR, nrRetriesOnError ) );
+    xml.append( XmlHandler.addTagValue( RETRY, retryingOnDisconnect ) );
     xml.append( XmlHandler.addTagValue( CYPHER_FROM_FIELD, cypherFromField ) );
     xml.append( XmlHandler.addTagValue( CYPHER_FIELD, cypherField ) );
     xml.append( XmlHandler.addTagValue( UNWIND, usingUnwind ) );
@@ -203,7 +208,8 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
     batchSize = XmlHandler.getTagValue( transformNode, BATCH_SIZE );
     readOnly = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, READ_ONLY ) );
     String retryString = XmlHandler.getTagValue( transformNode, RETRY );
-    retrying = StringUtils.isEmpty( retryString ) || "Y".equalsIgnoreCase( retryString );
+    retryingOnDisconnect = StringUtils.isEmpty( retryString ) || "Y".equalsIgnoreCase( retryString );
+    nrRetriesOnError = XmlHandler.getTagValue( transformNode, NR_RETRIES_ON_ERROR );
     cypherFromField = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, CYPHER_FROM_FIELD ) );
     cypherField = XmlHandler.getTagValue( transformNode, CYPHER_FIELD );
     usingUnwind = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, UNWIND ) );
@@ -326,15 +332,15 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
    *
    * @return value of retrying
    */
-  public boolean isRetrying() {
-    return retrying;
+  public boolean isRetryingOnDisconnect() {
+    return retryingOnDisconnect;
   }
 
   /**
-   * @param retrying The retrying to set
+   * @param retryingOnDisconnect The retrying to set
    */
-  public void setRetrying( boolean retrying ) {
-    this.retrying = retrying;
+  public void setRetryingOnDisconnect( boolean retryingOnDisconnect ) {
+    this.retryingOnDisconnect = retryingOnDisconnect;
   }
 
   /**
@@ -447,5 +453,21 @@ public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cyph
    */
   public void setReturnGraphField( String returnGraphField ) {
     this.returnGraphField = returnGraphField;
+  }
+
+  /**
+   * Gets nrRetriesOnError
+   *
+   * @return value of nrRetriesOnError
+   */
+  public String getNrRetriesOnError() {
+    return nrRetriesOnError;
+  }
+
+  /**
+   * @param nrRetriesOnError The nrRetriesOnError to set
+   */
+  public void setNrRetriesOnError( String nrRetriesOnError ) {
+    this.nrRetriesOnError = nrRetriesOnError;
   }
 }

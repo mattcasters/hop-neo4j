@@ -53,11 +53,11 @@ public class GenerateCsvMeta extends BaseTransformMeta implements ITransformMeta
 
     inputRowMeta.clear();
 
-    IValueMeta filenameValueMeta = new ValueMetaString( space.environmentSubstitute( filenameField ) );
+    IValueMeta filenameValueMeta = new ValueMetaString( space.resolve( filenameField ) );
     filenameValueMeta.setOrigin( name );
     inputRowMeta.addValueMeta( filenameValueMeta );
 
-    IValueMeta fileTypeValueMeta = new ValueMetaString( space.environmentSubstitute( fileTypeField ) );
+    IValueMeta fileTypeValueMeta = new ValueMetaString( space.resolve( fileTypeField ) );
     fileTypeValueMeta.setOrigin( name );
     inputRowMeta.addValueMeta( fileTypeValueMeta );
 

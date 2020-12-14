@@ -100,7 +100,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
     wName.setLayoutData( fdName );
     Control lastControl = wName;
 
-    wConnection = new MetaSelectionLine<>( getWorkflowMeta(), getMetadataProvider(), NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
+    wConnection = new MetaSelectionLine<>( variables, getMetadataProvider(), NeoConnection.class, shell, SWT.SINGLE | SWT.LEFT | SWT.BORDER, "Neo4j Connection", "The name of the Neo4j connection to use" );
     props.setLook( wConnection );
     wConnection.addModifyListener( lsMod );
     FormData fdConnection = new FormData();
@@ -147,7 +147,7 @@ public class CypherScriptDialog extends ActionDialog implements IActionDialog {
     fdlCypher.right = new FormAttachment( 100, 0 );
     fdlCypher.top = new FormAttachment( wConnection, margin );
     wlScript.setLayoutData( fdlCypher );
-    wScript = new TextVar( getWorkflowMeta(), shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
+    wScript = new TextVar( variables, shell, SWT.MULTI | SWT.LEFT | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL );
     wScript.getTextWidget().setFont( GuiResource.getInstance().getFontFixed() );
     props.setLook( wScript );
     wScript.addModifyListener( lsMod );

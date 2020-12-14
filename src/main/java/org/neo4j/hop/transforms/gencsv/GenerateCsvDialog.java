@@ -1,6 +1,7 @@
 package org.neo4j.hop.transforms.gencsv;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hop.core.variables.IVariables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -47,8 +48,8 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
 
   private GenerateCsvMeta input;
 
-  public GenerateCsvDialog( Shell parent, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
-    super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
+  public GenerateCsvDialog( Shell parent, IVariables variables, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
+    super( parent, variables, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (GenerateCsvMeta) inputMetadata;
 
     metadataProvider = HopGui.getInstance().getMetadataProvider();
@@ -118,7 +119,7 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
 
     String[] fieldnames = new String[] {};
     try {
-      fieldnames = pipelineMeta.getPrevTransformFields(transformMeta).getFieldNames();
+      fieldnames = pipelineMeta.getPrevTransformFields(variables, transformMeta).getFieldNames();
     } catch ( HopTransformException e ) {
       log.logError("error getting input field names: ", e);
     }
@@ -153,7 +154,7 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
     fdlBaseFolder.right = new FormAttachment( middle, -margin );
     fdlBaseFolder.top = new FormAttachment( lastControl, 2 * margin );
     wlBaseFolder.setLayoutData( fdlBaseFolder );
-    wBaseFolder = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wBaseFolder = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wBaseFolder );
     wBaseFolder.addModifyListener( lsMod );
     FormData fdBaseFolder = new FormData();
@@ -171,7 +172,7 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
     fdlFilesPrefix.right = new FormAttachment( middle, -margin );
     fdlFilesPrefix.top = new FormAttachment( lastControl, 2 * margin );
     wlFilesPrefix.setLayoutData( fdlFilesPrefix );
-    wFilesPrefix = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wFilesPrefix = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wFilesPrefix );
     wFilesPrefix.addModifyListener( lsMod );
     FormData fdFilesPrefix = new FormData();
@@ -207,7 +208,7 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
     fdlFilenameField.right = new FormAttachment( middle, -margin );
     fdlFilenameField.top = new FormAttachment( lastControl, 2 * margin );
     wlFilenameField.setLayoutData( fdlFilenameField );
-    wFilenameField = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wFilenameField = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wFilenameField );
     wFilenameField.addModifyListener( lsMod );
     FormData fdFilenameField = new FormData();
@@ -225,7 +226,7 @@ public class GenerateCsvDialog extends BaseTransformDialog implements ITransform
     fdlFileTypeField.right = new FormAttachment( middle, -margin );
     fdlFileTypeField.top = new FormAttachment( lastControl, 2 * margin );
     wlFileTypeField.setLayoutData( fdlFileTypeField );
-    wFileTypeField = new TextVar(pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wFileTypeField = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wFileTypeField );
     wFileTypeField.addModifyListener( lsMod );
     FormData fdFileTypeField = new FormData();

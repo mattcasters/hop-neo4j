@@ -48,9 +48,6 @@ public class LoggingCore {
     }
     IHopMetadataSerializer<NeoConnection> serializer = metadataProvider.getSerializer( NeoConnection.class );
     NeoConnection connection = serializer.load( connectionName );
-    if ( connection != null ) {
-      connection.initializeVariablesFrom( space );
-    }
     return connection;
   }
 
@@ -116,17 +113,16 @@ public class LoggingCore {
   }
 
 
-  public static <T> T executeCypher( ILogChannel log, NeoConnection connection, String cypher, Map<String, Object> parameters, WorkLambda<T> lambda ) throws Exception {
+  public static <T> T executeCypher( ILogChannel log, IVariables variables, NeoConnection connection, String cypher, Map<String, Object> parameters,
+                                     WorkLambda<T> lambda ) throws Exception {
 
     Session session = null;
     try {
-      session = connection.getSession(log);
+      session = connection.getSession(log, variables);
 
-      return session.readTransaction( new TransactionWork<T>() {
-        @Override public T execute( Transaction tx ) {
-          Result result = tx.run( cypher, parameters );
-          return lambda.getResultValue( result );
-        }
+      return session.readTransaction( tx -> {
+        Result result = tx.run( cypher, parameters );
+        return lambda.getResultValue( result );
       } );
     } finally {
       if ( session != null ) {

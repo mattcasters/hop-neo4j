@@ -52,23 +52,23 @@ public class Importer extends BaseTransform<ImporterMeta, ImporterData> implemen
       if ( StringUtils.isEmpty( meta.getAdminCommand() ) ) {
         data.adminCommand = "neo4j-admin";
       } else {
-        data.adminCommand = environmentSubstitute( meta.getAdminCommand() );
+        data.adminCommand = resolve( meta.getAdminCommand() );
       }
 
-      data.databaseFilename = environmentSubstitute( meta.getDatabaseFilename() );
-      data.reportFile = environmentSubstitute( meta.getReportFile() );
+      data.databaseFilename = resolve( meta.getDatabaseName() );
+      data.reportFile = resolve( meta.getReportFile() );
 
-      data.baseFolder = environmentSubstitute( meta.getBaseFolder() );
+      data.baseFolder = resolve( meta.getBaseFolder() );
       if ( !data.baseFolder.endsWith( File.separator ) ) {
         data.baseFolder += File.separator;
       }
 
       data.importFolder = data.baseFolder + "import/";
 
-      data.readBufferSize = environmentSubstitute( meta.getReadBufferSize() );
-
-      data.maxMemory = environmentSubstitute( meta.getMaxMemory() );
-
+      data.badTolerance = resolve( meta.getBadTolerance() );
+      data.readBufferSize = resolve( meta.getReadBufferSize() );
+      data.maxMemory = resolve( meta.getMaxMemory() );
+      data.processors = resolve( meta.getProcessors() );
     }
 
     String filename = getInputRowMeta().getString( row, data.filenameFieldIndex );
@@ -118,27 +118,39 @@ public class Importer extends BaseTransform<ImporterMeta, ImporterData> implemen
     List<String> arguments = new ArrayList<>();
 
     arguments.add( data.adminCommand );
+    arguments.add( "import");
     arguments.add( "--database=" + data.databaseFilename );
-    arguments.add( "--into=data/databases/"+data.databaseFilename);
     arguments.add( "--id-type=STRING" );
-    for ( String nodesFile : data.nodesFiles ) {
-      arguments.add( "--nodes=" + nodesFile );
-    }
-    for ( String relsFile : data.relsFiles) {
-      arguments.add( "--relationships=" + relsFile );
-    }
     arguments.add( "--report-file=" + data.reportFile );
+
     arguments.add( "--high-io=" + ( meta.isHighIo() ? "true" : "false" ) );
+    arguments.add( "--cache-on-heap=" + ( meta.isHighIo() ? "true" : "false" ) );
+    arguments.add( "--ignore-empty-strings=" + ( meta.isIgnoringEmptyStrings() ? "true" : "false" ) );
     arguments.add( "--ignore-extra-columns=" + ( meta.isIgnoringExtraColumns() ? "true" : "false" ) );
-    arguments.add( "--ignore-duplicate-nodes=" + ( meta.isIgnoringDuplicateNodes() ? "true" : "false" ) );
-    arguments.add( "--ignore-missing-nodes=" + ( meta.isIgnoringMissingNodes() ? "true" : "false" ) );
-    arguments.add( "--skip-bad-relationships=" + ( meta.isSkippingBadRelationships() ? "true" : "false" ) );
+    arguments.add( "--legacy-style-quoting=" + ( meta.isQuotingLegacyStyle() ? "true" : "false" ) );
     arguments.add( "--multiline-fields=" + ( meta.isMultiLine() ? "true" : "false" ) );
+    arguments.add( "--normalize-types=" + ( meta.isNormalizingTypes() ? "true" : "false" ) );
+    arguments.add( "--skip-duplicate-nodes=" + ( meta.isSkippingDuplicateNodes() ? "true" : "false" ) );
+    arguments.add( "--skip-bad-relationships=" + ( meta.isSkippingBadRelationships() ? "true" : "false" ) );
+    arguments.add( "--trim-strings=" + ( meta.isTrimmingStrings() ? "true" : "false" ) );
+
+    if (StringUtils.isNotEmpty( data.badTolerance )) {
+      arguments.add("--bad-tolerance="+data.badTolerance);
+    }
     if (StringUtils.isNotEmpty( data.readBufferSize )) {
       arguments.add("--read-buffer-size="+data.readBufferSize);
     }
     if (StringUtils.isNotEmpty( data.maxMemory)) {
       arguments.add("--max-memory="+data.maxMemory);
+    }
+
+    // Finally specify the nodes and relationship files
+    //
+    for ( String nodesFile : data.nodesFiles ) {
+      arguments.add( "--nodes=" + nodesFile );
+    }
+    for ( String relsFile : data.relsFiles) {
+      arguments.add( "--relationships=" + relsFile );
     }
 
     StringBuffer command = new StringBuffer();

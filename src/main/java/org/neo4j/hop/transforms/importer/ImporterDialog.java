@@ -3,6 +3,7 @@ package org.neo4j.hop.transforms.importer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Const;
 import org.apache.hop.core.exception.HopTransformException;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.i18n.BaseMessages;
 import org.apache.hop.pipeline.PipelineMeta;
 import org.apache.hop.pipeline.transform.BaseTransformMeta;
@@ -29,7 +30,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.neo4j.hop.transforms.importer.ImporterMeta;
 
 public class ImporterDialog extends BaseTransformDialog implements ITransformDialog {
 
@@ -42,19 +42,28 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
   private TextVar wDatabaseFilename;
   private TextVar wAdminCommand;
   private TextVar wBaseFolder;
-  private TextVar wMaxMemory;
+
+  private Button wVerbose;
   private Button wHighIo;
-  private Button wIgnoreDuplicateNodes;
-  private Button wIgnoreMissingNodes;
+  private Button wCacheOnHeap;
+  private Button wIgnoreEmptyStrings;
   private Button wIgnoreExtraColumns;
+  private Button wLegacyStyleQuoting;
   private Button wMultiLine;
+  private Button wNormalizeTypes;
+  private Button wSkipBadEntriesLogging;
   private Button wSkipBadRelationships;
+  private Button wSkipDuplicateNodes;
+  private Button wTrimStrings;
+  private TextVar wBadTolerance;
+  private TextVar wMaxMemory;
   private TextVar wReadBufferSize;
+  private TextVar wProcessors;
 
   private ImporterMeta input;
 
-  public ImporterDialog( Shell parent, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
-    super( parent, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
+  public ImporterDialog( Shell parent, IVariables variables, Object inputMetadata, PipelineMeta pipelineMeta, String transformName ) {
+    super( parent, variables, (BaseTransformMeta) inputMetadata, pipelineMeta, transformName );
     input = (ImporterMeta) inputMetadata;
 
     metadataProvider = HopGui.getInstance().getMetadataProvider();
@@ -124,7 +133,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
 
     String[] fieldnames = new String[] {};
     try {
-      fieldnames = pipelineMeta.getPrevTransformFields( transformMeta ).getFieldNames();
+      fieldnames = pipelineMeta.getPrevTransformFields( variables, transformMeta ).getFieldNames();
     } catch ( HopTransformException e ) {
       log.logError( "error getting input field names: ", e );
     }
@@ -147,7 +156,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdFilenameField.right = new FormAttachment( 100, 0 );
     fdFilenameField.top = new FormAttachment( wlFilenameField, 0, SWT.CENTER );
     wFilenameField.setLayoutData( fdFilenameField );
-    lastControl = wFilenameField;
+    lastControl = wlFilenameField;
 
     // FileType field
     //
@@ -167,7 +176,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdFileTypeField.right = new FormAttachment( 100, 0 );
     fdFileTypeField.top = new FormAttachment( wlFileTypeField, 0, SWT.CENTER );
     wFileTypeField.setLayoutData( fdFileTypeField );
-    lastControl = wFileTypeField;
+    lastControl = wlFileTypeField;
 
     // The database filename to gencsv to
     //
@@ -179,7 +188,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlDatabaseFilename.right = new FormAttachment( middle, -margin );
     fdlDatabaseFilename.top = new FormAttachment( lastControl, 2 * margin );
     wlDatabaseFilename.setLayoutData( fdlDatabaseFilename );
-    wDatabaseFilename = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wDatabaseFilename = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wDatabaseFilename );
     wDatabaseFilename.addModifyListener( lsMod );
     FormData fdDatabaseFilename = new FormData();
@@ -199,7 +208,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlAdminCommand.right = new FormAttachment( middle, -margin );
     fdlAdminCommand.top = new FormAttachment( lastControl, 2 * margin );
     wlAdminCommand.setLayoutData( fdlAdminCommand );
-    wAdminCommand = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wAdminCommand = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wAdminCommand );
     wAdminCommand.addModifyListener( lsMod );
     FormData fdAdminCommand = new FormData();
@@ -219,7 +228,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlBaseFolder.right = new FormAttachment( middle, -margin );
     fdlBaseFolder.top = new FormAttachment( lastControl, 2 * margin );
     wlBaseFolder.setLayoutData( fdlBaseFolder );
-    wBaseFolder = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wBaseFolder = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wBaseFolder );
     wBaseFolder.addModifyListener( lsMod );
     FormData fdBaseFolder = new FormData();
@@ -229,26 +238,25 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     wBaseFolder.setLayoutData( fdBaseFolder );
     lastControl = wBaseFolder;
 
-    // The max memory used
+    // Verbose output?
     //
-    Label wlMaxMemory = new Label( wComposite, SWT.RIGHT );
-    wlMaxMemory.setText( "Max memory) " );
-    props.setLook( wlMaxMemory );
-    FormData fdlMaxMemory = new FormData();
-    fdlMaxMemory.left = new FormAttachment( 0, 0 );
-    fdlMaxMemory.right = new FormAttachment( middle, -margin );
-    fdlMaxMemory.top = new FormAttachment( lastControl, 2 * margin );
-    wlMaxMemory.setLayoutData( fdlMaxMemory );
-    wMaxMemory = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
-    props.setLook( wMaxMemory );
-    wMaxMemory.addModifyListener( lsMod );
-    FormData fdMaxMemory = new FormData();
-    fdMaxMemory.left = new FormAttachment( middle, 0 );
-    fdMaxMemory.right = new FormAttachment( 100, 0 );
-    fdMaxMemory.top = new FormAttachment( wlMaxMemory, 0, SWT.CENTER );
-    wMaxMemory.setLayoutData( fdMaxMemory );
-    lastControl = wMaxMemory;
-
+    Label wlVerbose = new Label( wComposite, SWT.RIGHT );
+    wlVerbose.setText( "Verbose output? " );
+    props.setLook( wlVerbose );
+    FormData fdlVerbose = new FormData();
+    fdlVerbose.left = new FormAttachment( 0, 0 );
+    fdlVerbose.right = new FormAttachment( middle, -margin );
+    fdlVerbose.top = new FormAttachment( lastControl, 2 * margin );
+    wlVerbose.setLayoutData( fdlVerbose );
+    wVerbose = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wVerbose );
+    FormData fdVerbose = new FormData();
+    fdVerbose.left = new FormAttachment( middle, 0 );
+    fdVerbose.right = new FormAttachment( 100, 0 );
+    fdVerbose.top = new FormAttachment( wlVerbose, 0, SWT.CENTER );
+    wVerbose.setLayoutData( fdVerbose );
+    lastControl = wlVerbose;
+    
     // High IO?
     //
     Label wlHighIo = new Label( wComposite, SWT.RIGHT );
@@ -266,45 +274,45 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdHighIo.right = new FormAttachment( 100, 0 );
     fdHighIo.top = new FormAttachment( wlHighIo, 0, SWT.CENTER );
     wHighIo.setLayoutData( fdHighIo );
-    lastControl = wHighIo;
+    lastControl = wlHighIo;
 
-    // Ignore duplicate nodes?
+    // Cache on heap?
     //
-    Label wlIgnoreDuplicateNodes = new Label( wComposite, SWT.RIGHT );
-    wlIgnoreDuplicateNodes.setText( "Ignore duplicate nodes? " );
-    props.setLook( wlIgnoreDuplicateNodes );
-    FormData fdlIgnoreDuplicateNodes = new FormData();
-    fdlIgnoreDuplicateNodes.left = new FormAttachment( 0, 0 );
-    fdlIgnoreDuplicateNodes.right = new FormAttachment( middle, -margin );
-    fdlIgnoreDuplicateNodes.top = new FormAttachment( lastControl, 2 * margin );
-    wlIgnoreDuplicateNodes.setLayoutData( fdlIgnoreDuplicateNodes );
-    wIgnoreDuplicateNodes = new Button( wComposite, SWT.CHECK | SWT.LEFT );
-    props.setLook( wIgnoreDuplicateNodes );
-    FormData fdIgnoreDuplicateNodes = new FormData();
-    fdIgnoreDuplicateNodes.left = new FormAttachment( middle, 0 );
-    fdIgnoreDuplicateNodes.right = new FormAttachment( 100, 0 );
-    fdIgnoreDuplicateNodes.top = new FormAttachment( wlIgnoreDuplicateNodes, 0, SWT.CENTER );
-    wIgnoreDuplicateNodes.setLayoutData( fdIgnoreDuplicateNodes );
-    lastControl = wIgnoreDuplicateNodes;
+    Label wlCacheOnHeap = new Label( wComposite, SWT.RIGHT );
+    wlCacheOnHeap.setText( "Cache on heap? " );
+    props.setLook( wlCacheOnHeap );
+    FormData fdlCacheOnHeap = new FormData();
+    fdlCacheOnHeap.left = new FormAttachment( 0, 0 );
+    fdlCacheOnHeap.right = new FormAttachment( middle, -margin );
+    fdlCacheOnHeap.top = new FormAttachment( lastControl, 2 * margin );
+    wlCacheOnHeap.setLayoutData( fdlCacheOnHeap );
+    wCacheOnHeap = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wCacheOnHeap );
+    FormData fdCacheOnHeap = new FormData();
+    fdCacheOnHeap.left = new FormAttachment( middle, 0 );
+    fdCacheOnHeap.right = new FormAttachment( 100, 0 );
+    fdCacheOnHeap.top = new FormAttachment( wlCacheOnHeap, 0, SWT.CENTER );
+    wCacheOnHeap.setLayoutData( fdCacheOnHeap );
+    lastControl = wlCacheOnHeap;
 
-    // Ignore missing nodes?
+    // Ignore empty strings?
     //
-    Label wlIgnoreMissingNodes = new Label( wComposite, SWT.RIGHT );
-    wlIgnoreMissingNodes.setText( "Ignore missing nodes? " );
-    props.setLook( wlIgnoreMissingNodes );
-    FormData fdlIgnoreMissingNodes = new FormData();
-    fdlIgnoreMissingNodes.left = new FormAttachment( 0, 0 );
-    fdlIgnoreMissingNodes.right = new FormAttachment( middle, -margin );
-    fdlIgnoreMissingNodes.top = new FormAttachment( lastControl, 2 * margin );
-    wlIgnoreMissingNodes.setLayoutData( fdlIgnoreMissingNodes );
-    wIgnoreMissingNodes = new Button( wComposite, SWT.CHECK | SWT.LEFT );
-    props.setLook( wIgnoreMissingNodes );
-    FormData fdIgnoreMissingNodes = new FormData();
-    fdIgnoreMissingNodes.left = new FormAttachment( middle, 0 );
-    fdIgnoreMissingNodes.right = new FormAttachment( 100, 0 );
-    fdIgnoreMissingNodes.top = new FormAttachment( wlIgnoreMissingNodes, 0, SWT.CENTER );
-    wIgnoreMissingNodes.setLayoutData( fdIgnoreMissingNodes );
-    lastControl = wIgnoreMissingNodes;
+    Label wlIgnoreEmptyStrings = new Label( wComposite, SWT.RIGHT );
+    wlIgnoreEmptyStrings.setText( "Ignore extra columns? " );
+    props.setLook( wlIgnoreEmptyStrings );
+    FormData fdlIgnoreEmptyStrings = new FormData();
+    fdlIgnoreEmptyStrings.left = new FormAttachment( 0, 0 );
+    fdlIgnoreEmptyStrings.right = new FormAttachment( middle, -margin );
+    fdlIgnoreEmptyStrings.top = new FormAttachment( lastControl, 2 * margin );
+    wlIgnoreEmptyStrings.setLayoutData( fdlIgnoreEmptyStrings );
+    wIgnoreEmptyStrings = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wIgnoreEmptyStrings );
+    FormData fdIgnoreEmptyStrings = new FormData();
+    fdIgnoreEmptyStrings.left = new FormAttachment( middle, 0 );
+    fdIgnoreEmptyStrings.right = new FormAttachment( 100, 0 );
+    fdIgnoreEmptyStrings.top = new FormAttachment( wlIgnoreEmptyStrings, 0, SWT.CENTER );
+    wIgnoreEmptyStrings.setLayoutData( fdIgnoreEmptyStrings );
+    lastControl = wIgnoreEmptyStrings;
 
     // Ignore extra columns?
     //
@@ -325,6 +333,25 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     wIgnoreExtraColumns.setLayoutData( fdIgnoreExtraColumns );
     lastControl = wIgnoreExtraColumns;
 
+    // Legacy style quoting?
+    //
+    Label wlLegacyStyleQuoting = new Label( wComposite, SWT.RIGHT );
+    wlLegacyStyleQuoting.setText( "Legacy style quoting? " );
+    props.setLook( wlLegacyStyleQuoting );
+    FormData fdlLegacyStyleQuoting = new FormData();
+    fdlLegacyStyleQuoting.left = new FormAttachment( 0, 0 );
+    fdlLegacyStyleQuoting.right = new FormAttachment( middle, -margin );
+    fdlLegacyStyleQuoting.top = new FormAttachment( lastControl, 2 * margin );
+    wlLegacyStyleQuoting.setLayoutData( fdlLegacyStyleQuoting );
+    wLegacyStyleQuoting = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wLegacyStyleQuoting );
+    FormData fdLegacyStyleQuoting = new FormData();
+    fdLegacyStyleQuoting.left = new FormAttachment( middle, 0 );
+    fdLegacyStyleQuoting.right = new FormAttachment( 100, 0 );
+    fdLegacyStyleQuoting.top = new FormAttachment( wlLegacyStyleQuoting, 0, SWT.CENTER );
+    wLegacyStyleQuoting.setLayoutData( fdLegacyStyleQuoting );
+    lastControl = wlLegacyStyleQuoting;
+
     // Whether or not fields from input source can span multiple lines
     //
     Label wlMultiLine = new Label( wComposite, SWT.RIGHT );
@@ -342,7 +369,45 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdMultiLine.right = new FormAttachment( 100, 0 );
     fdMultiLine.top = new FormAttachment( wlMultiLine, 0, SWT.CENTER );
     wMultiLine.setLayoutData( fdMultiLine );
-    lastControl = wMultiLine;
+    lastControl = wlMultiLine;
+
+    // Whether or not fields from input source can span multiple lines
+    //
+    Label wlNormalizeTypes = new Label( wComposite, SWT.RIGHT );
+    wlNormalizeTypes.setText( "Normalize types? " );
+    props.setLook( wlNormalizeTypes );
+    FormData fdlNormalizeTypes = new FormData();
+    fdlNormalizeTypes.left = new FormAttachment( 0, 0 );
+    fdlNormalizeTypes.right = new FormAttachment( middle, -margin );
+    fdlNormalizeTypes.top = new FormAttachment( lastControl, 2 * margin );
+    wlNormalizeTypes.setLayoutData( fdlNormalizeTypes );
+    wNormalizeTypes = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wNormalizeTypes );
+    FormData fdNormalizeTypes = new FormData();
+    fdNormalizeTypes.left = new FormAttachment( middle, 0 );
+    fdNormalizeTypes.right = new FormAttachment( 100, 0 );
+    fdNormalizeTypes.top = new FormAttachment( wlNormalizeTypes, 0, SWT.CENTER );
+    wNormalizeTypes.setLayoutData( fdNormalizeTypes );
+    lastControl = wlNormalizeTypes;
+
+    // skip logging bad entries detected during import
+    //
+    Label wlSkipBadEntriesLogging = new Label( wComposite, SWT.RIGHT );
+    wlSkipBadEntriesLogging.setText( "Skip logging bad entries during import? " );
+    props.setLook( wlSkipBadEntriesLogging );
+    FormData fdlSkipBadEntriesLogging = new FormData();
+    fdlSkipBadEntriesLogging.left = new FormAttachment( 0, 0 );
+    fdlSkipBadEntriesLogging.right = new FormAttachment( middle, -margin );
+    fdlSkipBadEntriesLogging.top = new FormAttachment( lastControl, 2 * margin );
+    wlSkipBadEntriesLogging.setLayoutData( fdlSkipBadEntriesLogging );
+    wSkipBadEntriesLogging = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wSkipBadEntriesLogging );
+    FormData fdSkipBadEntriesLogging = new FormData();
+    fdSkipBadEntriesLogging.left = new FormAttachment( middle, 0 );
+    fdSkipBadEntriesLogging.right = new FormAttachment( 100, 0 );
+    fdSkipBadEntriesLogging.top = new FormAttachment( wlSkipBadEntriesLogging, 0, SWT.CENTER );
+    wSkipBadEntriesLogging.setLayoutData( fdSkipBadEntriesLogging );
+    lastControl = wlSkipBadEntriesLogging;
 
     // Whether or not to skip importing relationships that refers to missing node ids
     //
@@ -361,8 +426,90 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdSkipBadRelationships.right = new FormAttachment( 100, 0 );
     fdSkipBadRelationships.top = new FormAttachment( wlSkipBadRelationships, 0, SWT.CENTER );
     wSkipBadRelationships.setLayoutData( fdSkipBadRelationships );
-    lastControl = wSkipBadRelationships;
+    lastControl = wlSkipBadRelationships;
+    
+    // Ignore duplicate nodes?
+    //
+    Label wlSkipDuplicateNodes = new Label( wComposite, SWT.RIGHT );
+    wlSkipDuplicateNodes.setText( "Skip duplicate nodes? " );
+    props.setLook( wlSkipDuplicateNodes );
+    FormData fdlSkipDuplicateNodes = new FormData();
+    fdlSkipDuplicateNodes.left = new FormAttachment( 0, 0 );
+    fdlSkipDuplicateNodes.right = new FormAttachment( middle, -margin );
+    fdlSkipDuplicateNodes.top = new FormAttachment( lastControl, 2 * margin );
+    wlSkipDuplicateNodes.setLayoutData( fdlSkipDuplicateNodes );
+    wSkipDuplicateNodes = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wSkipDuplicateNodes );
+    FormData fdSkipDuplicateNodes = new FormData();
+    fdSkipDuplicateNodes.left = new FormAttachment( middle, 0 );
+    fdSkipDuplicateNodes.right = new FormAttachment( 100, 0 );
+    fdSkipDuplicateNodes.top = new FormAttachment( wlSkipDuplicateNodes, 0, SWT.CENTER );
+    wSkipDuplicateNodes.setLayoutData( fdSkipDuplicateNodes );
+    lastControl = wlSkipDuplicateNodes;
 
+    // Ignore duplicate nodes?
+    //
+    Label wlTrimStrings = new Label( wComposite, SWT.RIGHT );
+    wlTrimStrings.setText( "Trim strings? " );
+    props.setLook( wlTrimStrings );
+    FormData fdlTrimStrings = new FormData();
+    fdlTrimStrings.left = new FormAttachment( 0, 0 );
+    fdlTrimStrings.right = new FormAttachment( middle, -margin );
+    fdlTrimStrings.top = new FormAttachment( lastControl, 2 * margin );
+    wlTrimStrings.setLayoutData( fdlTrimStrings );
+    wTrimStrings = new Button( wComposite, SWT.CHECK | SWT.LEFT );
+    props.setLook( wTrimStrings );
+    FormData fdTrimStrings = new FormData();
+    fdTrimStrings.left = new FormAttachment( middle, 0 );
+    fdTrimStrings.right = new FormAttachment( 100, 0 );
+    fdTrimStrings.top = new FormAttachment( wlTrimStrings, 0, SWT.CENTER );
+    wTrimStrings.setLayoutData( fdTrimStrings );
+    lastControl = wlTrimStrings;
+
+    // The max memory used
+    //
+    Label wlBadTolerance = new Label( wComposite, SWT.RIGHT );
+    wlBadTolerance.setText( "Bad tolerance" );
+    String ttBadTolerance = "Number of bad entries before the import is considered failed";
+    wlBadTolerance.setToolTipText( ttBadTolerance );
+    props.setLook( wlBadTolerance );
+    FormData fdlBadTolerance = new FormData();
+    fdlBadTolerance.left = new FormAttachment( 0, 0 );
+    fdlBadTolerance.right = new FormAttachment( middle, -margin );
+    fdlBadTolerance.top = new FormAttachment( lastControl, 2 * margin );
+    wlBadTolerance.setLayoutData( fdlBadTolerance );
+    wBadTolerance = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wBadTolerance.setToolTipText( ttBadTolerance );
+    props.setLook( wBadTolerance );
+    wBadTolerance.addModifyListener( lsMod );
+    FormData fdBadTolerance = new FormData();
+    fdBadTolerance.left = new FormAttachment( middle, 0 );
+    fdBadTolerance.right = new FormAttachment( 100, 0 );
+    fdBadTolerance.top = new FormAttachment( wlBadTolerance, 0, SWT.CENTER );
+    wBadTolerance.setLayoutData( fdBadTolerance );
+    lastControl = wBadTolerance;
+
+
+    // The max memory used
+    //
+    Label wlMaxMemory = new Label( wComposite, SWT.RIGHT );
+    wlMaxMemory.setText( "Max memory) " );
+    props.setLook( wlMaxMemory );
+    FormData fdlMaxMemory = new FormData();
+    fdlMaxMemory.left = new FormAttachment( 0, 0 );
+    fdlMaxMemory.right = new FormAttachment( middle, -margin );
+    fdlMaxMemory.top = new FormAttachment( lastControl, 2 * margin );
+    wlMaxMemory.setLayoutData( fdlMaxMemory );
+    wMaxMemory = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    props.setLook( wMaxMemory );
+    wMaxMemory.addModifyListener( lsMod );
+    FormData fdMaxMemory = new FormData();
+    fdMaxMemory.left = new FormAttachment( middle, 0 );
+    fdMaxMemory.right = new FormAttachment( 100, 0 );
+    fdMaxMemory.top = new FormAttachment( wlMaxMemory, 0, SWT.CENTER );
+    wMaxMemory.setLayoutData( fdMaxMemory );
+    lastControl = wMaxMemory;
+    
     // Size of each buffer for reading input data. It has to at least be large enough
     // to hold the biggest single value in the input data.
     //
@@ -374,7 +521,7 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     fdlReadBufferSize.right = new FormAttachment( middle, -margin );
     fdlReadBufferSize.top = new FormAttachment( lastControl, 2 * margin );
     wlReadBufferSize.setLayoutData( fdlReadBufferSize );
-    wReadBufferSize = new TextVar( pipelineMeta, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    wReadBufferSize = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
     props.setLook( wReadBufferSize );
     wReadBufferSize.addModifyListener( lsMod );
     FormData fdReadBufferSize = new FormData();
@@ -384,6 +531,25 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     wReadBufferSize.setLayoutData( fdReadBufferSize );
     lastControl = wReadBufferSize;
 
+    // Processors
+    //
+    Label wlProcessors = new Label( wComposite, SWT.RIGHT );
+    wlProcessors.setText( "Processors) " );
+    props.setLook( wlProcessors );
+    FormData fdlProcessors = new FormData();
+    fdlProcessors.left = new FormAttachment( 0, 0 );
+    fdlProcessors.right = new FormAttachment( middle, -margin );
+    fdlProcessors.top = new FormAttachment( lastControl, 2 * margin );
+    wlProcessors.setLayoutData( fdlProcessors );
+    wProcessors = new TextVar(variables, wComposite, SWT.SINGLE | SWT.LEFT | SWT.BORDER );
+    props.setLook( wProcessors );
+    wProcessors.addModifyListener( lsMod );
+    FormData fdProcessors = new FormData();
+    fdProcessors.left = new FormAttachment( middle, 0 );
+    fdProcessors.right = new FormAttachment( 100, 0 );
+    fdProcessors.top = new FormAttachment( wlProcessors, 0, SWT.CENTER );
+    wProcessors.setLayoutData( fdProcessors );
+    lastControl = wProcessors;
 
     // Some buttons
     wOk = new Button( wComposite, SWT.PUSH );
@@ -422,8 +588,10 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     wDatabaseFilename.addSelectionListener( lsDef );
     wAdminCommand.addSelectionListener( lsDef );
     wBaseFolder.addSelectionListener( lsDef );
+    wBadTolerance.addSelectionListener( lsDef );
     wMaxMemory.addSelectionListener( lsDef );
     wReadBufferSize.addSelectionListener( lsDef );
+    wProcessors.addSelectionListener( lsDef );
 
     // Detect X or ALT-F4 or something that kills this window...
     shell.addShellListener( new ShellAdapter() {
@@ -460,18 +628,25 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     wTransformName.setText( Const.NVL( transformName, "" ) );
     wFilenameField.setText( Const.NVL( input.getFilenameField(), "" ) );
     wFileTypeField.setText( Const.NVL( input.getFileTypeField(), "" ) );
-    wDatabaseFilename.setText( Const.NVL( input.getDatabaseFilename(), "" ) );
+    wDatabaseFilename.setText( Const.NVL( input.getDatabaseName(), "" ) );
     wAdminCommand.setText( Const.NVL( input.getAdminCommand(), "" ) );
     wBaseFolder.setText( Const.NVL( input.getBaseFolder(), "" ) );
-    wMaxMemory.setText( Const.NVL( input.getMaxMemory(), "" ) );
-    wHighIo.setSelection( input.isHighIo() );
-    wIgnoreDuplicateNodes.setSelection( input.isIgnoringDuplicateNodes() );
-    wIgnoreMissingNodes.setSelection( input.isIgnoringMissingNodes() );
-    wIgnoreExtraColumns.setSelection( input.isIgnoringExtraColumns() );
-    wSkipBadRelationships.setSelection( input.isSkippingBadRelationships() );
-    wMultiLine.setSelection( input.isMultiLine() );
-    wReadBufferSize.setText( Const.NVL( input.getReadBufferSize(), "" ) );
 
+    wHighIo.setSelection( input.isHighIo() );
+    wCacheOnHeap.setSelection( input.isCacheOnHeap() );
+    wIgnoreEmptyStrings.setSelection( input.isIgnoringEmptyStrings() );
+    wIgnoreExtraColumns.setSelection( input.isIgnoringExtraColumns() );
+    wLegacyStyleQuoting.setSelection( input.isQuotingLegacyStyle() );
+    wMultiLine.setSelection( input.isMultiLine() );
+    wNormalizeTypes.setSelection( input.isNormalizingTypes() );
+    wSkipBadEntriesLogging.setSelection( input.isSkippingBadEntriesLogging() );
+    wSkipBadRelationships.setSelection( input.isSkippingBadRelationships() );
+    wSkipDuplicateNodes.setSelection( input.isSkippingDuplicateNodes() );
+    wTrimStrings.setSelection( input.isTrimmingStrings() );
+    wBadTolerance.setText( Const.NVL( input.getBadTolerance(), "" ) );
+    wMaxMemory.setText( Const.NVL( input.getMaxMemory(), "" ) );
+    wReadBufferSize.setText( Const.NVL( input.getReadBufferSize(), "" ) );
+    wProcessors.setText( Const.NVL( input.getProcessors(), "" ) );
   }
 
   private void ok() {
@@ -487,16 +662,23 @@ public class ImporterDialog extends BaseTransformDialog implements ITransformDia
     meta.setFilenameField( wFilenameField.getText() );
     meta.setFileTypeField( wFileTypeField.getText() );
     meta.setAdminCommand( wAdminCommand.getText() );
-    meta.setDatabaseFilename( wDatabaseFilename.getText() );
+    meta.setDatabaseName( wDatabaseFilename.getText() );
     meta.setBaseFolder( wBaseFolder.getText() );
-    meta.setMaxMemory( wMaxMemory.getText() );
+
     meta.setHighIo( wHighIo.getSelection() );
-    meta.setIgnoringDuplicateNodes( wIgnoreDuplicateNodes.getSelection() );
-    meta.setIgnoringMissingNodes( wIgnoreMissingNodes.getSelection() );
+    meta.setCacheOnHeap( wCacheOnHeap.getSelection() );
+    meta.setIgnoringEmptyStrings( wIgnoreEmptyStrings.getSelection() );
     meta.setIgnoringExtraColumns( wIgnoreExtraColumns.getSelection() );
-    meta.setSkippingBadRelationships( wSkipBadRelationships.getSelection() );
+    meta.setQuotingLegacyStyle( wLegacyStyleQuoting.getSelection() );
     meta.setMultiLine( wMultiLine.getSelection() );
+    meta.setNormalizingTypes( wNormalizeTypes.getSelection() );
+    meta.setSkippingBadEntriesLogging( wSkipBadEntriesLogging.getSelection() );
+    meta.setSkippingBadRelationships( wSkipBadRelationships.getSelection() );
+    meta.setSkippingDuplicateNodes( wSkipDuplicateNodes.getSelection() );
+    meta.setBadTolerance( wBadTolerance.getText() );
+    meta.setMaxMemory( wMaxMemory.getText() );
     meta.setReadBufferSize( wReadBufferSize.getText() );
+    meta.setProcessors( wProcessors.getText() );
   }
 
 }

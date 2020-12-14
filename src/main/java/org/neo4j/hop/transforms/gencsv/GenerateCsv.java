@@ -100,12 +100,12 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
       } else {
         data.indexedGraphData = null;
       }
-      data.filesPrefix = environmentSubstitute( meta.getFilesPrefix() );
+      data.filesPrefix = resolve( meta.getFilesPrefix() );
 
-      data.filenameField = environmentSubstitute( meta.getFilenameField() );
-      data.fileTypeField = environmentSubstitute( meta.getFileTypeField() );
+      data.filenameField = resolve( meta.getFilenameField() );
+      data.fileTypeField = resolve( meta.getFileTypeField() );
 
-      data.baseFolder = environmentSubstitute( meta.getBaseFolder() );
+      data.baseFolder = resolve( meta.getBaseFolder() );
       if ( !data.baseFolder.endsWith( File.separator ) ) {
         data.baseFolder += File.separator;
       }
@@ -307,19 +307,19 @@ public class GenerateCsv extends BaseTransform<GenerateCsvMeta, GenerateCsvData>
   }
 
   private String calculateNodeShortFilename( String propertySetKey ) {
-    return "import/" + Const.NVL( data.filesPrefix + "-", "" ) + "nodes-" + propertySetKey + "-" + environmentSubstitute( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
+    return "import/" + Const.NVL( data.filesPrefix + "-", "" ) + "nodes-" + propertySetKey + "-" + resolve( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
   }
 
   private String calculateNodeFilename( String propertySetKey ) {
-    return data.importFolder + Const.NVL( data.filesPrefix + "-", "" ) + "nodes-" + propertySetKey + "-" + environmentSubstitute( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
+    return data.importFolder + Const.NVL( data.filesPrefix + "-", "" ) + "nodes-" + propertySetKey + "-" + resolve( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
   }
 
   private String calculateRelatiohshipsShortFilename( String propertySetKey ) {
-    return "import/" + Const.NVL( data.filesPrefix + "-", "" ) + "rels-" + propertySetKey + "-" + environmentSubstitute( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
+    return "import/" + Const.NVL( data.filesPrefix + "-", "" ) + "rels-" + propertySetKey + "-" + resolve( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
   }
 
   private String calculateRelatiohshipsFilename( String propertySetKey ) {
-    return data.importFolder + Const.NVL( data.filesPrefix + "-", "" ) + "rels-" + propertySetKey + "-" + environmentSubstitute( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
+    return data.importFolder + Const.NVL( data.filesPrefix + "-", "" ) + "rels-" + propertySetKey + "-" + resolve( "${" + Const.INTERNAL_VARIABLE_TRANSFORM_COPYNR + "}" ) + ".csv";
   }
 
   private void writeNodeCsvHeader( OutputStream os, List<IdType> props, String idFieldName ) throws HopException, IOException {

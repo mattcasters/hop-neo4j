@@ -1,6 +1,7 @@
 package org.neo4j.hop.shared;
 
 import org.apache.hop.core.logging.ILogChannel;
+import org.apache.hop.core.variables.IVariables;
 import org.neo4j.driver.Driver;
 
 import java.util.ArrayList;
@@ -25,14 +26,14 @@ public class DriverSingleton {
     return singleton;
   }
 
-  public static Driver getDriver( ILogChannel log, NeoConnection connection ) {
+  public static Driver getDriver( ILogChannel log, IVariables variables, NeoConnection connection ) {
     DriverSingleton ds = getInstance();
 
-    String key = getDriverKey( connection );
+    String key = getDriverKey( connection, variables);
 
     Driver driver = ds.driverMap.get( key );
     if ( driver == null ) {
-      driver = connection.getDriver( log );
+      driver = connection.getDriver( log, variables );
       ds.driverMap.put( key, driver );
     }
 
@@ -52,10 +53,10 @@ public class DriverSingleton {
     }
   }
 
-  private static String getDriverKey( NeoConnection connection ) {
-    String hostname = connection.environmentSubstitute( connection.getServer() );
-    String boltPort = connection.environmentSubstitute( connection.getBoltPort() );
-    String username = connection.environmentSubstitute( connection.getUsername() );
+  private static String getDriverKey( NeoConnection connection, IVariables variables ) {
+    String hostname = variables.resolve( connection.getServer() );
+    String boltPort = variables.resolve( connection.getBoltPort() );
+    String username = variables.resolve( connection.getUsername() );
 
     return hostname + ":" + boltPort + "@" + username;
   }

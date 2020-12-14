@@ -457,7 +457,7 @@ public class HopNeo4jPerspective implements IHopPerspective {
 
       Session session = null;
       try {
-        session = connection.getSession(log);
+        session = connection.getSession(log, hopGui.getVariables() );
 
         analyzeLogging(session, id, name, type);
         List<List<HistoryResult>> shortestPaths = analyzeErrorLineage( session, id, name, type, errors );
@@ -630,8 +630,8 @@ public class HopNeo4jPerspective implements IHopPerspective {
 
     cypher.append("Below are a few Cypher statements you can run in the Neo4j browser");
     cypher.append(Const.CR);
-    String neoServer = vars.environmentSubstitute(connection.getServer());
-    String neoBrowserPort = vars.environmentSubstitute(connection.getBrowserPort());
+    String neoServer = vars.resolve(connection.getServer());
+    String neoBrowserPort = vars.resolve(connection.getBrowserPort());
     String browserUrl = "http://" + neoServer + ":" + Const.NVL(neoBrowserPort, "7474");
     cypher.append("URL of the Neo4j browser: ").append(browserUrl);
     cypher.append(Const.CR);
@@ -765,7 +765,7 @@ public class HopNeo4jPerspective implements IHopPerspective {
       try {
         wResults.clearAll(false);
 
-        session = connection.getSession(log);
+        session = connection.getSession(log, hopGui.getVariables());
 
         session.readTransaction(
             tx -> {
@@ -869,7 +869,7 @@ public class HopNeo4jPerspective implements IHopPerspective {
   private void openItem(NeoConnection connection, String id, String name, String type) {
     Session session = null;
     try {
-      session = connection.getSession(hopGui.getLog());
+      session = connection.getSession(hopGui.getLog(), hopGui.getVariables());
 
       if ("PIPELINE".equals(type)) {
         openPipelineOrWorkflow(session, name, type, id, "Pipeline", "EXECUTION_OF_PIPELINE");

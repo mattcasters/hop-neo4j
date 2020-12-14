@@ -8,6 +8,7 @@ import org.apache.hop.core.extension.IExtensionPoint;
 import org.apache.hop.core.logging.ILogChannel;
 import org.apache.hop.core.plugins.IPlugin;
 import org.apache.hop.core.plugins.PluginRegistry;
+import org.apache.hop.core.variables.IVariables;
 import org.apache.hop.metadata.api.HopMetadata;
 import org.apache.hop.metadata.plugin.MetadataPluginType;
 import org.neo4j.hop.model.GraphModel;
@@ -22,7 +23,7 @@ import java.util.List;
   description = "Register the Neo4j metadata plugin classes"
 )
 public class RegisterMetadataObjectsExtensionPoint implements IExtensionPoint<PluginRegistry> {
-  @Override public void callExtensionPoint( ILogChannel log, PluginRegistry pluginRegistry ) throws HopException {
+  @Override public void callExtensionPoint( ILogChannel log, IVariables variables, PluginRegistry pluginRegistry ) throws HopException {
 
     // Find the plugin for this class.
     //
