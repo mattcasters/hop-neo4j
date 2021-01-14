@@ -33,7 +33,7 @@ import java.util.List;
   description = "Reads from or writes to Neo4j using Cypher with parameter data from input fields",
   image = "neo4j_cypher.svg",
   categoryDescription = "Neo4j",
-  documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/Neo4j-Cypher#description"
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/Neo4j-Cypher#description"
 )
 @InjectionSupported( localizationPrefix = "Cypher.Injection.", groups = { "PARAMETERS", "RETURNS" } )
 public class CypherMeta extends BaseTransformMeta implements ITransformMeta<Cypher,CypherData> {

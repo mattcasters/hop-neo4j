@@ -22,7 +22,7 @@ import org.w3c.dom.Node;
   description = "Generate CSV files for nodes and relationships in the import/ folder for use with neo4j-import",
   image = "neo4j_load.svg",
   categoryDescription = "Neo4j",
-  documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/"
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/"
 )
 public class GenerateCsvMeta extends BaseTransformMeta implements ITransformMeta<GenerateCsv, GenerateCsvData> {
 

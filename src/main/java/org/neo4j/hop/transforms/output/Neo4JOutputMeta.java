@@ -35,7 +35,7 @@ import java.util.List;
   name = "Neo4JOutput.Transform.Name",
   description = "Neo4JOutput.Transform.Description",
   categoryDescription = "Neo4JOutput.Transform.Category",
-  documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/Neo4j-Output#description"
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/Neo4j-Output#description"
 )
 @InjectionSupported( localizationPrefix = "Neo4JOutput.Injection.",
   groups = { "FROM_NODE_PROPS", "FROM_LABELS", "TO_NODE_PROPS", "TO_LABELS", "REL_PROPS" } )

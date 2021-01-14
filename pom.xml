@@ -4,16 +4,25 @@
 
   <groupId>org.neo4j.hop</groupId>
   <artifactId>hop-neo4j</artifactId>
-  <version>6.0.9</version>
+  <version>6.0.10</version>
   <packaging>jar</packaging>
 
   <name>hop-neo4j</name>
   <url>http://maven.apache.org</url>
 
+  <licenses>
+    <license>
+      <name>Apache License, version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+      <comments/>
+    </license>
+  </licenses>
+
   <properties>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hop.version>0.50-SNAPSHOT</hop.version>
+    <hop.version>0.60-SNAPSHOT</hop.version>
     <neo4j.driver.version>4.1.1</neo4j.driver.version>
 
     <maven.compiler.source>1.8</maven.compiler.source>

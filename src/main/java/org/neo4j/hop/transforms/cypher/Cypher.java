@@ -358,6 +358,9 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData>
 
     try {
       for (int attempt = 0; attempt < data.attempts; attempt++) {
+        if (attempt > 0) {
+          log.logBasic("Attempt #" + (attempt + 1) + "/" + data.attempts + " on Neo4j transaction");
+        }
         try {
           if (meta.isReadOnly()) {
             data.session.readTransaction(cypherTransactionWork);
@@ -370,7 +373,11 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData>
           if (attempt + 1 >= data.attempts) {
             throw e;
           } else {
-            log.logBasic("Retrying transaction after attempt #"+(attempt+1)+" with error : "+e.getMessage());
+            log.logBasic(
+                "Retrying transaction after attempt #"
+                    + (attempt + 1)
+                    + " with error : "
+                    + e.getMessage());
           }
         }
       }
@@ -567,19 +574,23 @@ public class Cypher extends BaseTransform<CypherMeta, CypherData>
   }
 
   private boolean processSummary(Result result) {
-    boolean error = false;
-    ResultSummary summary = result.consume();
-    for (Notification notification : summary.notifications()) {
-      log.logError(notification.title() + " (" + notification.severity() + ")");
-      log.logError(
-          notification.code()
-              + " : "
-              + notification.description()
-              + ", position "
-              + notification.position());
-      error = true;
+    if (meta.isUsingUnwind()) {
+      return false;
+    } else {
+      boolean error = false;
+      ResultSummary summary = result.consume();
+      for (Notification notification : summary.notifications()) {
+        log.logError(notification.title() + " (" + notification.severity() + ")");
+        log.logError(
+            notification.code()
+                + " : "
+                + notification.description()
+                + ", position "
+                + notification.position());
+        error = true;
+      }
+      return error;
     }
-    return error;
   }
 
   @Override

@@ -23,7 +23,7 @@ import org.w3c.dom.Node;
   description = "Splits the nodes and relationships of a graph data type",
   image = "neo4j_split.svg",
   categoryDescription = "Neo4j",
-  documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/"
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/"
 )
 public class SplitGraphMeta extends BaseTransformMeta implements ITransformMeta<SplitGraph, SplitGraphData> {
 

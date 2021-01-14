@@ -85,6 +85,18 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     int middle = props.getMiddlePct();
     int margin = Const.MARGIN;
 
+    // Add buttons first, then the list of connections dynamically sizing
+    // Put these buttons at the bottom
+    //
+    wOk = new Button( shell, SWT.PUSH );
+    wOk.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
+    wOk.addListener( SWT.Selection, e -> ok() );
+    wCancel = new Button( shell, SWT.PUSH );
+    wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
+    wCancel.addListener( SWT.Selection, e -> cancel() );
+    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOk, wCancel, }, margin, null );
+
+
     Label wlName = new Label( shell, SWT.RIGHT );
     wlName.setText( "Action name" );
     props.setLook( wlName );
@@ -102,27 +114,14 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     fdName.right = new FormAttachment( 100, 0 );
     wName.setLayoutData( fdName );
 
-    Label wlConnections = new Label( shell, SWT.RIGHT );
+    Label wlConnections = new Label( shell, SWT.LEFT );
     wlConnections.setText( "Neo4j Connections:" );
     props.setLook( wlConnections );
     FormData fdlConnections = new FormData();
     fdlConnections.left = new FormAttachment( 0, 0 );
     fdlConnections.right = new FormAttachment( middle, -margin );
-    fdlConnections.top = new FormAttachment( 0, margin );
+    fdlConnections.top = new FormAttachment( wName, margin );
     wlConnections.setLayoutData( fdlConnections );
-
-    // Add buttons first, then the list of connections dynamically sizing
-    //
-    wOk = new Button( shell, SWT.PUSH );
-    wOk.setText( BaseMessages.getString( PKG, "System.Button.OK" ) );
-    wOk.addListener( SWT.Selection, e -> ok() );
-    wCancel = new Button( shell, SWT.PUSH );
-    wCancel.setText( BaseMessages.getString( PKG, "System.Button.Cancel" ) );
-    wCancel.addListener( SWT.Selection, e -> cancel() );
-
-    // Put these buttons at the bottom
-    //
-    BaseTransformDialog.positionBottomButtons( shell, new Button[] { wOk, wCancel, }, margin, null );
 
     try {
       IHopMetadataSerializer<NeoConnection> connectionSerializer = getMetadataProvider().getSerializer( NeoConnection.class );
@@ -140,7 +139,7 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
       action.getConnectionNames().size(), false, lsMod, props );
     FormData fdConnections = new FormData();
     fdConnections.left = new FormAttachment( 0, 0 );
-    fdConnections.top = new FormAttachment( wName, margin );
+    fdConnections.top = new FormAttachment( wlConnections, margin );
     fdConnections.right = new FormAttachment( 100, 0 );
     fdConnections.bottom = new FormAttachment( wOk, -margin * 2 );
     wConnections.setLayoutData( fdConnections );

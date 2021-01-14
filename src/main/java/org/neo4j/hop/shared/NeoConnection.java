@@ -391,7 +391,7 @@ public class NeoConnection extends HopMetadataBase implements IHopMetadata {
       }
       if ( StringUtils.isNotEmpty( maxTransactionRetryTime ) ) {
         long seconds = Const.toLong( variables.resolve( maxTransactionRetryTime ), -1L );
-        if ( seconds > 0 ) {
+        if ( seconds >= 0 ) {
           configBuilder = configBuilder.withMaxTransactionRetryTime( seconds, TimeUnit.MILLISECONDS );
         }
       }

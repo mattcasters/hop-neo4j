@@ -57,7 +57,8 @@ import java.util.List;
   name = "Get Neo4j Logging Info",
   description = "Queries the Neo4j logging graph and gets information back",
   categoryDescription = "Neo4j",
-  image = "systeminfo.svg"
+  image = "systeminfo.svg",
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/"
 )
 @InjectionSupported( localizationPrefix = "GetLoggingInfoMeta.Injection." )
 public class GetLoggingInfoMeta extends BaseTransformMeta implements ITransformMeta<GetLoggingInfo, GetLoggingInfoData> {

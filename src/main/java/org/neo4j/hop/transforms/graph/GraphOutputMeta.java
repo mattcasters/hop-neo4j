@@ -30,7 +30,7 @@ import java.util.List;
   description = "Write to a Neo4j graph using an input field mapping",
   image = "neo4j_graph_output.svg",
   categoryDescription = "Neo4j",
-  documentationUrl = "https://github.com/knowbi/knowbi-pentaho-pdi-neo4j-output/wiki/Neo4j-Graph-Output#description"
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/Neo4j-Graph-Output#description"
 )
 @InjectionSupported( localizationPrefix = "GraphOutput.Injection.", groups = { "MAPPINGS", } )
 public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta<GraphOutput, GraphOutputData> {

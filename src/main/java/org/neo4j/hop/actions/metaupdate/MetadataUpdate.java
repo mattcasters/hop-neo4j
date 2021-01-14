@@ -1,4 +1,4 @@
-package org.neo4j.hop.actions.cypherscript;
+package org.neo4j.hop.actions.metaupdate;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hop.core.Result;
@@ -17,13 +17,13 @@ import org.neo4j.hop.shared.NeoConnection;
 import org.w3c.dom.Node;
 
 @Action(
-    id = "NEO4J_CYPHER_SCRIPT",
-    name = "Neo4j Cypher Script",
-    description = "Execute a Neo4j Cypher script",
-    image = "neo4j_cypher.svg",
-    categoryDescription = "i18n:org.apache.hop.workflow:ActionCategory.Category.Scripting",
+    id = "NEO4J_METADATA_UPDATE",
+    name = "Neo4j Metadata Update",
+    description = "Updates the metadata and lineage information in an audit graph",
+    image = "NEO4J.svg",
+    categoryDescription = "i18n:org.apache.hop.workflow:ActionCategory.Category.Utility",
     documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/")
-public class CypherScript extends ActionBase implements IAction {
+public class MetadataUpdate extends ActionBase implements IAction {
 
   private String connectionName;
 
@@ -31,15 +31,15 @@ public class CypherScript extends ActionBase implements IAction {
 
   private boolean replacingVariables;
 
-  public CypherScript() {
+  public MetadataUpdate() {
     this("", "");
   }
 
-  public CypherScript(String name) {
+  public MetadataUpdate( String name) {
     this(name, "");
   }
 
-  public CypherScript(String name, String description) {
+  public MetadataUpdate( String name, String description) {
     super(name, description);
   }
 

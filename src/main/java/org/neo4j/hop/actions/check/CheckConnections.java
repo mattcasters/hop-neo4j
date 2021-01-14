@@ -23,7 +23,7 @@ import java.util.List;
   description = "Check to see if we can connect to the listed Neo4j databases",
   image = "neo4j_check.svg",
   categoryDescription = "i18n:org.apache.hop.workflow:ActionCategory.Category.Conditions",
-  documentationUrl = "https://github.com/mattcasters/hop-neo4j/"
+  documentationUrl = "https://github.com/mattcasters/hop-neo4j/wiki/"
 )
 public class CheckConnections extends ActionBase implements IAction {
 
