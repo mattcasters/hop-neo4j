@@ -68,20 +68,19 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
   private static final String STRING_RETURNING_GRAPH = "returning_graph";
   private static final String STRING_RETURN_GRAPH_FIELD = "return_graph_field";
 
-
-  @Injection( name = STRING_CONNECTION )
+  @Injection( name = "CONNECTION" )
   private String connection;
-  @Injection( name = STRING_BATCH_SIZE )
+  @Injection( name = "BATCH_SIZE" )
   private String batchSize;
-  @Injection( name = STRING_CREATE_INDEXES )
+  @Injection( name = "CREATE_INDEXES" )
   private boolean creatingIndexes;
-  @Injection( name = STRING_USE_CREATE )
+  @Injection( name = "USE_CREATE" )
   private boolean usingCreate;
-  @Injection( name = STRING_ONLY_CREATE_RELATIONSHIPS )
+  @Injection( name = "ONLY_CREATE_RELATIONSHIPS" )
   private boolean onlyCreatingRelationships;
-  @Injection( name = STRING_READ_ONLY_FROM_NODE )
+  @Injection( name = "READ_ONLY_FROM_NODE" )
   private boolean readOnlyFromNode;
-  @Injection( name = STRING_READ_ONLY_TO_NODE )
+  @Injection( name = "READ_ONLY_TO_NODE" )
   private boolean readOnlyToNode;
 
   @Injection( name = "FROM_NODE_PROPERTY_FIELD", group = "FROM_NODE_PROPS" )
@@ -125,10 +124,10 @@ public class Neo4JOutputMeta extends BaseTransformMeta implements ITransformMeta
   @Injection( name = "REL_VALUE" )
   private String relationshipValue;
 
-  @Injection( name = STRING_RETURNING_GRAPH )
+  @Injection( name = "RETURNING_GRAPH" )
   private boolean returningGraph;
 
-  @Injection( name = STRING_RETURN_GRAPH_FIELD )
+  @Injection( name = "RETURN_GRAPH_FIELD" )
   private String returnGraphField;
 
 

@@ -134,6 +134,13 @@ public class Neo4JOutput extends BaseNeoTransform<Neo4JOutputMeta, Neo4JOutputDa
         data.toOperationType = OperationType.MATCH;
         data.relOperationType = OperationType.CREATE;
       }
+      if ( meta.isReadOnlyFromNode() ) {
+        data.fromOperationType = OperationType.MATCH;
+      }
+      if ( meta.isReadOnlyToNode() ) {
+        data.toOperationType = OperationType.MATCH;
+      }
+
       // No 'From' Node activity?
       //
       if ( meta.getFromNodeLabels().length == 0 && meta.getFromNodeLabelValues().length == 0 ) {

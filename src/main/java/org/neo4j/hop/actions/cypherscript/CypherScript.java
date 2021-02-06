@@ -69,7 +69,7 @@ public class CypherScript extends ActionBase implements IAction {
   public Result execute(Result result, int nr) throws HopException {
 
     IHopMetadataSerializer<NeoConnection> serializer =
-        metadataProvider.getSerializer(NeoConnection.class);
+        getMetadataProvider().getSerializer(NeoConnection.class);
 
     // Replace variables & parameters
     //
