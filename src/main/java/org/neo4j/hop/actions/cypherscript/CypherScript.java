@@ -154,8 +154,7 @@ public class CypherScript extends ActionBase implements IAction {
     return super.getDialogClassName();
   }
 
-  @Override
-  public boolean evaluates() {
+  @Override public boolean isEvaluation() {
     return true;
   }
 

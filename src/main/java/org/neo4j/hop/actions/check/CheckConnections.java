@@ -73,7 +73,7 @@ public class CheckConnections extends ActionBase implements IAction {
 
   @Override public Result execute( Result result, int nr ) throws HopException {
 
-    IHopMetadataSerializer<NeoConnection> serializer = metadataProvider.getSerializer( NeoConnection.class );
+    IHopMetadataSerializer<NeoConnection> serializer = getMetadataProvider().getSerializer( NeoConnection.class );
 
     // Replace variables & parameters
     //
@@ -135,7 +135,7 @@ public class CheckConnections extends ActionBase implements IAction {
     this.connectionNames = connectionNames;
   }
 
-  @Override public boolean evaluates() {
+  @Override public boolean isEvaluation() {
     return true;
   }
 

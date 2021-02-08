@@ -4,7 +4,7 @@
 
   <groupId>org.neo4j.hop</groupId>
   <artifactId>hop-neo4j</artifactId>
-  <version>6.0.11</version>
+  <version>6.0.12</version>
   <packaging>jar</packaging>
 
   <name>hop-neo4j</name>
@@ -22,7 +22,7 @@
   <properties>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hop.version>0.60-SNAPSHOT</hop.version>
+    <hop.version>0.70-SNAPSHOT</hop.version>
     <neo4j.driver.version>4.1.1</neo4j.driver.version>
 
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -30,8 +30,6 @@
     <maven.build.timestamp.format>yyyy-MM-dd hh.mm.ss</maven.build.timestamp.format>
 
 		<jandex-maven-plugin.version>1.0.8</jandex-maven-plugin.version>
-
-		<hop-neo4j-core.version>2.0.6</hop-neo4j-core.version>
   </properties>
 
   <build>
@@ -173,8 +171,8 @@
 
     <dependency>
       <groupId>org.apache.hop</groupId>
-      <artifactId>hop-ui-swt</artifactId>
-      <version>${hop.version}</version>
+      <artifactId>hop-ui</artifactId>
+      <version>0.70-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 

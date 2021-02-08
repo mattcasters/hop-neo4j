@@ -16,6 +16,7 @@ import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Config;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Logging;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
@@ -28,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 @HopMetadata(
   key = "neo4j-connection",
@@ -395,6 +397,10 @@ public class NeoConnection extends HopMetadataBase implements IHopMetadata {
           configBuilder = configBuilder.withMaxTransactionRetryTime( seconds, TimeUnit.MILLISECONDS );
         }
       }
+
+      // Disable info messages: only warnings and above...
+      //
+      configBuilder = configBuilder.withLogging( Logging.javaUtilLogging( Level.WARNING) );
 
       Config config = configBuilder.build();
 

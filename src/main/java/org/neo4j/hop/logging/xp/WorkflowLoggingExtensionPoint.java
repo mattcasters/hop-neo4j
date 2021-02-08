@@ -120,7 +120,6 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
             actionPars.put( "launchingParallel", actionMeta.isLaunchingInParallel() );
             actionPars.put( "start", actionMeta.isStart() );
             actionPars.put( "unconditional", actionMeta.isUnconditional() );
-            actionPars.put( "copyNr", Long.valueOf( actionMeta.getNr() ) );
             actionPars.put( "locationX", actionMeta.getLocation().x );
             actionPars.put( "locationY", actionMeta.getLocation().y );
 
@@ -288,7 +287,6 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
             actionPars.put( "type", EXECUTION_TYPE_ACTION );
             actionPars.put( "id", actionLogChannelId );
             actionPars.put( "workflowId", workflowLogChannelId );
-            actionPars.put( "nr", actionResult.getActionNr() );
             actionPars.put( "comment", actionResult.getComment() );
             actionPars.put( "reason", actionResult.getReason() );
             actionPars.put( "loggingText", transformLoggingText );
@@ -304,7 +302,6 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
             actionExecCypher.append( "SET " );
             actionExecCypher.append( "  e.workflowId = $workflowId " );
             actionExecCypher.append( ", e.loggingText = $loggingText " );
-            actionExecCypher.append( ", e.nr = $nr " );
             actionExecCypher.append( ", e.comment = $comment " );
             actionExecCypher.append( ", e.reason = $reason " );
             actionExecCypher.append( ", e.linesRead = $linesRead " );

@@ -69,7 +69,7 @@ public class MetadataUpdate extends ActionBase implements IAction {
   public Result execute(Result result, int nr) throws HopException {
 
     IHopMetadataSerializer<NeoConnection> serializer =
-        metadataProvider.getSerializer(NeoConnection.class);
+        getMetadataProvider().getSerializer(NeoConnection.class);
 
     // Replace variables & parameters
     //
@@ -155,7 +155,7 @@ public class MetadataUpdate extends ActionBase implements IAction {
   }
 
   @Override
-  public boolean evaluates() {
+  public boolean isEvaluation() {
     return true;
   }
 
