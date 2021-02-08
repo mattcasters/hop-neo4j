@@ -262,7 +262,7 @@ public class NeoConnection extends HopMetadataBase implements IHopMetadata {
      * bolt+routing://core-server:port/?policy=MyPolicy
      */
     String url = "";
-    if ( isRouting() ) {
+    if ( isUsingRouting(variables) ) {
       url += "neo4j";
     } else {
       url += "bolt";
