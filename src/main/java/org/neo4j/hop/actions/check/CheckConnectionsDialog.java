@@ -135,6 +135,7 @@ public class CheckConnectionsDialog extends ActionDialog implements IActionDialo
     ColumnInfo[] columns = new ColumnInfo[] {
       new ColumnInfo( "Connection name", ColumnInfo.COLUMN_TYPE_CCOMBO, availableConnectionNames, false ),
     };
+    columns[0].setUsingVariables( true );
     wConnections = new TableView( action, shell, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI, columns,
       action.getConnectionNames().size(), false, lsMod, props );
     FormData fdConnections = new FormData();

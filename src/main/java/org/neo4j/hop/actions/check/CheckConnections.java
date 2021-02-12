@@ -94,8 +94,7 @@ public class CheckConnections extends ActionBase implements IAction {
           throw new HopException( "Unable to find connection with name '" + connectionName + "'" );
         }
 
-        Session session = connection.getSession( log, this);
-        session.close();
+        connection.test(this);
 
       } catch ( Exception e ) {
         // Something bad happened, log the error, flag error
