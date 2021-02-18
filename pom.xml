@@ -23,7 +23,7 @@
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hop.version>0.70-SNAPSHOT</hop.version>
-    <neo4j.driver.version>4.1.1</neo4j.driver.version>
+    <neo4j.driver.version>4.2.1</neo4j.driver.version>
 
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
