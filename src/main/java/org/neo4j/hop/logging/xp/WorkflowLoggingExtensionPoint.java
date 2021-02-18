@@ -134,7 +134,6 @@ public class WorkflowLoggingExtensionPoint implements IExtensionPoint<IWorkflowE
             actionCypher.append( ", a.launchingParallel = $launchingParallel " );
             actionCypher.append( ", a.start = $start " );
             actionCypher.append( ", a.unconditional = $unconditional " );
-            actionCypher.append( ", a.copyNr = $copyNr " );
             actionCypher.append( ", a.locationX = $locationX " );
             actionCypher.append( ", a.locationY = $locationY " );
 
