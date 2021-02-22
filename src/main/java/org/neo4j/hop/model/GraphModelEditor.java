@@ -18,6 +18,7 @@ import org.apache.hop.ui.core.metadata.MetadataManager;
 import org.apache.hop.ui.core.widget.ColumnInfo;
 import org.apache.hop.ui.core.widget.TableView;
 import org.apache.hop.ui.hopgui.HopGui;
+import org.apache.hop.ui.hopgui.perspective.metadata.MetadataPerspective;
 import org.apache.hop.ui.pipeline.transform.BaseTransformDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -108,7 +109,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
   private int middle;
   private int margin;
 
-  public GraphModelEditor( HopGui hopGui, MetadataManager<GraphModel> manager, GraphModel metadata) {
+  public GraphModelEditor(HopGui hopGui, MetadataManager<GraphModel> manager, GraphModel metadata) {
     super(hopGui, manager, metadata);
     this.inputRowMeta = new RowMeta();
 
@@ -149,10 +150,18 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
   public void setWidgetsContent() {
     // Model tab
     wModelName.setText(Const.NVL(graphModel.getName(), ""));
-    wModelName.addListener(SWT.Modify, event -> graphModel.setName(wModelName.getText()));
+    wModelName.addListener(
+        SWT.Modify,
+        event -> {
+          graphModel.setName(wModelName.getText());
+          setChanged();
+        });
     wModelDescription.setText(Const.NVL(graphModel.getDescription(), ""));
     wModelDescription.addListener(
-        SWT.Modify, event -> graphModel.setDescription(wModelDescription.getText()));
+        SWT.Modify, event -> {
+          graphModel.setDescription(wModelDescription.getText());
+          setChanged();
+      });
 
     refreshNodesList();
     if (graphModel.getNodes().size() > 0) {
@@ -172,8 +181,9 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
     enableFields();
   }
 
-  @Override public void getWidgetsContent( GraphModel gm ) {
-    gm.replace( graphModel );
+  @Override
+  public void getWidgetsContent(GraphModel gm) {
+    gm.replace(graphModel);
   }
 
   private void enableFields() {
@@ -527,6 +537,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
             String[] nodeNames = graphModel.getNodeNames();
             wNodesList.setItems(nodeNames);
             wNodesList.setSelection(Const.indexOfString(nodeName, nodeNames));
+            setChanged();
           }
         });
     props.setLook(wNodeName);
@@ -549,6 +560,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
         event -> {
           if (activeNode != null) {
             activeNode.setDescription(wNodeDescription.getText());
+            setChanged();
           }
         });
     props.setLook(wNodeDescription);
@@ -709,6 +721,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
   private void getNodeLabelsFromView() {
 
     if (activeNode != null) {
+      setChanged();
       if (monitorLabels) {
         // System.out.println( "Labels changed! " + new Date().getTime() + " found " +
         // wNodeLabels.nrNonEmpty() + " labels" );
@@ -739,6 +752,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
   private void getNodePropertiesFromView() {
 
     if (activeNode != null) {
+      setChanged();
       if (monitorNodeProperties) {
         // System.out.println( "Labels changed! " + new Date().getTime() + " found " +
         // wNodeProperties.nrNonEmpty() + " properties" );
@@ -779,7 +793,8 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
     String[] fieldNames = inputRowMeta.getFieldNames();
 
     EnterListDialog dialog =
-        new EnterListDialog(hopGui.getShell(), SWT.DIALOG_TRIM | SWT.RESIZE | SWT.CLOSE, fieldNames);
+        new EnterListDialog(
+            hopGui.getShell(), SWT.DIALOG_TRIM | SWT.RESIZE | SWT.CLOSE, fieldNames);
     String[] fields = dialog.open();
     if (fields != null) {
 
@@ -979,6 +994,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
             wRelationshipsList.setItems(relationshipNames);
             wRelationshipsList.setSelection(
                 Const.indexOfString(relationshipName, relationshipNames));
+            setChanged();
           }
         });
 
@@ -1001,6 +1017,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
         event -> {
           if (activeRelationship != null) {
             activeRelationship.setDescription(wRelDescription.getText());
+            setChanged();
           }
         });
 
@@ -1023,6 +1040,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
         event -> {
           if (activeRelationship != null) {
             activeRelationship.setLabel(wRelLabel.getText());
+            setChanged();
           }
         });
 
@@ -1045,6 +1063,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
         event -> {
           if (activeRelationship != null) {
             activeRelationship.setNodeSource(wRelSource.getText());
+            setChanged();
           }
         });
 
@@ -1067,6 +1086,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
         event -> {
           if (activeRelationship != null) {
             activeRelationship.setNodeTarget(wRelTarget.getText());
+            setChanged();
           }
         });
 
@@ -1135,6 +1155,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
   private void getRelationshipPropertiesFromView() {
 
     if (activeRelationship != null) {
+      setChanged();
       if (monitorRelProperties) {
         // System.out.println( "Relationship properties changed! " + new Date().getTime() + " found
         // " + wRelProperties.nrNonEmpty() + " properties" );
@@ -1797,7 +1818,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
     try {
       EnterTextDialog dialog =
           new EnterTextDialog(
-            getShell(),
+              getShell(),
               "Model JSON",
               "This is the JSON of the graph model",
               graphModel.getJSONString(),
@@ -1826,7 +1847,11 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
 
       EnterTextDialog dialog =
           new EnterTextDialog(
-            getShell(), "Model JSON", "This is the JSON of the graph model", prettyJsonString, true);
+              getShell(),
+              "Model JSON",
+              "This is the JSON of the graph model",
+              prettyJsonString,
+              true);
       dialog.open();
     } catch (Exception e) {
       new ErrorDialog(getShell(), "ERROR", "Error serializing to JSON", e);
@@ -1837,7 +1862,7 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
     try {
       EnterTextDialog dialog =
           new EnterTextDialog(
-            getShell(),
+              getShell(),
               "Cypher Workbench Export",
               "Paste the cypher workbench model export (JSON) below",
               "{}",
@@ -1863,5 +1888,12 @@ public class GraphModelEditor extends MetadataEditor<GraphModel> {
 
   private String getModelJson() throws HopException {
     return graphModel.getJSONString();
+  }
+
+  protected void setChanged() {
+    if (this.isChanged == false) {
+      this.isChanged = true;
+      MetadataPerspective.getInstance().updateEditor(this);
+    }
   }
 }
