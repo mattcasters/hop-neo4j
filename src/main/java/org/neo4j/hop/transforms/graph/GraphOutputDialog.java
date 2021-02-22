@@ -66,6 +66,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
   private Label wlReturnGraphField;
   private TextVar wReturnGraphField;
   private Button wValidateAgainstModel;
+  private Button wOutOfOrderAllowed;
 
   private TableView wFieldMappings;
 
@@ -248,7 +249,26 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     fdValidateAgainstModel.top = new FormAttachment( wlValidateAgainstModel, 0, SWT.CENTER );
     wValidateAgainstModel.setLayoutData( fdValidateAgainstModel );
     wValidateAgainstModel.addListener( SWT.Selection, e -> enableFields() );
-    lastControl = wValidateAgainstModel;
+    lastControl = wlValidateAgainstModel;
+
+    Label wlOutOfOrderAllowed = new Label( shell, SWT.RIGHT );
+    wlOutOfOrderAllowed.setText( "Allow out of order updates?" );
+    wlOutOfOrderAllowed.setToolTipText( "The transform can group similar cypher statements to increase performance." );
+    props.setLook( wlOutOfOrderAllowed );
+    FormData fdlOutOfOrderAllowed = new FormData();
+    fdlOutOfOrderAllowed.left = new FormAttachment( 0, 0 );
+    fdlOutOfOrderAllowed.right = new FormAttachment( middle, -margin );
+    fdlOutOfOrderAllowed.top = new FormAttachment( lastControl, 2 * margin );
+    wlOutOfOrderAllowed.setLayoutData( fdlOutOfOrderAllowed );
+    wOutOfOrderAllowed = new Button( shell, SWT.CHECK | SWT.BORDER );
+    wOutOfOrderAllowed.setToolTipText( returnGraphTooltipText );
+    props.setLook( wOutOfOrderAllowed );
+    FormData fdOutOfOrderAllowed = new FormData();
+    fdOutOfOrderAllowed.left = new FormAttachment( middle, 0 );
+    fdOutOfOrderAllowed.right = new FormAttachment( 100, 0 );
+    fdOutOfOrderAllowed.top = new FormAttachment( wlOutOfOrderAllowed, 0, SWT.CENTER );
+    wOutOfOrderAllowed.setLayoutData( fdOutOfOrderAllowed );
+    lastControl = wlOutOfOrderAllowed;
 
     // Some buttons at the bottom...
     //
@@ -483,6 +503,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     wReturnGraphField.setText( Const.NVL( input.getReturnGraphField(), "" ) );
 
     wValidateAgainstModel.setSelection( input.isValidatingAgainstModel() );
+    wOutOfOrderAllowed.setSelection( input.isOutOfOrderAllowed() );
 
     enableFields();
   }
@@ -502,6 +523,7 @@ public class GraphOutputDialog extends BaseTransformDialog implements ITransform
     input.setReturnGraphField( wReturnGraphField.getText() );
 
     input.setValidatingAgainstModel( wValidateAgainstModel.getSelection() );
+    input.setOutOfOrderAllowed( wOutOfOrderAllowed.getSelection() );
 
     List<FieldModelMapping> mappings = new ArrayList<>();
     for ( int i = 0; i < wFieldMappings.nrNonEmpty(); i++ ) {

@@ -48,6 +48,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
   public static final String TARGET_NAME = "target_name";
   public static final String TARGET_PROPERTY = "target_property";
   public static final String VALIDATE_AGAINST_MODEL = "validate_against_model";
+  public static final String OUT_OF_ORDER_ALLOWED = "out_of_order_allowed";
 
   @Injection( name = CONNECTION )
   private String connectionName;
@@ -70,6 +71,9 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
   @Injection( name = VALIDATE_AGAINST_MODEL )
   private boolean validatingAgainstModel;
 
+  @Injection( name = OUT_OF_ORDER_ALLOWED )
+  private boolean outOfOrderAllowed;
+
   @InjectionDeep
   private List<FieldModelMapping> fieldModelMappings;
 
@@ -78,6 +82,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
     super();
     fieldModelMappings = new ArrayList<>();
     creatingIndexes = true;
+    outOfOrderAllowed = true;
   }
 
   @Override public void setDefault() {
@@ -117,6 +122,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
     xml.append( XmlHandler.addTagValue( RETURNING_GRAPH, returningGraph ) );
     xml.append( XmlHandler.addTagValue( RETURN_GRAPH_FIELD, returnGraphField ) );
     xml.append( XmlHandler.addTagValue( VALIDATE_AGAINST_MODEL, validatingAgainstModel ) );
+    xml.append( XmlHandler.addTagValue( OUT_OF_ORDER_ALLOWED, outOfOrderAllowed ) );
 
     xml.append( XmlHandler.openTag( MAPPINGS ) );
     for ( FieldModelMapping fieldModelMapping : fieldModelMappings ) {
@@ -140,6 +146,7 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
     returningGraph = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, RETURNING_GRAPH ) );
     returnGraphField = XmlHandler.getTagValue( transformNode, RETURN_GRAPH_FIELD );
     validatingAgainstModel = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, VALIDATE_AGAINST_MODEL ) );
+    outOfOrderAllowed = "Y".equalsIgnoreCase( XmlHandler.getTagValue( transformNode, OUT_OF_ORDER_ALLOWED ) );
 
     // Parse parameter mappings
     //
@@ -284,5 +291,21 @@ public class GraphOutputMeta extends BaseTransformMeta implements ITransformMeta
    */
   public void setValidatingAgainstModel( boolean validatingAgainstModel ) {
     this.validatingAgainstModel = validatingAgainstModel;
+  }
+
+  /**
+   * Gets outOfOrderAllowed
+   *
+   * @return value of outOfOrderAllowed
+   */
+  public boolean isOutOfOrderAllowed() {
+    return outOfOrderAllowed;
+  }
+
+  /**
+   * @param outOfOrderAllowed The outOfOrderAllowed to set
+   */
+  public void setOutOfOrderAllowed( boolean outOfOrderAllowed ) {
+    this.outOfOrderAllowed = outOfOrderAllowed;
   }
 }

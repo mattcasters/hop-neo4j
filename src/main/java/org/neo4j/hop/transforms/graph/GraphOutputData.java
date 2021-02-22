@@ -11,6 +11,7 @@ import org.apache.hop.core.row.IRowMeta;
 import org.apache.hop.pipeline.transform.ITransformData;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GraphOutputData extends BaseNeoTransformData implements ITransformData {
@@ -30,4 +31,11 @@ public class GraphOutputData extends BaseNeoTransformData implements ITransformD
   public HashMap<String, Map<GraphProperty, Integer>> relationshipPropertyIndexMap;
   public boolean version4;
   public ModelValidator modelValidator;
+
+  // How many records were dumped into the unwind maps?
+  //
+  public int unwindCount;
+
+  // A mapping between a cypher statements and it's unwind parameters map...
+  public Map<String, List<Map<String, Object>>> unwindMapList;
 }
