@@ -442,7 +442,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
 
     // See if there's actual work to be done...
     //
-    if (data.unwindCount==0 || data.unwindMapList==null || data.unwindMapList.isEmpty()) {
+    if (data.unwindCount == 0 || data.unwindMapList == null || data.unwindMapList.isEmpty()) {
       return false;
     }
 
@@ -588,7 +588,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
           nodes.add(node);
         }
         nodeProperties.add(
-          new NodeAndPropertyData( node, graphProperty, valueMeta, valueData, index ) );
+            new NodeAndPropertyData(node, graphProperty, valueMeta, valueData, index));
       }
     }
 
@@ -668,7 +668,6 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
       cypher.append("UNWIND $props AS pr ");
       cypher.append(Const.CR);
     }
-
 
     // No relationships case...
     //
@@ -944,7 +943,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
 
   private String buildParameterClause(String parameterName) {
     if (meta.isOutOfOrderAllowed()) {
-      return "pr."+parameterName;
+      return "pr." + parameterName;
     } else {
       return "$" + parameterName;
     }
@@ -956,13 +955,16 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
   }
 
   private void wrapUpTransaction() {
-    if (data.outputCount > 0) {
 
-      if (meta.isOutOfOrderAllowed()) {
-        emptyUnwindMap();
-      } else {
+    if (meta.isOutOfOrderAllowed()) {
+      boolean errors = emptyUnwindMap();
+      if (errors) {
+        stopAll();
+        setErrors(1L);
+      }
+    } else {
+      if (data.outputCount > 0) {
         data.transaction.commit();
-
         data.transaction.close();
 
         // Force creation of a new transaction on the next batch of records
@@ -1057,7 +1059,7 @@ public class GraphOutput extends BaseNeoTransform<GraphOutputMeta, GraphOutputDa
       if (!nodes.contains(node)) {
         nodes.add(node);
       }
-      nodeProperties.add( new NodeAndPropertyData( node, graphProperty, valueMeta, valueData, index ) );
+      nodeProperties.add(new NodeAndPropertyData(node, graphProperty, valueMeta, valueData, index));
     }
 
     // Evaluate whether or not the node property is primary and null
