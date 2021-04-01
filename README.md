@@ -1,3 +1,7 @@
+# Archived!
+
+Important: this code has been integrated into Apache Hop itself.  This means that if you download a recent version you'll get the most recent version of the Neo4j plugins as well.
+
 # Documentation
 
 These plugins are an [Apache Hop (incubating)](http://hop.apache.org) port and a direct mirror of the Kettle Neo4j plugins located here:
